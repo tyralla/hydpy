@@ -1,0 +1,387 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>selectiontools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sequencetools" href="sequencetools.html" />
+    <link rel="prev" title="pub" href="pub.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sequencetools.html" title="sequencetools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pub.html" title="pub"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" accesskey="U">Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="selectiontools">
+<span id="id1"></span><h1>selectiontools<a class="headerlink" href="#selectiontools" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.core.selectiontools"></span><dl class="class">
+<dt id="hydpy.core.selectiontools.Selections">
+<em class="property">class </em><code class="descclassname">hydpy.core.selectiontools.</code><code class="descname">Selections</code><span class="sig-paren">(</span><em>*selections</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Collects <a class="reference internal" href="#hydpy.core.selectiontools.Selection" title="hydpy.core.selectiontools.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instances.</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd><ul class="first last simple">
+<li>? (<a class="reference internal" href="#hydpy.core.selectiontools.Selection" title="hydpy.core.selectiontools.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a>): An arbitrary number of <a class="reference internal" href="#hydpy.core.selectiontools.Selection" title="hydpy.core.selectiontools.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a>
+objects, which can be added (and removed) on demand.  Choose
+attribute names that are meaningfull within your specific project.</li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="hydpy.core.selectiontools.Selections.names">
+<code class="descname">names</code><a class="headerlink" href="#hydpy.core.selectiontools.Selections.names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Names of the actual selections.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.selectiontools.Selections.selections">
+<code class="descname">selections</code><a class="headerlink" href="#hydpy.core.selectiontools.Selections.selections" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual selections themselves.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selections.assignrepr">
+<code class="descname">assignrepr</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selections.assignrepr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selections.assignrepr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a> string with an prefixed assignement.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>prefix(<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Usually something like ‘x = ‘.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.selectiontools.Selection">
+<em class="property">class </em><code class="descclassname">hydpy.core.selectiontools.</code><code class="descname">Selection</code><span class="sig-paren">(</span><em>name</em>, <em>nodes=None</em>, <em>elements=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Defines a combination of <code class="xref py py-class docutils literal"><span class="pre">Node</span></code> and
+<code class="xref py py-class docutils literal"><span class="pre">Element</span></code> objects suitable for a
+specific task.</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd><ul class="first last simple">
+<li>name (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Name of the selection.</li>
+<li>nodes (<code class="xref py py-class docutils literal"><span class="pre">Nodes</span></code>):
+Currently selected nodes.</li>
+<li>elements (<code class="xref py py-class docutils literal"><span class="pre">Elements</span></code>):
+Currently selected elements.</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.select_upstream">
+<code class="descname">select_upstream</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.select_upstream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.select_upstream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limit the current selection to the network upstream of the given
+starting point, including the starting point itself.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>device (<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> or
+<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a>): Lowest point
+to be selected.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.deselect_upstream">
+<code class="descname">deselect_upstream</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.deselect_upstream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.deselect_upstream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the network upstream of the given starting point from the
+current selection, including the starting point itself.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>device (<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> or
+<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a>): Highest point
+to be deselected.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.getby_upstream">
+<code class="descname">getby_upstream</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.getby_upstream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.getby_upstream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the network upstream of the given starting point, including
+the starting point itself.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>device (<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> or
+<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a>): Lowest point
+to be selected.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.select_modelclasses">
+<code class="descname">select_modelclasses</code><span class="sig-paren">(</span><em>*modelclass</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.select_modelclasses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.select_modelclasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limits the current selection to all elements containing the
+given modelclass(es).  (All nodes are removed.)</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>modelclass (subclass of <code class="xref py py-class docutils literal"><span class="pre">Model</span></code>):
+Model type(s) as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.deselect_modelclasses">
+<code class="descname">deselect_modelclasses</code><span class="sig-paren">(</span><em>*modelclasses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.deselect_modelclasses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.deselect_modelclasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limits the current selection to all elements not containing the
+given modelclass(es).  (All nodes are removed.)</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>modelclass (subclass of <code class="xref py py-class docutils literal"><span class="pre">Model</span></code>):
+Model type(s) as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.getby_modelclasses">
+<code class="descname">getby_modelclasses</code><span class="sig-paren">(</span><em>*modelclasses</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.getby_modelclasses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.getby_modelclasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all elements of the current selection containing the given
+modelclass(es).</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>modelclass (subclass of <code class="xref py py-class docutils literal"><span class="pre">Model</span></code>):
+Model type(s) as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.select_nodenames">
+<code class="descname">select_nodenames</code><span class="sig-paren">(</span><em>*substrings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.select_nodenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.select_nodenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limits the current selection to all nodes with a name
+containing the given substring(s).  (All elements are unaffected.)</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>substrings (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): (Possible) Part(s) of the nodes
+name as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.deselect_nodenames">
+<code class="descname">deselect_nodenames</code><span class="sig-paren">(</span><em>*substrings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.deselect_nodenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.deselect_nodenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limits the current selection to all nodes with a name
+not containing the given substring(s).  (All elements are unaffected.)</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>substrings (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): (Possible) Part(s) of the nodes
+name as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.getby_nodenames">
+<code class="descname">getby_nodenames</code><span class="sig-paren">(</span><em>*substrings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.getby_nodenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.getby_nodenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all nodes of the current selection with a name
+containing the given substrings(s).</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>substrings (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): (Possible) Part(s) of the nodes
+name as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.select_elementnames">
+<code class="descname">select_elementnames</code><span class="sig-paren">(</span><em>*substrings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.select_elementnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.select_elementnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limits the current selection to all elements with a name
+containing the given substring(s).  (All nodes are unaffected.)</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>substrings (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): (Possible) Part(s) of the elements
+name as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.deselect_elementnames">
+<code class="descname">deselect_elementnames</code><span class="sig-paren">(</span><em>*substrings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.deselect_elementnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.deselect_elementnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Limits the current selection to all elements with a name
+not containing the given substring(s).  (All nodes are unaffected.)</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>substrings (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): (Possible) Part(s) of the elements
+name as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.getby_elementnames">
+<code class="descname">getby_elementnames</code><span class="sig-paren">(</span><em>*substrings</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.getby_elementnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.getby_elementnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all elements of the current selection with a name
+containing the given substrings(s).</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>substrings (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): (Possible) Part(s) of the elements
+name as the selection criterion/criteria.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a semi-deep copy of the current selection.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><ul class="first last simple">
+<li>name (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Name of the new <a class="reference internal" href="#hydpy.core.selectiontools.Selection" title="hydpy.core.selectiontools.Selection"><code class="xref py py-class docutils literal"><span class="pre">Selection</span></code></a> instance.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.selectiontools.Selection.assignrepr">
+<code class="descname">assignrepr</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/selectiontools.html#Selection.assignrepr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.selectiontools.Selection.assignrepr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a> string with an prefixed assignement.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>prefix(<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Usually something like ‘x = ‘.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pub.html"
+                        title="previous chapter">pub</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sequencetools.html"
+                        title="next chapter">sequencetools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/selectiontools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sequencetools.html" title="sequencetools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pub.html" title="pub"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" >Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1962 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lland.lland_model &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lland.lland_model</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># imports...</span>
+<span class="c1"># ...standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">modeltools</span>
+<span class="kn">from</span> <span class="nn">hydpy.cythons</span> <span class="k">import</span> <span class="n">modelutils</span>
+<span class="c1"># ...model specifc</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland.lland_constants</span> <span class="k">import</span> <span class="n">WASSER</span><span class="p">,</span> <span class="n">VERS</span>
+
+
+<div class="viewcode-block" id="calc_nkor_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_nkor_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_nkor_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adjust the given precipitation values.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KG`</span>
+
+<span class="sd">    Required input sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_inputs.Nied`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.NKor`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`NKor = KG \\cdot Nied`</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">    &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nhru(3)</span>
+<span class="sd">    &gt;&gt;&gt; kg(.8, 1., 1.2)</span>
+<span class="sd">    &gt;&gt;&gt; inputs.nied = 10.</span>
+<span class="sd">    &gt;&gt;&gt; model.calc_nkor_v1()</span>
+<span class="sd">    &gt;&gt;&gt; fluxes.nkor</span>
+<span class="sd">    nkor(8.0, 10.0, 12.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">flu</span><span class="o">.</span><span class="n">nkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">kg</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">inp</span><span class="o">.</span><span class="n">nied</span></div>
+
+
+<div class="viewcode-block" id="calc_tkor_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_tkor_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_tkor_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adjust the given air temperature values.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KT`</span>
+
+<span class="sd">    Required input sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_inputs.TemL`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.TKor`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`TKor = KT + TemL`</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">    &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nhru(3)</span>
+<span class="sd">    &gt;&gt;&gt; kt(-2., 0., 2.)</span>
+<span class="sd">    &gt;&gt;&gt; inputs.teml(1.)</span>
+<span class="sd">    &gt;&gt;&gt; model.calc_tkor_v1()</span>
+<span class="sd">    &gt;&gt;&gt; fluxes.tkor</span>
+<span class="sd">    tkor(-1.0, 1.0, 3.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">kt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">inp</span><span class="o">.</span><span class="n">teml</span></div>
+
+
+<div class="viewcode-block" id="calc_et0_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_et0_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_et0_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate reference evapotranspiration after Turc-Wendling.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KE`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KF`</span>
+
+<span class="sd">    Required input sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_inputs.Glob`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.TKor`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.ET0`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`ET0 = KE \\cdot</span>
+<span class="sd">      \\frac{(8.64 \\cdot Glob+93 \\cdot KF) \\cdot (TKor+22)}</span>
+<span class="sd">      {165 \\cdot (TKor+123) \\cdot (1 + 0.00019 \\cdot min(HNN, 600))}`</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">    &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nhru(3)</span>
+<span class="sd">    &gt;&gt;&gt; ke(1.1)</span>
+<span class="sd">    &gt;&gt;&gt; kf(.6)</span>
+<span class="sd">    &gt;&gt;&gt; hnn(200., 600., 1000.)</span>
+<span class="sd">    &gt;&gt;&gt; inputs.glob = 200.</span>
+<span class="sd">    &gt;&gt;&gt; fluxes.tkor = 15.</span>
+<span class="sd">    &gt;&gt;&gt; model.calc_et0_v1()</span>
+<span class="sd">    &gt;&gt;&gt; fluxes.et0</span>
+<span class="sd">    et0(1.535855, 1.431075, 1.431075)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">flu</span><span class="o">.</span><span class="n">et0</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">ke</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="p">(((</span><span class="mf">8.64</span><span class="o">*</span><span class="n">inp</span><span class="o">.</span><span class="n">glob</span><span class="o">+</span><span class="mf">93.</span><span class="o">*</span><span class="n">con</span><span class="o">.</span><span class="n">kf</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">*</span>
+                                  <span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="mf">22.</span><span class="p">))</span> <span class="o">/</span>
+                                 <span class="p">(</span><span class="mf">165.</span><span class="o">*</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="mf">123.</span><span class="p">)</span> <span class="o">*</span>
+                                  <span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="mf">0.00019</span><span class="o">*</span><span class="nb">min</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">hnn</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mf">600.</span><span class="p">)))))</span></div>
+
+
+<div class="viewcode-block" id="calc_evpo_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_evpo_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_evpo_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate land use and month specific values of potential</span>
+<span class="sd">    evapotranspiration.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.FLn`</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.MOY`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.ET0`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvPo`</span>
+
+<span class="sd">    Additional requirements:</span>
+<span class="sd">      :attr:`~hydpy.core.modeltools.Model.idx_sim`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`EvPo = FLn \\cdot ET0`</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">        For clarity, this is more of a kind of an integration example.</span>
+<span class="sd">        Parameter :class:`~hydpy.models.lland.lland_control.FLn` both</span>
+<span class="sd">        depends on time (the actual month) and space (the actual land use).</span>
+<span class="sd">        Firstly, let us define a initialization time period spanning the</span>
+<span class="sd">        transition from June to July:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy import pub, Timegrid, Timegrids</span>
+<span class="sd">        &gt;&gt;&gt; pub.timegrids = Timegrids(Timegrid(&#39;30.06.2000&#39;,</span>
+<span class="sd">        ...                                    &#39;02.07.2000&#39;,</span>
+<span class="sd">        ...                                    &#39;1d&#39;))</span>
+
+<span class="sd">        Secondly, assume that the considered subbasin is differenciated in</span>
+<span class="sd">        two HRUs, one of primarily consisting of arable land and the other</span>
+<span class="sd">        one of deciduous forests:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(2)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, LAUBW)</span>
+
+<span class="sd">        Thirdly, set the :class:`~hydpy.models.lland.lland_control.FLn`</span>
+<span class="sd">        values, one for the relevant months and land use classes:</span>
+
+<span class="sd">        &gt;&gt;&gt; fln.acker_jun = 1.299</span>
+<span class="sd">        &gt;&gt;&gt; fln.acker_jul = 1.304</span>
+<span class="sd">        &gt;&gt;&gt; fln.laubw_jun = 1.350</span>
+<span class="sd">        &gt;&gt;&gt; fln.laubw_jul = 1.365</span>
+
+<span class="sd">        Fourthly, the index array connecting the simulation time steps</span>
+<span class="sd">        defined above and the month indexes (0...11) can be retrieved</span>
+<span class="sd">        from the :mod:`~hydpy.pub` module.  This can be done manually</span>
+<span class="sd">        more conveniently via its update method:</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.moy.update()</span>
+<span class="sd">        &gt;&gt;&gt; derived.moy</span>
+<span class="sd">        moy(5, 6)</span>
+
+<span class="sd">        Finally, the actual method (with its simple equation) is applied</span>
+<span class="sd">        as usual:</span>
+
+<span class="sd">        &gt;&gt;&gt; fluxes.et0 = 2.</span>
+<span class="sd">        &gt;&gt;&gt; model.idx_sim = 0</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_evpo_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evpo</span>
+<span class="sd">        evpo(2.598, 2.7)</span>
+<span class="sd">        &gt;&gt;&gt; model.idx_sim = 1</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_evpo_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evpo</span>
+<span class="sd">        evpo(2.608, 2.73)</span>
+
+<span class="sd">        Reset module :mod:`~hydpy.pub` to not interfere the following</span>
+<span class="sd">        examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; pub.timegrids = None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">flu</span><span class="o">.</span><span class="n">evpo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">fln</span><span class="p">[</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">der</span><span class="o">.</span><span class="n">moy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_sim</span><span class="p">]]</span> <span class="o">*</span> <span class="n">flu</span><span class="o">.</span><span class="n">et0</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_nbes_inzp_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_nbes_inzp_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_nbes_inzp_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate throughfall and update the interception storage</span>
+<span class="sd">    accordingly.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KInz`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.NKor`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.NBes`</span>
+
+<span class="sd">    Updated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.Inzp`</span>
+
+<span class="sd">    Additional requirements:</span>
+<span class="sd">      :attr:`~hydpy.core.modeltools.Model.idx_sim`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`NBes = \\Bigl \\lbrace</span>
+<span class="sd">      {</span>
+<span class="sd">      {PKor \\ | \\ Inzp = KInz}</span>
+<span class="sd">      \\atop</span>
+<span class="sd">      {0 \\ | \\ Inzp &lt; KInz}</span>
+<span class="sd">      }`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        Initialize six HRUs with different land usages:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(4)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(SIED_D, FEUCHT, GLETS, WASSER)</span>
+
+<span class="sd">        Define values for the maximum interception storage directly:</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kinz.sied_d_jul = 2.</span>
+<span class="sd">        &gt;&gt;&gt; derived.kinz.feucht_jul = 1.</span>
+<span class="sd">        &gt;&gt;&gt; derived.kinz.glets_jul = 0.</span>
+<span class="sd">        &gt;&gt;&gt; derived.kinz.wasser_jul = 0.</span>
+
+<span class="sd">        Assume that the three consecutive initialization time steps</span>
+<span class="sd">        lie in three different months (does not make sense for the</span>
+<span class="sd">        selected time step of one day, but allows for a more rigorous</span>
+<span class="sd">        testing of proper indexing):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.moy.shape = 3</span>
+<span class="sd">        &gt;&gt;&gt; derived.moy = numpy.array([5, 6, 7])</span>
+<span class="sd">        &gt;&gt;&gt; model.idx_sim = 1</span>
+
+<span class="sd">        The dense settlement and the wetland area start with a initial</span>
+<span class="sd">        interception storage of 1/2 mm, the glacier and water area (must)</span>
+<span class="sd">        start with 0 mm.  In the first example, actual precipition is 2 mm:</span>
+
+<span class="sd">        &gt;&gt;&gt; states.inzp(0.5, 0.5, 0., 0.)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nkor = 1.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_nbes_inzp_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.inzp</span>
+<span class="sd">        inzp(1.5, 1.0, 0.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nbes</span>
+<span class="sd">        nbes(0.0, 0.5, 1.0, 1.0)</span>
+
+<span class="sd">        Only for the settled area, interception capacity is not exceeded,</span>
+<span class="sd">        meaning not through fall occurs.</span>
+
+<span class="sd">        If there is no precipitation, there is of course also no through</span>
+<span class="sd">        fall and interception storage remains unchanged:</span>
+
+<span class="sd">        &gt;&gt;&gt; states.inzp(0.5, 0.5, 0., 0.)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nkor = 0.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_nbes_inzp_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.inzp</span>
+<span class="sd">        inzp(0.5, 0.5, 0.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nbes</span>
+<span class="sd">        nbes(0.0, 0.0, 0.0, 0.0)</span>
+
+<span class="sd">        Note the following to peculiarities:  Firstly, the behaviour of</span>
+<span class="sd">        the glacier area is due to its zero interception capacity.  On the</span>
+<span class="sd">        contrary, the behaviour of the water area hard coded.  Hence,</span>
+<span class="sd">        increasing the interception capacity shows no effect:</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kinz.glets_jul = 1.</span>
+<span class="sd">        &gt;&gt;&gt; derived.kinz.wasser_jul = 1.</span>
+<span class="sd">        &gt;&gt;&gt; states.inzp(0.5, 0.5, 0., 0.)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nkor = 1.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_nbes_inzp_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.inzp</span>
+<span class="sd">        inzp(1.5, 1.0, 1.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nbes</span>
+<span class="sd">        nbes(0.0, 0.5, 0.0, 1.0)</span>
+
+<span class="sd">        Secondly, due to discontinuous changes of the interception capacity</span>
+<span class="sd">        between two months, through fall can occur after the corresponding</span>
+<span class="sd">        precipitation event has occured.  In the last example, this results</span>
+<span class="sd">        from the given decrease of the glaciers interception capacity:</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kinz.glets_jul = .6</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nkor = 0.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_nbes_inzp_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.inzp</span>
+<span class="sd">        inzp(1.5, 1.0, 0.6, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nbes</span>
+<span class="sd">        nbes(0.0, 0.0, 0.4, 0.0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">nbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="nb">max</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">nkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">sta</span><span class="o">.</span><span class="n">inzp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span>
+                    <span class="n">der</span><span class="o">.</span><span class="n">kinz</span><span class="p">[</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">der</span><span class="o">.</span><span class="n">moy</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_sim</span><span class="p">]],</span> <span class="mf">0.</span><span class="p">)</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">inzp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">flu</span><span class="o">.</span><span class="n">nkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">flu</span><span class="o">.</span><span class="n">nbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">nbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">flu</span><span class="o">.</span><span class="n">nkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">inzp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="calc_evi_inzp_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_evi_inzp_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_evi_inzp_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate interception evaporation and update the interception</span>
+<span class="sd">    storage accordingly.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.TRefT`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.TRefN`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvPo`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvI`</span>
+
+<span class="sd">    Updated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.Inzp`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`EvI = \\Bigl \\lbrace</span>
+<span class="sd">      {</span>
+<span class="sd">      {EvPo \\ | \\ Inzp &gt; 0}</span>
+<span class="sd">      \\atop</span>
+<span class="sd">      {0 \\ | \\ Inzp = 0}</span>
+<span class="sd">      }`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Initialize four HRUs with different combinations of land usage</span>
+<span class="sd">        and initial interception storage and apply a value of potential</span>
+<span class="sd">        evaporation of 3 mm on each one:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(4)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, ACKER, ACKER, WASSER)</span>
+<span class="sd">        &gt;&gt;&gt; states.inzp = 0., 2., 4., 0.</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evpo = 3.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_evi_inzp_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.inzp</span>
+<span class="sd">        inzp(0.0, 0.0, 1.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evi</span>
+<span class="sd">        evi(0.0, 2.0, 3.0, 3.0)</span>
+
+<span class="sd">        For the first three HRUs of land use class</span>
+<span class="sd">        :const:`~hydpy.models.lland.lland_constants.ACKER`,</span>
+<span class="sd">        interception evaporation is identical with potential</span>
+<span class="sd">        evapotranspiration as long as it is met by the available</span>
+<span class="sd">        intercepted water.  For water areas, interception evaporation is</span>
+<span class="sd">        generally set to potential evaporation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">evi</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">evpo</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">sta</span><span class="o">.</span><span class="n">inzp</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">inzp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-=</span> <span class="n">flu</span><span class="o">.</span><span class="n">evi</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">evi</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">flu</span><span class="o">.</span><span class="n">evpo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_sbes_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_sbes_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_sbes_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the frozen part of stand precipitation.</span>
+
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.TGr`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.TSp`</span>
+
+<span class="sd">    Required flux sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.TKor`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.NBes`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.SBes`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        In the first example, the threshold temperature of seven hydrological</span>
+<span class="sd">        response units is 0°C and the corresponding temperature interval of</span>
+<span class="sd">        mixed precipitation 2°C:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(7)</span>
+<span class="sd">        &gt;&gt;&gt; tgr(0.)</span>
+<span class="sd">        &gt;&gt;&gt; tsp(2.)</span>
+
+<span class="sd">        The value of `sbes` is zero above 1°C and equal to the value of</span>
+<span class="sd">        `nbes` below -1°C.  Between these temperature values, `sbes`</span>
+<span class="sd">        decreases linearly:</span>
+
+<span class="sd">        &gt;&gt;&gt; fluxes.nbes = 4.</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.tkor = -10., -1., -.5, 0., .5, 1., 10.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_sbes_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.sbes</span>
+<span class="sd">        sbes(4.0, 4.0, 3.0, 2.0, 1.0, 0.0, 0.0)</span>
+
+<span class="sd">        Note the special case of a zero temperature intervall.  With the</span>
+<span class="sd">        actual temperature beeing equal to the threshold temperature, the</span>
+<span class="sd">        the value of `sbes` is zero:</span>
+
+<span class="sd">        &gt;&gt;&gt; tsp(0.)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_sbes_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.sbes</span>
+<span class="sd">        sbes(4.0, 4.0, 4.0, 0.0, 0.0, 0.0, 0.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">tgr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">con</span><span class="o">.</span><span class="n">tsp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="mf">2.</span><span class="p">):</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">sbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">elif</span> <span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">tgr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">tsp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="mf">2.</span><span class="p">):</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">sbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">flu</span><span class="o">.</span><span class="n">nbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">sbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">((((</span><span class="n">con</span><span class="o">.</span><span class="n">tgr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">con</span><span class="o">.</span><span class="n">tsp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span><span class="o">-</span><span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">/</span>
+                            <span class="n">con</span><span class="o">.</span><span class="n">tsp</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="o">*</span><span class="n">flu</span><span class="o">.</span><span class="n">nbes</span><span class="p">[</span><span class="n">k</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="calc_wgtf_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_wgtf_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_wgtf_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the potential snow melt.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.GTF`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.TRefT`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.TRefN`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.RSchmelz`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.CPWasser`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.TKor`</span>
+
+<span class="sd">    Calculated fluxes sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.WGTF`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`WGTF = max(GTF \\cdot (TKor - TRefT), 0) +</span>
+<span class="sd">      max(\\frac{CPWasser}{RSchmelz} \\cdot (TKor - TRefN), 0)`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Initialize six HRUs with identical degree-day factors and</span>
+<span class="sd">        temperature thresholds, but different combinations of land use</span>
+<span class="sd">        and air temperature:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(6)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, LAUBW, WASSER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; gtf(5.)</span>
+<span class="sd">        &gt;&gt;&gt; treft(0.)</span>
+<span class="sd">        &gt;&gt;&gt; trefn(1.)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.tkor = 2., 2., 2., -1., 0., 1.</span>
+
+<span class="sd">        The specific heat capacity and melt heat capacity of water are</span>
+<span class="sd">        (compared to most parameters of hydrological models) relatively</span>
+<span class="sd">        fixed properties:</span>
+
+<span class="sd">        &gt;&gt;&gt; cpwasser(4.1868)</span>
+<span class="sd">        &gt;&gt;&gt; rschmelz(334.0)</span>
+
+<span class="sd">        Note that the values of the degree-day factor are only half</span>
+<span class="sd">        as much as the given value, due to the small simulation step size</span>
+<span class="sd">        beeing only half as long as the parameter step size:</span>
+
+<span class="sd">        &gt;&gt;&gt; gtf</span>
+<span class="sd">        gtf(5.0)</span>
+<span class="sd">        &gt;&gt;&gt; gtf.values</span>
+<span class="sd">        array([ 2.5,  2.5,  2.5,  2.5,  2.5,  2.5])</span>
+
+
+<span class="sd">        (These values are not hard coded, to allow for changing the</span>
+<span class="sd">        sensitivity of the snow routine for precipitation driven snow</span>
+<span class="sd">        melt events.)</span>
+
+<span class="sd">        When performing the calculations, one sees that the potential</span>
+<span class="sd">        melting rate is identical for the first two HRUs.  The land use</span>
+<span class="sd">        class results in no difference, except for water areas (third HRU),</span>
+<span class="sd">        where no potential melt needs to be calculated.  The last three</span>
+<span class="sd">        HRUs show the usual behaviour of the degree day method, when the</span>
+<span class="sd">        actual temperature is below (fourth HRU), equal to (fifth HRU) or</span>
+<span class="sd">        above (sixths zone) the threshold temperature.  Additionally, the</span>
+<span class="sd">        first two zones show the influence of the additional energy intake</span>
+<span class="sd">        due to &quot;warm&quot; precipitation.  Obviously, this additional term is</span>
+<span class="sd">        quite negligible for common parameterizations, even if lower</span>
+<span class="sd">        values for the seperate threshold temperature would be taken into</span>
+<span class="sd">        account:</span>
+
+<span class="sd">        &gt;&gt;&gt; model.calc_wgtf_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.wgtf</span>
+<span class="sd">        wgtf(5.012535, 5.012535, 0.0, 0.0, 0.0, 2.5)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">wgtf</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+              <span class="nb">max</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">gtf</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">treft</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
+              <span class="nb">max</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">cpwasser</span><span class="o">/</span><span class="n">con</span><span class="o">.</span><span class="n">rschmelz</span><span class="o">*</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">tkor</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">trefn</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="mf">0.</span><span class="p">)</span>
+              <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">wgtf</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="calc_schm_wats_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_schm_wats_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_schm_wats_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the actual amount of water melting within the snow cover.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+
+<span class="sd">    Required flux sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.SBes`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.WGTF`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.Schm`</span>
+
+<span class="sd">    Updated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.WATS`</span>
+
+<span class="sd">    Basic equations:</span>
+<span class="sd">      :math:`\\frac{dWATS}{dt}  = SBes - Schm`</span>
+<span class="sd">      :math:`Schm = \\Bigl \\lbrace</span>
+<span class="sd">      {</span>
+<span class="sd">      {WGTF \\ | \\ WATS &gt; 0}</span>
+<span class="sd">      \\atop</span>
+<span class="sd">      {0 \\ | \\ WATS = 0}</span>
+<span class="sd">      }`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Initialize one water and four arable land HRUs.  Assume the same</span>
+<span class="sd">        values for the initial amount of frozen water and the frozen</span>
+<span class="sd">        part of stand precipitation, but different values for the</span>
+<span class="sd">        potential snow melt:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(5)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; states.wats = 2.</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.sbes = 1.</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.wgtf = 0., 0., 1., 3., 5.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_schm_wats_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.wats</span>
+<span class="sd">        wats(0.0, 3.0, 2.0, 0.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.schm</span>
+<span class="sd">        schm(0.0, 0.0, 1.0, 3.0, 3.0)</span>
+
+<span class="sd">        For water areas, both the frozen amount of water and actual melt</span>
+<span class="sd">        are set to zero.  For all other land use classes, actual melt</span>
+<span class="sd">        is either limited by potential melt or the available frozen water,</span>
+<span class="sd">        which is the sum of initial frozen water and the frozen part</span>
+<span class="sd">        of stand precipitation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">:</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">wats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">flu</span><span class="o">.</span><span class="n">sbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">schm</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">wgtf</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">sta</span><span class="o">.</span><span class="n">wats</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">wats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-=</span> <span class="n">flu</span><span class="o">.</span><span class="n">schm</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">wats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">schm</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="calc_wada_waes_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_wada_waes_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_wada_waes_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the actual water release from the snow cover.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.PWMax`</span>
+
+<span class="sd">    Required flux sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.NBes`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.WaDa`</span>
+
+<span class="sd">    Required state sequences</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.WAeS`</span>
+
+<span class="sd">    Updated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.WAeS`</span>
+
+<span class="sd">    Basic equations:</span>
+<span class="sd">      :math:`\\frac{dWAeS}{dt} = NBes - WaDa`</span>
+<span class="sd">      :math:`WAeS \\leq PWMax \\cdot WATS`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        For simplicity, :class:`~hydpy.models.lland.lland_control.PWMax`</span>
+<span class="sd">        is set to a value of two for each of the five initialized HRUs.</span>
+<span class="sd">        Thus, the snow cover can hold as much liquid water as it contains</span>
+<span class="sd">        frozen water.  Stand precipitation is also always set to the same</span>
+<span class="sd">        value, but the initial conditions of the snow cover are varied:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(5)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; pwmax(2.)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.nbes = 1.</span>
+<span class="sd">        &gt;&gt;&gt; states.wats = 0., 0., 1., 1.0, 1.</span>
+<span class="sd">        &gt;&gt;&gt; states.waes = 0., 0., 1., 1.5, 2.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_wada_waes_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.waes</span>
+<span class="sd">        waes(0.0, 0.0, 2.0, 2.0, 2.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.wada</span>
+<span class="sd">        wada(1.0, 1.0, 0.0, 0.5, 1.0)</span>
+
+<span class="sd">        Note the special cases of the first HRU (the snow routine is not</span>
+<span class="sd">        applied for water areas) and the second HRU (for all other land</span>
+<span class="sd">        use classes the snow routine is also applied on &quot;empty&quot; snow</span>
+<span class="sd">        covers with zero initial values).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">:</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">waes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">flu</span><span class="o">.</span><span class="n">nbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">wada</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sta</span><span class="o">.</span><span class="n">waes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">pwmax</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">sta</span><span class="o">.</span><span class="n">wats</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mf">0.</span><span class="p">)</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">waes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-=</span> <span class="n">flu</span><span class="o">.</span><span class="n">wada</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">waes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">wada</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">flu</span><span class="o">.</span><span class="n">nbes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_evb_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_evb_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_evb_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the actual water release from the snow cover.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NFk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.GrasRef_R`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.BoWa`</span>
+
+<span class="sd">    Required flux sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvPo`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvI`</span>
+
+<span class="sd">    Used aide sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_aides.Temp`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvB`</span>
+
+<span class="sd">    Basic equations:</span>
+<span class="sd">      :math:`temp = exp(-GrasRef_R \\cdot \\frac{BoWa}{NFk})`</span>
+<span class="sd">      :math:`EvB = (EvPo - EvI) \\cdot</span>
+<span class="sd">      \\frac{1 - temp}{1 + temp -2 \\cdot exp(-GrasRef_R)}`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Soil evaporation is calculated neither for water nor for sealed</span>
+<span class="sd">        areas (see HRUs one and two).  All other land use classes are</span>
+<span class="sd">        handled in accordance with a recommendation of the set of codes</span>
+<span class="sd">        described in ATV-DVWK-M 504 (arable land has been selected for</span>
+<span class="sd">        HRUs three to six arbitrarily):</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(6)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, VERS, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; grasref_r(5.)</span>
+<span class="sd">        &gt;&gt;&gt; nfk(0., 0., 0., 100., 100., 100.)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evpo = 5.</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evi = 3.</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa = 0., 0., 0., 0., 50., 100.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_evb_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evb</span>
+<span class="sd">        evb(0.0, 0.0, 0.0, 0.0, 1.717962, 2.0)</span>
+
+<span class="sd">        In case usable field capacity is zero, soil evaporation is</span>
+<span class="sd">        generally set to zero (see the third HRU).  The last three</span>
+<span class="sd">        HRUs demonstrate the rise in soil evaporation with increasing</span>
+<span class="sd">        soil moisture, lessening in the high soil moisture range.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">VERS</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">)):</span>
+            <span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="n">modelutils</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">grasref_r</span> <span class="o">*</span>
+                                      <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">evb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">flu</span><span class="o">.</span><span class="n">evpo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">flu</span><span class="o">.</span><span class="n">evi</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span><span class="p">)</span> <span class="o">/</span>
+                          <span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span><span class="o">-</span><span class="mf">2.</span><span class="o">*</span><span class="n">modelutils</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">grasref_r</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">evb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="calc_qbb_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qbb_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qbb_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the amount of base flow released from the soil.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Beta`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.FBeta`</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_derived.WB`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_derived.WZ`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.BoWa`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QBB`</span>
+
+<span class="sd">    Basic equations:</span>
+<span class="sd">      :math:`Beta_{eff} = \\Bigl \\lbrace</span>
+<span class="sd">      {</span>
+<span class="sd">      {Beta \\ | \\ BoWa \\leq WZ}</span>
+<span class="sd">      \\atop</span>
+<span class="sd">      {Beta \\cdot (1+(FBeta-1)\\cdot\\frac{BoWa-WZ}{NFk-WZ}) \\|\\ BoWa &gt; WZ}</span>
+<span class="sd">      }`</span>
+
+<span class="sd">      :math:`QBB = \\Bigl \\lbrace</span>
+<span class="sd">      {</span>
+<span class="sd">      {0 \\ | \\ BoWa \\leq WB}</span>
+<span class="sd">      \\atop</span>
+<span class="sd">      {Beta_{eff}  \\cdot (BoWa - WB) \\|\\ BoWa &gt; WB}</span>
+<span class="sd">      }`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        For water and sealed areas, no base is flow calculated (see the</span>
+<span class="sd">        first two HRUs).  No principal distinction is made between the</span>
+<span class="sd">        remaining land use classes (arable land has been selected for</span>
+<span class="sd">        the other five HRUs arbitrarily):</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(7)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, VERS, ACKER, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; beta(.04)</span>
+<span class="sd">        &gt;&gt;&gt; fbeta(2.)</span>
+<span class="sd">        &gt;&gt;&gt; nfk(0., 0., 0., 100., 100., 100., 200.)</span>
+<span class="sd">        &gt;&gt;&gt; derived.wb(10.)</span>
+<span class="sd">        &gt;&gt;&gt; derived.wz(70.)</span>
+
+<span class="sd">        Note the time dependence of parameter</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_control.Beta`:</span>
+
+<span class="sd">        &gt;&gt;&gt; beta</span>
+<span class="sd">        beta(0.04)</span>
+<span class="sd">        &gt;&gt;&gt; beta.values</span>
+<span class="sd">        array([ 0.02,  0.02,  0.02,  0.02,  0.02,  0.02,  0.02])</span>
+
+<span class="sd">        In the first example, the actual soil water content is set to low</span>
+<span class="sd">        values. For values below the threshold `wb`, not percolation occurs.</span>
+<span class="sd">        Above `wb` (but below `wz`), calculated percolation shows a linear</span>
+<span class="sd">        behaviour which is only related to parameter `beta`:</span>
+
+<span class="sd">        &gt;&gt;&gt; states.bowa = 0., 0., 0., 0., 10., 20., 20.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qbb_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qbb</span>
+<span class="sd">        qbb(0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.2)</span>
+
+<span class="sd">        Note that for the last two HRUs the same amount of</span>
+<span class="sd">        base flow generation is determined, in spite of the fact</span>
+<span class="sd">        that both exhibit different relative soil moistures.  It is</span>
+<span class="sd">        common to modify this &quot;pure absolute dependency&quot; to a &quot;mixed</span>
+<span class="sd">        absolute/relative dependency&quot; through defining the values of</span>
+<span class="sd">        parameter :class:`~hydpy.models.lland.lland_derived.WB` indirectly</span>
+<span class="sd">        via parameter :class:`~hydpy.models.lland.lland_control.RelWB`.</span>
+
+<span class="sd">        In the second example, the actual soil water content is set to high</span>
+<span class="sd">        values.  For values below the threshold `wz`, the disussion above</span>
+<span class="sd">        remains valid.  For values above `wz`, percolation shows a nonlinear</span>
+<span class="sd">        behaviour in case factor `fbeta` is set to value larger than one:</span>
+
+<span class="sd">        &gt;&gt;&gt; nfk(0., 0., 100., 100., 100, 100., 200.)</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa = 0., 0., 60., 70., 80., 100., 200.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qbb_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qbb</span>
+<span class="sd">        qbb(0.0, 0.0, 1.0, 1.2, 1.866667, 3.6, 7.6)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">WASSER</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">VERS</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">der</span><span class="o">.</span><span class="n">wb</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">)):</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qbb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">elif</span> <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">der</span><span class="o">.</span><span class="n">wz</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qbb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">wb</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qbb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">beta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">wb</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">*</span>
+                          <span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">fbeta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">wz</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">/</span>
+                                                 <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">wz</span><span class="p">[</span><span class="n">k</span><span class="p">]))))</span></div>
+
+
+<div class="viewcode-block" id="calc_qib1_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qib1_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qib1_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the first inflow component released from the soil.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NFk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.DMin`</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_derived.WB`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.BoWa`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIB1`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`QIB1 = DMin \\cdot \\frac{BoWa}{NFk}`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        For water and sealed areas, no interflow is calculated (see the</span>
+<span class="sd">        first two HRUs).  No principal distinction is made between the</span>
+<span class="sd">        remaining land use classes (arable land has been selected for</span>
+<span class="sd">        the other five HRUs arbitrarily):</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(7)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, VERS, ACKER, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; dmax(10.)</span>
+<span class="sd">        &gt;&gt;&gt; dmin(4.)</span>
+<span class="sd">        &gt;&gt;&gt; nfk(0., 0., 0., 101., 101., 101., 202.)</span>
+<span class="sd">        &gt;&gt;&gt; derived.wb(10.)</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa = 0., 0., 0., 0., 10., 10.1, 10.1</span>
+
+<span class="sd">        Note the time dependence of parameter</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_control.DMin`:</span>
+
+<span class="sd">        &gt;&gt;&gt; dmin</span>
+<span class="sd">        dmin(4.0)</span>
+<span class="sd">        &gt;&gt;&gt; dmin.values</span>
+<span class="sd">        array([ 2.,  2.,  2.,  2.,  2.,  2.,  2.])</span>
+
+<span class="sd">        Compared to the calculation of</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_fluxes.QBB`, the following</span>
+<span class="sd">        results show some relevant differences:</span>
+
+<span class="sd">        &gt;&gt;&gt; model.calc_qib1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib1</span>
+<span class="sd">        qib1(0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.1)</span>
+
+<span class="sd">        Firstly, as demonstrated with the help of the sixths and the</span>
+<span class="sd">        sevenths HRU the generation of first interflow component depends</span>
+<span class="sd">        on the relative soil moisture.  Secondly, as demonstratd with the</span>
+<span class="sd">        help the fifths and the sixths HRU, it starts abruptly whenever</span>
+<span class="sd">        there is the slightest exceedance of the threshold  parameter</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_derived.WB` occurs.  Such step</span>
+<span class="sd">        functions are a potential source of trouble.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">VERS</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">der</span><span class="o">.</span><span class="n">wb</span><span class="p">[</span><span class="n">k</span><span class="p">])):</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qib1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">dmin</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qib1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="calc_qib2_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qib2_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qib2_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the first inflow component released from the soil.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NFk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.DMin`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.DMax`</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_derived.WZ`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.BoWa`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIB2`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">      :math:`QIB2 = (DMax-DMin) \\cdot</span>
+<span class="sd">      (\\frac{BoWa-WZ}{NFk-WZ})^\\frac{3}{2}`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        For water and sealed areas, no interflow is calculated (see the</span>
+<span class="sd">        first two HRUs).  No principal distinction is made between the</span>
+<span class="sd">        remaining land use classes (arable land has been selected for</span>
+<span class="sd">        the other five HRUs arbitrarily):</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(7)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, VERS, ACKER, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; dmax(10.)</span>
+<span class="sd">        &gt;&gt;&gt; dmin(4.)</span>
+<span class="sd">        &gt;&gt;&gt; nfk(0., 0., 50., 100., 100., 100., 200.)</span>
+<span class="sd">        &gt;&gt;&gt; derived.wz(50.)</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa = 0., 0., 50.1, 50., 75., 100., 100.</span>
+
+<span class="sd">        Note the time dependence of parameters</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_control.DMin` (see the example</span>
+<span class="sd">        above) and :class:`~hydpy.models.lland.lland_control.DMax`:</span>
+
+<span class="sd">        &gt;&gt;&gt; dmax</span>
+<span class="sd">        dmax(10.0)</span>
+<span class="sd">        &gt;&gt;&gt; dmax.values</span>
+<span class="sd">        array([ 5.,  5.,  5.,  5.,  5.,  5.,  5.])</span>
+
+<span class="sd">        The following results show that he calculation of</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_fluxes.QIB2` both resembles</span>
+<span class="sd">        those of :class:`~hydpy.models.lland.lland_fluxes.QBB` and</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_fluxes.QIB1` in some regards:</span>
+
+<span class="sd">        &gt;&gt;&gt; model.calc_qib2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib2</span>
+<span class="sd">        qib2(0.0, 0.0, 0.0, 0.0, 1.06066, 3.0, 0.57735)</span>
+
+<span class="sd">        In the given example, the maximum rate of total interflow</span>
+<span class="sd">        generation is 5mm/12h.  For the sixths zone, which contains</span>
+<span class="sd">        a saturated soil, a value of 3mm/h is calculated.  The &quot;missing&quot;</span>
+<span class="sd">        2mm/12h would be added to the inflow concentration routine via</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_fluxes.QIB1`.</span>
+
+<span class="sd">        (The third zone, which is slightly oversaturated, is only intended</span>
+<span class="sd">        to demonstrate that zero division due to nfk=wz is circumvented.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">VERS</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">der</span><span class="o">.</span><span class="n">wz</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">der</span><span class="o">.</span><span class="n">wz</span><span class="p">[</span><span class="n">k</span><span class="p">])):</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qib2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">con</span><span class="o">.</span><span class="n">dmax</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">dmin</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">*</span>
+                           <span class="p">((</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">wz</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">/</span>
+                            <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">wz</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span><span class="o">**</span><span class="mf">1.5</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qib2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="calc_qdb_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdb_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qdb_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate direct runoff released from the soil.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NFk`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.BSF`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.BoWa`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.WaDa`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDB`</span>
+
+<span class="sd">    Basic equations:</span>
+<span class="sd">      :math:`QDB = \\Bigl \\lbrace</span>
+<span class="sd">      {</span>
+<span class="sd">      {max(Exz, 0) \\ | \\ SfA \\leq 0}</span>
+<span class="sd">      \\atop</span>
+<span class="sd">      {max(Exz + NFk \\cdot SfA^{BSf+1}, 0) \\ | \\ SfA &gt; 0}</span>
+<span class="sd">      }`</span>
+<span class="sd">      :math:`SFA = (1 - \\frac{BoWa}{NFk})^\\frac{1}{BSf+1} -</span>
+<span class="sd">      \\frac{WaDa}{(BSf+1) \\cdot NFk}`</span>
+<span class="sd">      :math:`Exz = (BoWa + WaDa) - NFk`</span>
+
+
+<span class="sd">    Examples:</span>
+<span class="sd">        For water areas, sealed areas, and areas without any soil storage</span>
+<span class="sd">        capacity, all water is completely routed as direct runoff (see the</span>
+<span class="sd">        first three HRUs).  No principal distinction is made between the</span>
+<span class="sd">        remaining land use classes (arable land has been selected for</span>
+<span class="sd">        the other five HRUs arbitrarily):</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(8)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, VERS, ACKER, ACKER, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; bsf(0.4)</span>
+<span class="sd">        &gt;&gt;&gt; nfk(0., 0., 0., 100., 100., 100., 100., 100.)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.wada = 10.</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa = 0., 0., 0., -.1, 0., 50., 100., 100.1</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdb_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qdb</span>
+<span class="sd">        qdb(10.0, 10.0, 10.0, 0.142039, 0.144959, 1.993649, 10.0, 10.1)</span>
+
+<span class="sd">        With the common bsf value of 0.4, the discharge coefficient</span>
+<span class="sd">        increases more or less exponentially with soil moisture.</span>
+<span class="sd">        For soil moisture values slightly below zero or above usable</span>
+<span class="sd">        field capacity, plausible amounts of generated direct runoff</span>
+<span class="sd">        are ensured.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">VERS</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                <span class="n">aid</span><span class="o">.</span><span class="n">sfa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="o">**</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">bsf</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="mf">1.</span><span class="p">))</span> <span class="o">-</span>
+                    <span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">wada</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="p">((</span><span class="n">con</span><span class="o">.</span><span class="n">bsf</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">])))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">aid</span><span class="o">.</span><span class="n">sfa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">aid</span><span class="o">.</span><span class="n">exz</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">flu</span><span class="o">.</span><span class="n">wada</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">exz</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">aid</span><span class="o">.</span><span class="n">sfa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">aid</span><span class="o">.</span><span class="n">sfa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">**</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">bsf</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span><span class="o">*</span><span class="n">con</span><span class="o">.</span><span class="n">nfk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">flu</span><span class="o">.</span><span class="n">wada</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_bowa_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_bowa_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_bowa_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update soil moisture and correct fluxes if necessary.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.WaDa`</span>
+
+<span class="sd">    Updated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_states.BoWa`</span>
+
+<span class="sd">    Required (and eventually corrected) flux sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvB`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QBB`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIB1`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIB2`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDB`</span>
+
+<span class="sd">    Basic equations:</span>
+<span class="sd">       :math:`\\frac{dBoWa}{dt} = WaDa - EvB - QBB - QIB1 - QIB2 - QDB`</span>
+<span class="sd">       :math:`BoWa \\geq 0`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        For water areas and sealed areas, soil moisture is simply set to</span>
+<span class="sd">        zero and no flux corrections need not be performed.  No principal</span>
+<span class="sd">        distinction is made between the remaining land use classes (arable</span>
+<span class="sd">        land has been selected for the other four HRUs arbitrarily):</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(6)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(WASSER, VERS, ACKER, ACKER, ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa = 2.</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.wada = 1.</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evb(0., 0., 0., .1, .2, .3)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qbb(0., 0., 0., .2, .4, .6)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib1(0., 0., 0., .3, .6, .9)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib2(0., 0., 0., .4, .8, 1.2)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qdb(0., 0., 0., .5, 1., 1.5)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_bowa_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa</span>
+<span class="sd">        bowa(0.0, 0.0, 3.0, 1.5, 0.0, 0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evb</span>
+<span class="sd">        evb(0.0, 0.0, 0.0, 0.1, 0.2, 0.2)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qbb</span>
+<span class="sd">        qbb(0.0, 0.0, 0.0, 0.2, 0.4, 0.4)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib1</span>
+<span class="sd">        qib1(0.0, 0.0, 0.0, 0.3, 0.6, 0.6)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib2</span>
+<span class="sd">        qib2(0.0, 0.0, 0.0, 0.4, 0.8, 0.8)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qdb</span>
+<span class="sd">        qdb(0.0, 0.0, 0.0, 0.5, 1.0, 1.0)</span>
+
+<span class="sd">        For the sixths HRU, the original loss terms would result in</span>
+<span class="sd">        negative soil moisture values.  They are corrected to the same</span>
+<span class="sd">        loss terms of the fifths HRU, which result in a complete</span>
+<span class="sd">        emptying of the soil storage exactly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">WASSER</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">VERS</span><span class="p">):</span>
+            <span class="n">aid</span><span class="o">.</span><span class="n">bvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">evb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span>
+                          <span class="n">flu</span><span class="o">.</span><span class="n">qbb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">flu</span><span class="o">.</span><span class="n">qib1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">flu</span><span class="o">.</span><span class="n">qib2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">aid</span><span class="o">.</span><span class="n">mvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">+</span><span class="n">flu</span><span class="o">.</span><span class="n">wada</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">aid</span><span class="o">.</span><span class="n">bvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">aid</span><span class="o">.</span><span class="n">mvl</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                <span class="n">aid</span><span class="o">.</span><span class="n">rvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">mvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">aid</span><span class="o">.</span><span class="n">bvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">flu</span><span class="o">.</span><span class="n">evb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">aid</span><span class="o">.</span><span class="n">rvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">flu</span><span class="o">.</span><span class="n">qbb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">aid</span><span class="o">.</span><span class="n">rvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">flu</span><span class="o">.</span><span class="n">qib1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">aid</span><span class="o">.</span><span class="n">rvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">flu</span><span class="o">.</span><span class="n">qib2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">aid</span><span class="o">.</span><span class="n">rvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">aid</span><span class="o">.</span><span class="n">rvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">mvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">aid</span><span class="o">.</span><span class="n">bvl</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sta</span><span class="o">.</span><span class="n">bowa</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="calc_qbgz_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qbgz_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qbgz_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Aggregate the amount of base flow released by all HRUs.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.FHRU`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QBB`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QBGZ`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QBGZ = \\Sigma(FHRU \\cdot QBB)`</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; nhru(2)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; fhru(.75, .25)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qbb = 1., 5.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qbgz_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qbgz</span>
+<span class="sd">        qbgz(2.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span><span class="o">.</span><span class="n">qbgz</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">sta</span><span class="o">.</span><span class="n">qbgz</span> <span class="o">+=</span> <span class="n">con</span><span class="o">.</span><span class="n">fhru</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">flu</span><span class="o">.</span><span class="n">qbb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_qigz1_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qigz1_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qigz1_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Aggregate the amount of the first interflow component released</span>
+<span class="sd">    by all HRUs.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.FHRU`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIB1`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGZ1`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QIGZ1 = \\Sigma(FHRU \\cdot QIB1)`</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; nhru(2)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; fhru(.75, .25)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib1 = 1., 5.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qigz1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qigz1</span>
+<span class="sd">        qigz1(2.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span><span class="o">.</span><span class="n">qigz1</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">sta</span><span class="o">.</span><span class="n">qigz1</span> <span class="o">+=</span> <span class="n">con</span><span class="o">.</span><span class="n">fhru</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">flu</span><span class="o">.</span><span class="n">qib1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_qigz2_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qigz2_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qigz2_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Aggregate the amount of the second interflow component released</span>
+<span class="sd">    by all HRUs.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.FHRU`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIB2`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGZ2`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QIGZ2 = \\Sigma(FHRU \\cdot QIB2)`</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; nhru(2)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; fhru(.75, .25)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qib2 = 1., 5.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qigz2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qigz2</span>
+<span class="sd">        qigz2(2.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span><span class="o">.</span><span class="n">qigz2</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">sta</span><span class="o">.</span><span class="n">qigz2</span> <span class="o">+=</span> <span class="n">con</span><span class="o">.</span><span class="n">fhru</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">flu</span><span class="o">.</span><span class="n">qib2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_qdgz_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdgz_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qdgz_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Aggregate the amount of total direct flow released by all HRUs.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.FHRU`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDB`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGZ`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QDGZ = \\Sigma(FHRU \\cdot QDB)`</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; nhru(2)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; fhru(.75, .25)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qdb = 1., 5.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdgz_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.qdgz</span>
+<span class="sd">        qdgz(2.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span><span class="o">.</span><span class="n">qdgz</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="n">flu</span><span class="o">.</span><span class="n">qdgz</span> <span class="o">+=</span> <span class="n">con</span><span class="o">.</span><span class="n">fhru</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">flu</span><span class="o">.</span><span class="n">qdb</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="calc_qdgz1_qdgz2_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdgz1_qdgz2_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qdgz1_qdgz2_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Seperate total direct flow into a small and a fast component.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.A1`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.A2`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGZ`</span>
+
+<span class="sd">    Calculated state sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGZ1`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGZ2`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QDGZ2 = \\frac{(QDGZ-A2)^2}{QDGZ+A1-A2}`</span>
+<span class="sd">       :math:`QDGZ1 = QDGZ - QDGZ1`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        The formula for calculating the amount of the fast component of</span>
+<span class="sd">        direct flow is borrowed from the famous curve number approach.</span>
+<span class="sd">        Parameter :class:`A2` would be the initial loss and parameter</span>
+<span class="sd">        :class:`A1` the maximum storage, but one should not take this</span>
+<span class="sd">        analogy too serious.  Instead, with the value of parameter `a1`</span>
+<span class="sd">        set to zero, parameter `a2` just defines the maximum amount of</span>
+<span class="sd">        &quot;slow&quot; direct runoff per time step:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; a1(0.)</span>
+
+<span class="sd">        Let us set the value of `a2` to 4 mm/d, which is 2 mm/12h with</span>
+<span class="sd">        respect to the selected simulation step size:</span>
+
+<span class="sd">        &gt;&gt;&gt; a2(4.)</span>
+<span class="sd">        &gt;&gt;&gt; a2</span>
+<span class="sd">        a2(4.0)</span>
+<span class="sd">        &gt;&gt;&gt; a2.value</span>
+<span class="sd">        2.0</span>
+
+<span class="sd">        Define a small test function to shorten the following examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; def test(*values):</span>
+<span class="sd">        ...     for value in values:</span>
+<span class="sd">        ...         fluxes.qdgz = value</span>
+<span class="sd">        ...         model.calc_qdgz1_qdgz2_v1()</span>
+<span class="sd">        ...         print(fluxes.qdgz, states.qdgz1, states.qdgz2)</span>
+
+<span class="sd">        The results of the seperation for total direct flow volumes of</span>
+<span class="sd">        1, 2, 3 and 4 mm/12h are:</span>
+
+<span class="sd">        &gt;&gt;&gt; test(1., 2., 3., 100.)</span>
+<span class="sd">        qdgz(1.0) qdgz1(1.0) qdgz2(0.0)</span>
+<span class="sd">        qdgz(2.0) qdgz1(2.0) qdgz2(0.0)</span>
+<span class="sd">        qdgz(3.0) qdgz1(2.0) qdgz2(1.0)</span>
+<span class="sd">        qdgz(100.0) qdgz1(2.0) qdgz2(98.0)</span>
+
+<span class="sd">        Setting `a2` to zero and `a1` to 4 mm/d (or 2mm/12h)...</span>
+
+<span class="sd">        &gt;&gt;&gt; a2(0.)</span>
+<span class="sd">        &gt;&gt;&gt; a1(4.)</span>
+<span class="sd">        &gt;&gt;&gt; a1</span>
+<span class="sd">        a1(4.0)</span>
+<span class="sd">        &gt;&gt;&gt; a1.value</span>
+<span class="sd">        2.0</span>
+
+<span class="sd">        ...results in a smoother transition instead:</span>
+
+<span class="sd">        &gt;&gt;&gt; test(1., 2., 3., 100.)</span>
+<span class="sd">        qdgz(1.0) qdgz1(0.666667) qdgz2(0.333333)</span>
+<span class="sd">        qdgz(2.0) qdgz1(1.0) qdgz2(1.0)</span>
+<span class="sd">        qdgz(3.0) qdgz1(1.2) qdgz2(1.8)</span>
+<span class="sd">        qdgz(100.0) qdgz1(1.960784) qdgz2(98.039216)</span>
+
+
+<span class="sd">        Alternatively, one can mix these two configurations by setting</span>
+<span class="sd">        the values of both parameters to 2 mm/h:</span>
+
+<span class="sd">        &gt;&gt;&gt; a2(2.)</span>
+<span class="sd">        &gt;&gt;&gt; a1(2.)</span>
+<span class="sd">        &gt;&gt;&gt; test(1., 2., 3., 100.)</span>
+<span class="sd">        qdgz(1.0) qdgz1(1.0) qdgz2(0.0)</span>
+<span class="sd">        qdgz(2.0) qdgz1(1.5) qdgz2(0.5)</span>
+<span class="sd">        qdgz(3.0) qdgz1(1.666667) qdgz2(1.333333)</span>
+<span class="sd">        qdgz(100.0) qdgz1(1.99) qdgz2(98.01)</span>
+
+<span class="sd">        Note the similarity of the results for very high values of total</span>
+<span class="sd">        direct flow in all three examples, which converge to the sum of</span>
+<span class="sd">        the values of parameter `a1` and `a2`, representing the maximum</span>
+<span class="sd">        value of `slow` direct flow generation per simulation step</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">if</span> <span class="n">flu</span><span class="o">.</span><span class="n">qdgz</span> <span class="o">&gt;</span> <span class="n">con</span><span class="o">.</span><span class="n">a2</span><span class="p">:</span>
+        <span class="n">sta</span><span class="o">.</span><span class="n">qdgz2</span> <span class="o">=</span> <span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">qdgz</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">flu</span><span class="o">.</span><span class="n">qdgz</span><span class="o">+</span><span class="n">con</span><span class="o">.</span><span class="n">a1</span><span class="o">-</span><span class="n">con</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span>
+        <span class="n">sta</span><span class="o">.</span><span class="n">qdgz1</span> <span class="o">=</span> <span class="n">flu</span><span class="o">.</span><span class="n">qdgz</span><span class="o">-</span><span class="n">sta</span><span class="o">.</span><span class="n">qdgz2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sta</span><span class="o">.</span><span class="n">qdgz2</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">sta</span><span class="o">.</span><span class="n">qdgz1</span> <span class="o">=</span> <span class="n">flu</span><span class="o">.</span><span class="n">qdgz</span></div>
+
+
+<div class="viewcode-block" id="calc_qbga_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qbga_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qbga_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the runoff concentration calculation for base flow.</span>
+
+<span class="sd">    The working equation is the analytical solution of the linear storage</span>
+<span class="sd">    equation under the assumption of constant change in inflow during</span>
+<span class="sd">    the simulation time step.</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KB`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QBGZ`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QBGA`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QBGA_{neu} = QBGA_{alt} +</span>
+<span class="sd">       (QBGZ_{alt}-QBGA_{alt}) \\cdot (1-exp(-KB^{-1})) +</span>
+<span class="sd">       (QBGZ_{neu}-QBGZ_{alt}) \\cdot (1-KB\\cdot(1-exp(-KB^{-1})))`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        A normal test case:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; derived.kb(0.1)</span>
+<span class="sd">        &gt;&gt;&gt; states.qbgz.old = 2.</span>
+<span class="sd">        &gt;&gt;&gt; states.qbgz.new = 4.</span>
+<span class="sd">        &gt;&gt;&gt; states.qbga.old = 3.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qbga_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qbga</span>
+<span class="sd">        qbga(3.800054)</span>
+
+<span class="sd">        First extreme test case (zero division is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kb(0.)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qbga_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qbga</span>
+<span class="sd">        qbga(4.0)</span>
+
+<span class="sd">        Second extreme test case (numerical overflow is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kb(1e200)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qbga_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qbga</span>
+<span class="sd">        qbga(5.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_old</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_new</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">if</span> <span class="n">der</span><span class="o">.</span><span class="n">kb</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qbga</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">qbgz</span>
+    <span class="k">elif</span> <span class="n">der</span><span class="o">.</span><span class="n">kb</span> <span class="o">&gt;</span> <span class="mf">1e200</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qbga</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">qbga</span><span class="o">+</span><span class="n">new</span><span class="o">.</span><span class="n">qbgz</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qbgz</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">modelutils</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">der</span><span class="o">.</span><span class="n">kb</span><span class="p">))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qbga</span> <span class="o">=</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qbga</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qbgz</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qbga</span><span class="p">)</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">qbgz</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qbgz</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">kb</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="calc_qiga1_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qiga1_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qiga1_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the runoff concentration calculation for the first</span>
+<span class="sd">    interflow component.</span>
+
+<span class="sd">    The working equation is the analytical solution of the linear storage</span>
+<span class="sd">    equation under the assumption of constant change in inflow during</span>
+<span class="sd">    the simulation time step.</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KI1`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGZ1`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGA1`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QIGA1_{neu} = QIGA1_{alt} +</span>
+<span class="sd">       (QIGZ1_{alt}-QIGA1_{alt}) \\cdot (1-exp(-KI1^{-1})) +</span>
+<span class="sd">       (QIGZ1_{neu}-QIGZ1_{alt}) \\cdot (1-KI1\\cdot(1-exp(-KI1^{-1})))`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        A normal test case:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; derived.ki1(0.1)</span>
+<span class="sd">        &gt;&gt;&gt; states.qigz1.old = 2.</span>
+<span class="sd">        &gt;&gt;&gt; states.qigz1.new = 4.</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga1.old = 3.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qiga1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga1</span>
+<span class="sd">        qiga1(3.800054)</span>
+
+<span class="sd">        First extreme test case (zero division is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.ki1(0.)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qiga1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga1</span>
+<span class="sd">        qiga1(4.0)</span>
+
+<span class="sd">        Second extreme test case (numerical overflow is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.ki1(1e200)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qiga1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga1</span>
+<span class="sd">        qiga1(5.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_old</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_new</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">if</span> <span class="n">der</span><span class="o">.</span><span class="n">ki1</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qiga1</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">qigz1</span>
+    <span class="k">elif</span> <span class="n">der</span><span class="o">.</span><span class="n">ki1</span> <span class="o">&gt;</span> <span class="mf">1e200</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qiga1</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">qiga1</span><span class="o">+</span><span class="n">new</span><span class="o">.</span><span class="n">qigz1</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qigz1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">modelutils</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">der</span><span class="o">.</span><span class="n">ki1</span><span class="p">))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qiga1</span> <span class="o">=</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qiga1</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qigz1</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qiga1</span><span class="p">)</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">qigz1</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qigz1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">ki1</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="calc_qiga2_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qiga2_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qiga2_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the runoff concentration calculation for the second</span>
+<span class="sd">    interflow component.</span>
+
+<span class="sd">    The working equation is the analytical solution of the linear storage</span>
+<span class="sd">    equation under the assumption of constant change in inflow during</span>
+<span class="sd">    the simulation time step.</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.KI2`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGZ2`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGA2`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QIGA2_{neu} = QIGA2_{alt} +</span>
+<span class="sd">       (QIGZ2_{alt}-QIGA2_{alt}) \\cdot (1-exp(-KI2^{-1})) +</span>
+<span class="sd">       (QIGZ2_{neu}-QIGZ2_{alt}) \\cdot (1-KI2\\cdot(1-exp(-KI2^{-1})))`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        A normal test case:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; derived.ki2(0.1)</span>
+<span class="sd">        &gt;&gt;&gt; states.qigz2.old = 2.</span>
+<span class="sd">        &gt;&gt;&gt; states.qigz2.new = 4.</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga2.old = 3.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qiga2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga2</span>
+<span class="sd">        qiga2(3.800054)</span>
+
+<span class="sd">        First extreme test case (zero division is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.ki2(0.)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qiga2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga2</span>
+<span class="sd">        qiga2(4.0)</span>
+
+<span class="sd">        Second extreme test case (numerical overflow is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.ki2(1e200)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qiga2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga2</span>
+<span class="sd">        qiga2(5.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_old</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_new</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">if</span> <span class="n">der</span><span class="o">.</span><span class="n">ki2</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qiga2</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">qigz2</span>
+    <span class="k">elif</span> <span class="n">der</span><span class="o">.</span><span class="n">ki2</span> <span class="o">&gt;</span> <span class="mf">1e200</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qiga2</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">qiga2</span><span class="o">+</span><span class="n">new</span><span class="o">.</span><span class="n">qigz2</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qigz2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">modelutils</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">der</span><span class="o">.</span><span class="n">ki2</span><span class="p">))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qiga2</span> <span class="o">=</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qiga2</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qigz2</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qiga2</span><span class="p">)</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">qigz2</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qigz2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">ki2</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="calc_qdga1_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdga1_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qdga1_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the runoff concentration calculation for &quot;slow&quot; direct runoff.</span>
+
+<span class="sd">    The working equation is the analytical solution of the linear storage</span>
+<span class="sd">    equation under the assumption of constant change in inflow during</span>
+<span class="sd">    the simulation time step.</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_derived.KD1`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGZ1`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGA1`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QDGA1_{neu} = QDGA1_{alt} +</span>
+<span class="sd">       (QDGZ1_{alt}-QDGA1_{alt}) \\cdot (1-exp(-KD1^{-1})) +</span>
+<span class="sd">       (QDGZ1_{neu}-QDGZ1_{alt}) \\cdot (1-KD1\\cdot(1-exp(-KD1^{-1})))`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        A normal test case:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; derived.kd1(0.1)</span>
+<span class="sd">        &gt;&gt;&gt; states.qdgz1.old = 2.</span>
+<span class="sd">        &gt;&gt;&gt; states.qdgz1.new = 4.</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga1.old = 3.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdga1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga1</span>
+<span class="sd">        qdga1(3.800054)</span>
+
+<span class="sd">        First extreme test case (zero division is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kd1(0.)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdga1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga1</span>
+<span class="sd">        qdga1(4.0)</span>
+
+<span class="sd">        Second extreme test case (numerical overflow is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kd1(1e200)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdga1_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga1</span>
+<span class="sd">        qdga1(5.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_old</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_new</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">if</span> <span class="n">der</span><span class="o">.</span><span class="n">kd1</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qdga1</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">qdgz1</span>
+    <span class="k">elif</span> <span class="n">der</span><span class="o">.</span><span class="n">kd1</span> <span class="o">&gt;</span> <span class="mf">1e200</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qdga1</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">qdga1</span><span class="o">+</span><span class="n">new</span><span class="o">.</span><span class="n">qdgz1</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qdgz1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">modelutils</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">der</span><span class="o">.</span><span class="n">kd1</span><span class="p">))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qdga1</span> <span class="o">=</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qdga1</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qdgz1</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qdga1</span><span class="p">)</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">qdgz1</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qdgz1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">kd1</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="calc_qdga2_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdga2_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_qdga2_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform the runoff concentration calculation for &quot;fast&quot; direct runoff.</span>
+
+<span class="sd">    The working equation is the analytical solution of the linear storage</span>
+<span class="sd">    equation under the assumption of constant change in inflow during</span>
+<span class="sd">    the simulation time step.</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_derived.KD2`</span>
+
+<span class="sd">    Required state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGZ2`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGA2`</span>
+
+<span class="sd">    Basic equation:</span>
+<span class="sd">       :math:`QDGA2_{neu} = QDGA2_{alt} +</span>
+<span class="sd">       (QDGZ2_{alt}-QDGA2_{alt}) \\cdot (1-exp(-KD2^{-1})) +</span>
+<span class="sd">       (QDGZ2_{neu}-QDGZ2_{alt}) \\cdot (1-KD2\\cdot(1-exp(-KD2^{-1})))`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        A normal test case:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; derived.kd2(0.1)</span>
+<span class="sd">        &gt;&gt;&gt; states.qdgz2.old = 2.</span>
+<span class="sd">        &gt;&gt;&gt; states.qdgz2.new = 4.</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga2.old = 3.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdga2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga2</span>
+<span class="sd">        qdga2(3.800054)</span>
+
+<span class="sd">        First extreme test case (zero division is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kd2(0.)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdga2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga2</span>
+<span class="sd">        qdga2(4.0)</span>
+
+<span class="sd">        Second extreme test case (numerical overflow is circumvented):</span>
+
+<span class="sd">        &gt;&gt;&gt; derived.kd2(1e200)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_qdga2_v1()</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga2</span>
+<span class="sd">        qdga2(5.0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_old</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess_new</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="k">if</span> <span class="n">der</span><span class="o">.</span><span class="n">kd2</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qdga2</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">qdgz2</span>
+    <span class="k">elif</span> <span class="n">der</span><span class="o">.</span><span class="n">kd2</span> <span class="o">&gt;</span> <span class="mf">1e200</span><span class="p">:</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qdga2</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">qdga2</span><span class="o">+</span><span class="n">new</span><span class="o">.</span><span class="n">qdgz2</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qdgz2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">modelutils</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="n">der</span><span class="o">.</span><span class="n">kd2</span><span class="p">))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">qdga2</span> <span class="o">=</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qdga2</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">qdgz2</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qdga2</span><span class="p">)</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">qdgz2</span><span class="o">-</span><span class="n">old</span><span class="o">.</span><span class="n">qdgz2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">der</span><span class="o">.</span><span class="n">kd2</span><span class="o">*</span><span class="n">aid</span><span class="o">.</span><span class="n">temp</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="calc_q_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_q_v1">[docs]</a><span class="k">def</span> <span class="nf">calc_q_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the final runoff.</span>
+
+<span class="sd">    Note that, in case there are water areas, their (interception)</span>
+<span class="sd">    evaporation values are subtracted from the &quot;potential&quot; runoff value.</span>
+
+<span class="sd">    Required control parameters:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.NHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.FHRU`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_control.Lnk`</span>
+
+<span class="sd">    Required flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.EvI`</span>
+
+<span class="sd">    Required state sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QBGA`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGA1`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QIGA2`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGA1`</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.QDGA2`</span>
+
+<span class="sd">    Calculated state sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.Q`</span>
+
+<span class="sd">    Basic equations:</span>
+<span class="sd">       :math:`Q = QBGA + QIGA1 + QIGA2 + QDGA1 + QDGA2 - EvI_{WASSER}`</span>
+<span class="sd">       :math:`Q \\geq 0`</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        When there are no water areas in the respective subbasin, the</span>
+<span class="sd">        different runoff components are simply summed up:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; nhru(3)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER, VERS, NADELW)</span>
+<span class="sd">        &gt;&gt;&gt; fhru(0.5, 0.2, 0.3)</span>
+<span class="sd">        &gt;&gt;&gt; states.qbga = .1</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga1 = .3</span>
+<span class="sd">        &gt;&gt;&gt; states.qiga2 = .5</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga1 = .7</span>
+<span class="sd">        &gt;&gt;&gt; states.qdga2 = .9</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evi = 4., 5., 3.</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_q_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.q</span>
+<span class="sd">        q(2.5)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evi</span>
+<span class="sd">        evi(4.0, 5.0, 3.0)</span>
+
+<span class="sd">        The defined values of interception evaporation do not show any</span>
+<span class="sd">        impact on the result of the given example.  But when the first</span>
+<span class="sd">        HRU is assumed to be a water area, its interception evaporation</span>
+<span class="sd">        is subtracted:</span>
+
+<span class="sd">        &gt;&gt;&gt; control.lnk(WASSER, VERS, NADELW)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_q_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.q</span>
+<span class="sd">        q(0.5)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evi</span>
+<span class="sd">        evi(4.0, 5.0, 3.0)</span>
+
+<span class="sd">        Note that only 2mm instead of 4mm are subtracted, as the first</span>
+<span class="sd">        HRU`s area is only 50% of the subbasin area.</span>
+
+<span class="sd">        Setting also the land use class of the second HRU to water would</span>
+<span class="sd">        result in overtrying.  To avoid this, both water evaporation</span>
+<span class="sd">        values are reduced by the same factor:</span>
+
+
+<span class="sd">        &gt;&gt;&gt; control.lnk(WASSER, WASSER, NADELW)</span>
+<span class="sd">        &gt;&gt;&gt; model.calc_q_v1()</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.q</span>
+<span class="sd">        q(0.0)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.evi</span>
+<span class="sd">        evi(3.333333, 4.166667, 3.0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">sta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">aid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">aides</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">sta</span><span class="o">.</span><span class="n">qbga</span><span class="o">+</span><span class="n">sta</span><span class="o">.</span><span class="n">qiga1</span><span class="o">+</span><span class="n">sta</span><span class="o">.</span><span class="n">qiga2</span><span class="o">+</span><span class="n">sta</span><span class="o">.</span><span class="n">qdga1</span><span class="o">+</span><span class="n">sta</span><span class="o">.</span><span class="n">qdga2</span>
+    <span class="n">aid</span><span class="o">.</span><span class="n">epw</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">WASSER</span><span class="p">:</span>
+            <span class="n">aid</span><span class="o">.</span><span class="n">epw</span> <span class="o">+=</span> <span class="n">con</span><span class="o">.</span><span class="n">fhru</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">flu</span><span class="o">.</span><span class="n">evi</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">flu</span><span class="o">.</span><span class="n">q</span> <span class="o">&gt;</span> <span class="n">aid</span><span class="o">.</span><span class="n">epw</span><span class="p">:</span>
+        <span class="n">flu</span><span class="o">.</span><span class="n">q</span> <span class="o">-=</span> <span class="n">aid</span><span class="o">.</span><span class="n">epw</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">nhru</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">lnk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">WASSER</span><span class="p">:</span>
+                <span class="n">flu</span><span class="o">.</span><span class="n">evi</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">flu</span><span class="o">.</span><span class="n">q</span><span class="o">/</span><span class="n">aid</span><span class="o">.</span><span class="n">epw</span>
+        <span class="n">flu</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="update_outlets_v1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.update_outlets_v1">[docs]</a><span class="k">def</span> <span class="nf">update_outlets_v1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the outlet link sequence.</span>
+
+<span class="sd">    Required derived parameter:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_derived.QFactor`</span>
+
+<span class="sd">    Required flux sequences:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_fluxes.Q`</span>
+
+<span class="sd">    Calculated flux sequence:</span>
+<span class="sd">      :class:`~hydpy.models.lland.lland_outlets.Q`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">derived</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">flu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">outlets</span><span class="o">.</span><span class="n">fastaccess</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">der</span><span class="o">.</span><span class="n">qfactor</span><span class="o">*</span><span class="n">flu</span><span class="o">.</span><span class="n">q</span></div>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_model.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">modeltools</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base model for HydPy-L-Land.&quot;&quot;&quot;</span>
+
+    <span class="n">_RUNMETHODS</span> <span class="o">=</span> <span class="p">(</span><span class="n">calc_nkor_v1</span><span class="p">,</span>
+                   <span class="n">calc_tkor_v1</span><span class="p">,</span>
+                   <span class="n">calc_et0_v1</span><span class="p">,</span>
+                   <span class="n">calc_evpo_v1</span><span class="p">,</span>
+                   <span class="n">calc_nbes_inzp_v1</span><span class="p">,</span>
+                   <span class="n">calc_evi_inzp_v1</span><span class="p">,</span>
+                   <span class="n">calc_sbes_v1</span><span class="p">,</span>
+                   <span class="n">calc_wgtf_v1</span><span class="p">,</span>
+                   <span class="n">calc_schm_wats_v1</span><span class="p">,</span>
+                   <span class="n">calc_wada_waes_v1</span><span class="p">,</span>
+                   <span class="n">calc_evb_v1</span><span class="p">,</span>
+                   <span class="n">calc_qbb_v1</span><span class="p">,</span>
+                   <span class="n">calc_qib1_v1</span><span class="p">,</span>
+                   <span class="n">calc_qib2_v1</span><span class="p">,</span>
+                   <span class="n">calc_qdb_v1</span><span class="p">,</span>
+                   <span class="n">calc_bowa_v1</span><span class="p">,</span>
+                   <span class="n">calc_qbgz_v1</span><span class="p">,</span>
+                   <span class="n">calc_qigz1_v1</span><span class="p">,</span>
+                   <span class="n">calc_qigz2_v1</span><span class="p">,</span>
+                   <span class="n">calc_qdgz_v1</span><span class="p">,</span>
+                   <span class="n">calc_qdgz1_qdgz2_v1</span><span class="p">,</span>
+                   <span class="n">calc_qbga_v1</span><span class="p">,</span>
+                   <span class="n">calc_qiga1_v1</span><span class="p">,</span>
+                   <span class="n">calc_qiga2_v1</span><span class="p">,</span>
+                   <span class="n">calc_qdga1_v1</span><span class="p">,</span>
+                   <span class="n">calc_qdga2_v1</span><span class="p">,</span>
+                   <span class="n">calc_q_v1</span><span class="p">,</span>
+                   <span class="n">update_outlets_v1</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,358 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hland_v1 (HBV96 version of HydPy-H-Land) &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="hstream_v1 (HBV96 version of HydPy-H-Stream)" href="hstream_v1.html" />
+    <link rel="prev" title="HydPy-H-Branch" href="HydPy-H-Branch.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hstream_v1.html" title="hstream_v1 (HBV96 version of HydPy-H-Stream)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Branch.html" title="HydPy-H-Branch"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-H.html" accesskey="U">HydPy-H (HBV)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-hydpy.models.hland_v1">
+<span id="hland-v1-hbv96-version-of-hydpy-h-land"></span><span id="hland-v1"></span><h1>hland_v1 (HBV96 version of HydPy-H-Land)<a class="headerlink" href="#module-hydpy.models.hland_v1" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="hydpy.models.hland_v1.Model">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">Model</code><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modeltools.html#hydpy.core.modeltools.Model" title="hydpy.core.modeltools.Model"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.modeltools.Model</span></code></a></p>
+<p>HBV96 version of HydPy-H-Land (hland_v1).</p>
+<dl class="docutils">
+<dt>The following “run methods” are called each simulation step run in the given sequence:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_tc_v1" title="hydpy.models.hland.hland_model.calc_tc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_tc_v1()</span></code></a> <cite>Adjust the measured air temperature to the altitude of the individual zones.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_tmean_v1" title="hydpy.models.hland.hland_model.calc_tmean_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_tmean_v1()</span></code></a> <cite>Calculate the areal mean temperature of the subbasin.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_fracrain_v1" title="hydpy.models.hland.hland_model.calc_fracrain_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_fracrain_v1()</span></code></a> <cite>Determine the temperature dependend fraction of (liquid) rainfall and (total) precipitation.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_rfc_sfc_v1" title="hydpy.models.hland.hland_model.calc_rfc_sfc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_rfc_sfc_v1()</span></code></a> <cite>Calculate the corrected fractions rainfall/snowfall and total precipitation.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_pc_v1" title="hydpy.models.hland.hland_model.calc_pc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_pc_v1()</span></code></a> <cite>Apply the precipitation correction factors and adjust precipitation to the altitude of the individual zones.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_ep_v1" title="hydpy.models.hland.hland_model.calc_ep_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_ep_v1()</span></code></a> <cite>Adjust potential norm evaporation to the actual temperature.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_epc_v1" title="hydpy.models.hland.hland_model.calc_epc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_epc_v1()</span></code></a> <cite>Apply the evaporation correction factors and adjust evaporation to the altitude of the individual zones.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_tf_ic_v1" title="hydpy.models.hland.hland_model.calc_tf_ic_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_tf_ic_v1()</span></code></a> <cite>Calculate throughfall and update the interception storage accordingly.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_ei_ic_v1" title="hydpy.models.hland.hland_model.calc_ei_ic_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_ei_ic_v1()</span></code></a> <cite>Calculate interception evaporation and update the interception storage accordingly.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_sp_wc_v1" title="hydpy.models.hland.hland_model.calc_sp_wc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_sp_wc_v1()</span></code></a> <cite>Add throughfall to the snow layer.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_melt_sp_wc_v1" title="hydpy.models.hland.hland_model.calc_melt_sp_wc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_melt_sp_wc_v1()</span></code></a> <cite>Calculate melting of the ice content within the snow layer and update both the snow layers ice and the water content.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_refr_sp_wc_v1" title="hydpy.models.hland.hland_model.calc_refr_sp_wc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_refr_sp_wc_v1()</span></code></a> <cite>Calculate refreezing of the water content within the snow layer and update both the snow layers ice and the water content.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_glmelt_in_v1" title="hydpy.models.hland.hland_model.calc_glmelt_in_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_glmelt_in_v1()</span></code></a> <cite>Calculate melting from glaciers which are actually not covered by a snow layer and add it to the water release of the snow module.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_in_wc_v1" title="hydpy.models.hland.hland_model.calc_in_wc_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_in_wc_v1()</span></code></a> <cite>Calculate the actual water release from the snow layer due to the exceedance of the snow layers capacity for (liquid) water.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_r_sm_v1" title="hydpy.models.hland.hland_model.calc_r_sm_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_r_sm_v1()</span></code></a> <cite>Calculate effective precipitation and update soil moisture.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_cf_sm_v1" title="hydpy.models.hland.hland_model.calc_cf_sm_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_cf_sm_v1()</span></code></a> <cite>Calculate capillary flow and update soil moisture.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_ea_sm_v1" title="hydpy.models.hland.hland_model.calc_ea_sm_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_ea_sm_v1()</span></code></a> <cite>Calculate soil evaporation and update soil moisture.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_inuz_v1" title="hydpy.models.hland.hland_model.calc_inuz_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_inuz_v1()</span></code></a> <cite>Accumulate the total inflow into the upper zone layer.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_contriarea_v1" title="hydpy.models.hland.hland_model.calc_contriarea_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_contriarea_v1()</span></code></a> <cite>Determine the relative size of the contributing area of the whole subbasin.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_q0_perc_uz_v1" title="hydpy.models.hland.hland_model.calc_q0_perc_uz_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_q0_perc_uz_v1()</span></code></a> <cite>Perform the upper zone layer routine which determines percolation to the lower zone layer and the fast response of the hland model. Note that the system behaviour of this method depends strongly on the specifications of the options :class:`RespArea</cite> and <code class="xref py py-class docutils literal"><span class="pre">RecStep</span></code>.`</li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_lz_v1" title="hydpy.models.hland.hland_model.calc_lz_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_lz_v1()</span></code></a> <cite>Update the lower zone layer in accordance with percolation from upper groundwater to lower groundwater and/or in accordance with lake precipitation.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_el_lz_v1" title="hydpy.models.hland.hland_model.calc_el_lz_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_el_lz_v1()</span></code></a> <cite>Calculate lake evaporation.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_q1_lz_v1" title="hydpy.models.hland.hland_model.calc_q1_lz_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_q1_lz_v1()</span></code></a> <cite>Calculate the slow response of the lower zone layer.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_inuh_v1" title="hydpy.models.hland.hland_model.calc_inuh_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_inuh_v1()</span></code></a> <cite>Calculate the unit hydrograph input.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_outuh_quh_v1" title="hydpy.models.hland.hland_model.calc_outuh_quh_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_outuh_quh_v1()</span></code></a> <cite>Calculate the unit hydrograph output (convolution).</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.calc_qt_v1" title="hydpy.models.hland.hland_model.calc_qt_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qt_v1()</span></code></a> <cite>Calcutate the total discharge after possible abstractions.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_model.update_outlets_v1" title="hydpy.models.hland.hland_model.update_outlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_outlets_v1()</span></code></a> <cite>Update the outlet link sequence.</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.ControlParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">ControlParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#ControlParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.ControlParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Control parameters of hland_v1, directly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.Area" title="hydpy.models.hland.hland_control.Area"><code class="xref py py-class docutils literal"><span class="pre">Area</span></code></a> <cite>Subbasin area [km²].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.NmbZones" title="hydpy.models.hland.hland_control.NmbZones"><code class="xref py py-class docutils literal"><span class="pre">NmbZones</span></code></a> <cite>Number of zones (hydrological response units) in a subbasin [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ZoneType" title="hydpy.models.hland.hland_control.ZoneType"><code class="xref py py-class docutils literal"><span class="pre">ZoneType</span></code></a> <cite>Type of each zone: 1 (FIELD), 2 (FOREST), 3 (GLACIER), or 4 (ILAKE).</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ZoneArea" title="hydpy.models.hland.hland_control.ZoneArea"><code class="xref py py-class docutils literal"><span class="pre">ZoneArea</span></code></a> <cite>Zone area [km²].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ZoneZ" title="hydpy.models.hland.hland_control.ZoneZ"><code class="xref py py-class docutils literal"><span class="pre">ZoneZ</span></code></a> <cite>Zone elevation [100m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ZRelP" title="hydpy.models.hland.hland_control.ZRelP"><code class="xref py py-class docutils literal"><span class="pre">ZRelP</span></code></a> <cite>Subbasin-wide reference elevation level for precipitation [100m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ZRelT" title="hydpy.models.hland.hland_control.ZRelT"><code class="xref py py-class docutils literal"><span class="pre">ZRelT</span></code></a> <cite>Subbasin-wide reference elevation level for temperature [100m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ZRelE" title="hydpy.models.hland.hland_control.ZRelE"><code class="xref py py-class docutils literal"><span class="pre">ZRelE</span></code></a> <cite>Subbasin-wide reference elevation level for evaporation [100m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.PCorr" title="hydpy.models.hland.hland_control.PCorr"><code class="xref py py-class docutils literal"><span class="pre">PCorr</span></code></a> <cite>General precipitation correction factor [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.PCAlt" title="hydpy.models.hland.hland_control.PCAlt"><code class="xref py py-class docutils literal"><span class="pre">PCAlt</span></code></a> <cite>Elevation correction factor for precipitation [-1/100m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.RfCF" title="hydpy.models.hland.hland_control.RfCF"><code class="xref py py-class docutils literal"><span class="pre">RfCF</span></code></a> <cite>Rainfall correction factor [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.SfCF" title="hydpy.models.hland.hland_control.SfCF"><code class="xref py py-class docutils literal"><span class="pre">SfCF</span></code></a> <cite>Snowfall correction factor [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.TCAlt" title="hydpy.models.hland.hland_control.TCAlt"><code class="xref py py-class docutils literal"><span class="pre">TCAlt</span></code></a> <cite>Elevation correction factor for temperature [-1°C/100m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ECorr" title="hydpy.models.hland.hland_control.ECorr"><code class="xref py py-class docutils literal"><span class="pre">ECorr</span></code></a> <cite>General evaporation correction factor [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ECAlt" title="hydpy.models.hland.hland_control.ECAlt"><code class="xref py py-class docutils literal"><span class="pre">ECAlt</span></code></a> <cite>Elevation correction factor for evaporation [-1/100m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.EPF" title="hydpy.models.hland.hland_control.EPF"><code class="xref py py-class docutils literal"><span class="pre">EPF</span></code></a> <cite>Decrease in potential evaporation due to precipitation [T/mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ETF" title="hydpy.models.hland.hland_control.ETF"><code class="xref py py-class docutils literal"><span class="pre">ETF</span></code></a> <cite>Temperature factor for evaporation [1/°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.ERed" title="hydpy.models.hland.hland_control.ERed"><code class="xref py py-class docutils literal"><span class="pre">ERed</span></code></a> <cite>Factor for restricting actual to potential evaporation [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.TTIce" title="hydpy.models.hland.hland_control.TTIce"><code class="xref py py-class docutils literal"><span class="pre">TTIce</span></code></a> <cite>Temperature threshold for lake evaporation [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.IcMax" title="hydpy.models.hland.hland_control.IcMax"><code class="xref py py-class docutils literal"><span class="pre">IcMax</span></code></a> <cite>Maximum interception storage [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.TT" title="hydpy.models.hland.hland_control.TT"><code class="xref py py-class docutils literal"><span class="pre">TT</span></code></a> <cite>Temperature threshold for snow/rain [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.TTInt" title="hydpy.models.hland.hland_control.TTInt"><code class="xref py py-class docutils literal"><span class="pre">TTInt</span></code></a> <cite>Temperature interval with a mixture of snow and rain [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.DTTM" title="hydpy.models.hland.hland_control.DTTM"><code class="xref py py-class docutils literal"><span class="pre">DTTM</span></code></a> <cite>Difference between :class:`TTM</cite> and <code class="xref py py-class docutils literal"><span class="pre">TT</span></code> [°C].`</li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.CFMax" title="hydpy.models.hland.hland_control.CFMax"><code class="xref py py-class docutils literal"><span class="pre">CFMax</span></code></a> <cite>Degree day factor for snow (on glaciers or not) [mm/°C/T].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.GMelt" title="hydpy.models.hland.hland_control.GMelt"><code class="xref py py-class docutils literal"><span class="pre">GMelt</span></code></a> <cite>Degree day factor for glacial ice [mm/°C/T].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.CFR" title="hydpy.models.hland.hland_control.CFR"><code class="xref py py-class docutils literal"><span class="pre">CFR</span></code></a> <cite>Refreezing factor for water stored within the snow layer [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.WHC" title="hydpy.models.hland.hland_control.WHC"><code class="xref py py-class docutils literal"><span class="pre">WHC</span></code></a> <cite>Relative water holding capacity of the snow layer [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.FC" title="hydpy.models.hland.hland_control.FC"><code class="xref py py-class docutils literal"><span class="pre">FC</span></code></a> <cite>Maximum soil moisture content (field capacity) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.LP" title="hydpy.models.hland.hland_control.LP"><code class="xref py py-class docutils literal"><span class="pre">LP</span></code></a> <cite>Relative limit for potential evaporation [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.Beta" title="hydpy.models.hland.hland_control.Beta"><code class="xref py py-class docutils literal"><span class="pre">Beta</span></code></a> <cite>Nonlinearity parameter of the soil routine [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.PercMax" title="hydpy.models.hland.hland_control.PercMax"><code class="xref py py-class docutils literal"><span class="pre">PercMax</span></code></a> <cite>Maximum percolation rate [mm/T].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.CFlux" title="hydpy.models.hland.hland_control.CFlux"><code class="xref py py-class docutils literal"><span class="pre">CFlux</span></code></a> <cite>Capacity (maximum) of the capillary return flux [mm/T].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.RespArea" title="hydpy.models.hland.hland_control.RespArea"><code class="xref py py-class docutils literal"><span class="pre">RespArea</span></code></a> <cite>Flag to enable the contibuting area approach [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.RecStep" title="hydpy.models.hland.hland_control.RecStep"><code class="xref py py-class docutils literal"><span class="pre">RecStep</span></code></a> <cite>Number of internal computation steps per simulation time step [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.Alpha" title="hydpy.models.hland.hland_control.Alpha"><code class="xref py py-class docutils literal"><span class="pre">Alpha</span></code></a> <cite>Nonlinearity parameter of the upper zone layer [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.K" title="hydpy.models.hland.hland_control.K"><code class="xref py py-class docutils literal"><span class="pre">K</span></code></a> <cite>Recession coefficient of the upper zone layer [1/T/mm^alpha].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.K4" title="hydpy.models.hland.hland_control.K4"><code class="xref py py-class docutils literal"><span class="pre">K4</span></code></a> <cite>Recession coefficient of the lower zone layer [1/T].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.Gamma" title="hydpy.models.hland.hland_control.Gamma"><code class="xref py py-class docutils literal"><span class="pre">Gamma</span></code></a> <cite>Nonlinearity parameter of the lower zone layer [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.MaxBaz" title="hydpy.models.hland.hland_control.MaxBaz"><code class="xref py py-class docutils literal"><span class="pre">MaxBaz</span></code></a> <cite>Base length of the triangle unit hydrograph [T].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.Abstr" title="hydpy.models.hland.hland_control.Abstr"><code class="xref py py-class docutils literal"><span class="pre">Abstr</span></code></a> <cite>Abstraction of water from computed outflow [mm/T].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.DerivedParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">DerivedParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#DerivedParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.DerivedParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Derived parameters of hland_v1, indirectly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.RelZoneArea" title="hydpy.models.hland.hland_derived.RelZoneArea"><code class="xref py py-class docutils literal"><span class="pre">RelZoneArea</span></code></a> <cite>Relative zone area [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.RelSoilArea" title="hydpy.models.hland.hland_derived.RelSoilArea"><code class="xref py py-class docutils literal"><span class="pre">RelSoilArea</span></code></a> <cite>Total area of all `field</cite> and <cite>forest</cite> zones [km²].`</li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.RelSoilZoneArea" title="hydpy.models.hland.hland_derived.RelSoilZoneArea"><code class="xref py py-class docutils literal"><span class="pre">RelSoilZoneArea</span></code></a> <cite>Relative zone area of all `field</cite> and <cite>forest</cite> zones [-].`</li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.RelLandZoneArea" title="hydpy.models.hland.hland_derived.RelLandZoneArea"><code class="xref py py-class docutils literal"><span class="pre">RelLandZoneArea</span></code></a> <cite>Relative Zone area of all `field</cite>, <cite>forest</cite> and <cite>glacier</cite> zones [-].`</li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.RelLandArea" title="hydpy.models.hland.hland_derived.RelLandArea"><code class="xref py py-class docutils literal"><span class="pre">RelLandArea</span></code></a> <cite>Quotient of the sum of :class:`LandZoneArea</cite> and <code class="xref py py-class docutils literal"><span class="pre">Area</span></code> [-].`</li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.TTM" title="hydpy.models.hland.hland_derived.TTM"><code class="xref py py-class docutils literal"><span class="pre">TTM</span></code></a> <cite>Threshold temperature for snow melting and refreezing [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.DT" title="hydpy.models.hland.hland_derived.DT"><code class="xref py py-class docutils literal"><span class="pre">DT</span></code></a> <cite>Relative time step length for the upper zone layer calculations [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.NmbUH" title="hydpy.models.hland.hland_derived.NmbUH"><code class="xref py py-class docutils literal"><span class="pre">NmbUH</span></code></a> <cite>Number of the required unit hydrograph ordinates [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.UH" title="hydpy.models.hland.hland_derived.UH"><code class="xref py py-class docutils literal"><span class="pre">UH</span></code></a> <cite>Unit hydrograph ordinates [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_derived.QFactor" title="hydpy.models.hland.hland_derived.QFactor"><code class="xref py py-class docutils literal"><span class="pre">QFactor</span></code></a> <cite>Factor for converting mm/stepsize to m³/s.</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.InputSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">InputSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#InputSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.InputSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.InputSequences" title="hydpy.core.sequencetools.InputSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.InputSequences</span></code></a></p>
+<p>Input sequences of hland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_inputs.P" title="hydpy.models.hland.hland_inputs.P"><code class="xref py py-class docutils literal"><span class="pre">P</span></code></a> <cite>Precipitation [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_inputs.T" title="hydpy.models.hland.hland_inputs.T"><code class="xref py py-class docutils literal"><span class="pre">T</span></code></a> <cite>Temperature [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_inputs.TN" title="hydpy.models.hland.hland_inputs.TN"><code class="xref py py-class docutils literal"><span class="pre">TN</span></code></a> <cite>Normal temperature [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_inputs.EPN" title="hydpy.models.hland.hland_inputs.EPN"><code class="xref py py-class docutils literal"><span class="pre">EPN</span></code></a> <cite>Normal potential evaporation [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.FluxSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">FluxSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#FluxSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.FluxSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.FluxSequences" title="hydpy.core.sequencetools.FluxSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.FluxSequences</span></code></a></p>
+<p>Flux sequences of hland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.TMean" title="hydpy.models.hland.hland_fluxes.TMean"><code class="xref py py-class docutils literal"><span class="pre">TMean</span></code></a> <cite>Mean subbasin temperature [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.TC" title="hydpy.models.hland.hland_fluxes.TC"><code class="xref py py-class docutils literal"><span class="pre">TC</span></code></a> <cite>Corrected temperature [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.FracRain" title="hydpy.models.hland.hland_fluxes.FracRain"><code class="xref py py-class docutils literal"><span class="pre">FracRain</span></code></a> <cite>Fraction rainfall / total precipitation [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.RfC" title="hydpy.models.hland.hland_fluxes.RfC"><code class="xref py py-class docutils literal"><span class="pre">RfC</span></code></a> <cite>Actual precipitation correction related to liquid precipitation [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.SfC" title="hydpy.models.hland.hland_fluxes.SfC"><code class="xref py py-class docutils literal"><span class="pre">SfC</span></code></a> <cite>Actual precipitation correction related to frozen precipitation [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.PC" title="hydpy.models.hland.hland_fluxes.PC"><code class="xref py py-class docutils literal"><span class="pre">PC</span></code></a> <cite>Corrected precipitation [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.EP" title="hydpy.models.hland.hland_fluxes.EP"><code class="xref py py-class docutils literal"><span class="pre">EP</span></code></a> <cite>Potential evaporation [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.EPC" title="hydpy.models.hland.hland_fluxes.EPC"><code class="xref py py-class docutils literal"><span class="pre">EPC</span></code></a> <cite>Corrected potential evaporation [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.EI" title="hydpy.models.hland.hland_fluxes.EI"><code class="xref py py-class docutils literal"><span class="pre">EI</span></code></a> <cite>Interception evaporation [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.TF" title="hydpy.models.hland.hland_fluxes.TF"><code class="xref py py-class docutils literal"><span class="pre">TF</span></code></a> <cite>Throughfall [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.TFWat" title="hydpy.models.hland.hland_fluxes.TFWat"><code class="xref py py-class docutils literal"><span class="pre">TFWat</span></code></a> <cite>Liquid throughfall [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.TFIce" title="hydpy.models.hland.hland_fluxes.TFIce"><code class="xref py py-class docutils literal"><span class="pre">TFIce</span></code></a> <cite>Frozen throughfall [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.GlMelt" title="hydpy.models.hland.hland_fluxes.GlMelt"><code class="xref py py-class docutils literal"><span class="pre">GlMelt</span></code></a> <cite>Glacier melt [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.MeltPot" title="hydpy.models.hland.hland_fluxes.MeltPot"><code class="xref py py-class docutils literal"><span class="pre">MeltPot</span></code></a> <cite>Potential melting of frozen water stored in the snow layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.Melt" title="hydpy.models.hland.hland_fluxes.Melt"><code class="xref py py-class docutils literal"><span class="pre">Melt</span></code></a> <cite>Actual melting of frozen water stored in the snow layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.RefrPot" title="hydpy.models.hland.hland_fluxes.RefrPot"><code class="xref py py-class docutils literal"><span class="pre">RefrPot</span></code></a> <cite>Potential (re)freezing of liquid water stored in the snow layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.Refr" title="hydpy.models.hland.hland_fluxes.Refr"><code class="xref py py-class docutils literal"><span class="pre">Refr</span></code></a> <cite>Actual (re)freezing of liquid water stored in the snow layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.In_" title="hydpy.models.hland.hland_fluxes.In_"><code class="xref py py-class docutils literal"><span class="pre">In_</span></code></a> <cite>Snow module release / soil module inflow [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.R" title="hydpy.models.hland.hland_fluxes.R"><code class="xref py py-class docutils literal"><span class="pre">R</span></code></a> <cite>Effective soil response [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.EA" title="hydpy.models.hland.hland_fluxes.EA"><code class="xref py py-class docutils literal"><span class="pre">EA</span></code></a> <cite>Actual soil evaporation [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.CFPot" title="hydpy.models.hland.hland_fluxes.CFPot"><code class="xref py py-class docutils literal"><span class="pre">CFPot</span></code></a> <cite>Potential capillary flow [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.CF" title="hydpy.models.hland.hland_fluxes.CF"><code class="xref py py-class docutils literal"><span class="pre">CF</span></code></a> <cite>Actual capillary flow [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.Perc" title="hydpy.models.hland.hland_fluxes.Perc"><code class="xref py py-class docutils literal"><span class="pre">Perc</span></code></a> <cite>Percolation from the upper to the lower zone layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.ContriArea" title="hydpy.models.hland.hland_fluxes.ContriArea"><code class="xref py py-class docutils literal"><span class="pre">ContriArea</span></code></a> <cite>Fraction of the `soil area</cite> contributing to runoff generation [-].`</li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.InUZ" title="hydpy.models.hland.hland_fluxes.InUZ"><code class="xref py py-class docutils literal"><span class="pre">InUZ</span></code></a> <cite>Inflow to the upper zone layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.Q0" title="hydpy.models.hland.hland_fluxes.Q0"><code class="xref py py-class docutils literal"><span class="pre">Q0</span></code></a> <cite>Outflow from the upper zone layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.EL" title="hydpy.models.hland.hland_fluxes.EL"><code class="xref py py-class docutils literal"><span class="pre">EL</span></code></a> <cite>Actual lake evaporation [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.Q1" title="hydpy.models.hland.hland_fluxes.Q1"><code class="xref py py-class docutils literal"><span class="pre">Q1</span></code></a> <cite>Outflow from the lower zone layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.InUH" title="hydpy.models.hland.hland_fluxes.InUH"><code class="xref py py-class docutils literal"><span class="pre">InUH</span></code></a> <cite>Input of the triangle unit hydrograph [m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.OutUH" title="hydpy.models.hland.hland_fluxes.OutUH"><code class="xref py py-class docutils literal"><span class="pre">OutUH</span></code></a> <cite>Output of the triangle unit hydrograph [m].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_fluxes.QT" title="hydpy.models.hland.hland_fluxes.QT"><code class="xref py py-class docutils literal"><span class="pre">QT</span></code></a> <cite>Total model outflow [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.StateSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">StateSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#StateSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.StateSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequences" title="hydpy.core.sequencetools.StateSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequences</span></code></a></p>
+<p>State sequences of hland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_states.Ic" title="hydpy.models.hland.hland_states.Ic"><code class="xref py py-class docutils literal"><span class="pre">Ic</span></code></a> <cite>Interception storage [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_states.SP" title="hydpy.models.hland.hland_states.SP"><code class="xref py py-class docutils literal"><span class="pre">SP</span></code></a> <cite>Frozen water stored in the snow layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_states.WC" title="hydpy.models.hland.hland_states.WC"><code class="xref py py-class docutils literal"><span class="pre">WC</span></code></a> <cite>Liquid water content of the snow layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_states.SM" title="hydpy.models.hland.hland_states.SM"><code class="xref py py-class docutils literal"><span class="pre">SM</span></code></a> <cite>Soil moisture [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_states.UZ" title="hydpy.models.hland.hland_states.UZ"><code class="xref py py-class docutils literal"><span class="pre">UZ</span></code></a> <cite>Storage in the upper zone layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_states.LZ" title="hydpy.models.hland.hland_states.LZ"><code class="xref py py-class docutils literal"><span class="pre">LZ</span></code></a> <cite>Storage in the lower zone layer [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.LogSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">LogSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#LogSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.LogSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.AideSequences" title="hydpy.core.sequencetools.AideSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.AideSequences</span></code></a></p>
+<p>Aide sequences of hland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_logs.QUH" title="hydpy.models.hland.hland_logs.QUH"><code class="xref py py-class docutils literal"><span class="pre">QUH</span></code></a> <cite>Whole outflow delayed by means of the unit hydrograph [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.AideSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">AideSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#AideSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.AideSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.AideSequences" title="hydpy.core.sequencetools.AideSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.AideSequences</span></code></a></p>
+<p>Aide sequences of hland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_aides.Perc" title="hydpy.models.hland.hland_aides.Perc"><code class="xref py py-class docutils literal"><span class="pre">Perc</span></code></a> <cite>Percolation from the upper to the lower zone layer [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_aides.Q0" title="hydpy.models.hland.hland_aides.Q0"><code class="xref py py-class docutils literal"><span class="pre">Q0</span></code></a> <cite>Outflow from the upper zone layer [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hland_v1.OutletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hland_v1.</code><code class="descname">OutletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hland_v1.html#OutletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hland_v1.OutletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Downstream link sequences of hland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_outlets.Q" title="hydpy.models.hland.hland_outlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Runoff [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="HydPy-H-Branch.html"
+                        title="previous chapter">HydPy-H-Branch</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="hstream_v1.html"
+                        title="next chapter">hstream_v1 (HBV96 version of HydPy-H-Stream)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/hland_v1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hstream_v1.html" title="hstream_v1 (HBV96 version of HydPy-H-Stream)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Branch.html" title="HydPy-H-Branch"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-H.html" >HydPy-H (HBV)</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

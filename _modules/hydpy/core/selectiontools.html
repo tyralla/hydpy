@@ -1,0 +1,539 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.core.selectiontools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.core.selectiontools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">devicetools</span>
+
+
+<div class="viewcode-block" id="Selections"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selections">[docs]</a><span class="k">class</span> <span class="nc">Selections</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Collects :class:`Selection` instances.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        * ? (:class:`Selection`): An arbitrary number of :class:`Selection`</span>
+<span class="sd">          objects, which can be added (and removed) on demand.  Choose</span>
+<span class="sd">          attribute names that are meaningfull within your specific project.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">selections</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">+=</span> <span class="n">selection</span>
+
+    <span class="k">def</span> <span class="nf">_getnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Names of the actual selections.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getnames</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getselections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The actual selections themselves.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="n">selections</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getselections</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Selection</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selections</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_getiterable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tries to convert the given argument to a :class:`list` of</span>
+<span class="sd">        :class:`Selection` objects and returns it.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * value (:class:`Selection`, :class:`Selections` of a simple</span>
+<span class="sd">            iterable containing :class:`Selection` objects): The second</span>
+<span class="sd">            operand applied in an arithmetic operation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Selection</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Selections</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">selections</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">selection</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">break</span>
+                <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Arithmetic operations on `Selections` &#39;</span>
+                                <span class="s1">&#39;objects are defined for other `Selections` &#39;</span>
+                                <span class="s1">&#39;objects, single `Selection` objects or &#39;</span>
+                                <span class="s1">&#39;simple iterables (like `list` objects) &#39;</span>
+                                <span class="s1">&#39;containing `Selection` objects only.  The &#39;</span>
+                                <span class="s1">&#39;given arguments type is `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                                <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getiterable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="n">new</span><span class="p">[</span><span class="n">selection</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">selection</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+    <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getiterable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">selection</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">selection</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getiterable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">del</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="n">selection</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+    <span class="k">def</span> <span class="nf">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getiterable</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">selection</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Selections.assignrepr"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selections.assignrepr">[docs]</a>    <span class="k">def</span> <span class="nf">assignrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a :func:`repr` string with an prefixed assignement.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * prefix(:class:`str`): Usually something like &#39;x = &#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefix</span> <span class="o">+=</span> <span class="s1">&#39;Selections(&#39;</span>
+        <span class="n">blanks</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selections</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="n">selections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="n">prefix</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="n">selection</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="n">blanks</span><span class="p">))</span>
+            <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">prefix</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="s1">&#39;selections&#39;</span><span class="p">,</span> <span class="s1">&#39;assignrepr&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Selection"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection">[docs]</a><span class="k">class</span> <span class="nc">Selection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines a combination of :class:`~hydpy.core.node.Node` and</span>
+<span class="sd">    :class:`~hydpy.core.element.Element` objects suitable for a</span>
+<span class="sd">    specific task.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        * name (:class:`str`): Name of the selection.</span>
+<span class="sd">        * nodes (:class:`~hydpy.core.node.Nodes`):</span>
+<span class="sd">          Currently selected nodes.</span>
+<span class="sd">        * elements (:class:`~hydpy.core.element.Elements`):</span>
+<span class="sd">          Currently selected elements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Nodes</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Elements</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Selection.select_upstream"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.select_upstream">[docs]</a>    <span class="k">def</span> <span class="nf">select_upstream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Limit the current selection to the network upstream of the given</span>
+<span class="sd">        starting point, including the starting point itself.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * device (:class:`~hydpy.core.devicetools.Node` or</span>
+<span class="sd">              :class:`~hydpy.core.devicetools.Element`): Lowest point</span>
+<span class="sd">              to be selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_upstream</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.deselect_upstream"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.deselect_upstream">[docs]</a>    <span class="k">def</span> <span class="nf">deselect_upstream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the network upstream of the given starting point from the</span>
+<span class="sd">        current selection, including the starting point itself.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * device (:class:`~hydpy.core.devicetools.Node` or</span>
+<span class="sd">              :class:`~hydpy.core.devicetools.Element`): Highest point</span>
+<span class="sd">              to be deselected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_upstream</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">-=</span> <span class="n">nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">-=</span> <span class="n">elements</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.getby_upstream"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.getby_upstream">[docs]</a>    <span class="k">def</span> <span class="nf">getby_upstream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the network upstream of the given starting point, including</span>
+<span class="sd">        the starting point itself.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * device (:class:`~hydpy.core.devicetools.Node` or</span>
+<span class="sd">              :class:`~hydpy.core.devicetools.Element`): Lowest point</span>
+<span class="sd">              to be selected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Nodes</span><span class="p">()</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Elements</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+            <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextnode</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+            <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextelement</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Pass either a `Node` or an `Element` &#39;</span>
+                                 <span class="s1">&#39;instance to the function.  The given &#39;</span>
+                                 <span class="s1">&#39;`device` value `</span><span class="si">%s</span><span class="s1">` is of type `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                                 <span class="o">%</span> <span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">device</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span></div>
+
+    <span class="k">def</span> <span class="nf">_nextnode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;First recursion method for :func:`~Selection.getupstreamnetwork`.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            * node (:class:`~hydpy.core.devicetools.Node`): The node which</span>
+<span class="sd">              is selected currently.</span>
+<span class="sd">            * nodes (:class:`~hydpy.core.devicetools.Nodes`): All nodes</span>
+<span class="sd">            which have been selected so far.</span>
+<span class="sd">            * elements (:class:`~hydpy.core.devicetools.Elements`): All</span>
+<span class="sd">            elements which have been selected so far.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">):</span>
+            <span class="n">nodes</span> <span class="o">+=</span> <span class="n">node</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+                <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextelement</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span>
+
+    <span class="k">def</span> <span class="nf">_nextelement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Second recursion method for :func:`~Selection.getupstreamnetwork`.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            * element (:class:`~hydpy.core.devicetools.Element`): The</span>
+<span class="sd">              element which is selected currently.</span>
+<span class="sd">            * nodes (:class:`~hydpy.core.devicetools.Nodes`): All nodes</span>
+<span class="sd">            which have been selected so far.</span>
+<span class="sd">            * elements (:class:`~hydpy.core.devicetools.Elements`): All</span>
+<span class="sd">            elements which have been selected so far.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">):</span>
+            <span class="n">elements</span> <span class="o">+=</span> <span class="n">element</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">inlets</span><span class="p">:</span>
+                <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextnode</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">elements</span>
+
+<div class="viewcode-block" id="Selection.select_modelclasses"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.select_modelclasses">[docs]</a>    <span class="k">def</span> <span class="nf">select_modelclasses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">modelclass</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Limits the current selection to all elements containing the</span>
+<span class="sd">        given modelclass(es).  (All nodes are removed.)</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * modelclass (subclass of :class:`~hydpy.core.models.Model`):</span>
+<span class="sd">              Model type(s) as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Nodes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_modelclasses</span><span class="p">(</span><span class="n">modelclass</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.deselect_modelclasses"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.deselect_modelclasses">[docs]</a>    <span class="k">def</span> <span class="nf">deselect_modelclasses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">modelclasses</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Limits the current selection to all elements not containing the</span>
+<span class="sd">        given modelclass(es).  (All nodes are removed.)</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * modelclass (subclass of :class:`~hydpy.core.models.Model`):</span>
+<span class="sd">              Model type(s) as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Nodes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_modelclasses</span><span class="p">(</span><span class="o">*</span><span class="n">modelclasses</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.getby_modelclasses"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.getby_modelclasses">[docs]</a>    <span class="k">def</span> <span class="nf">getby_modelclasses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">modelclasses</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns all elements of the current selection containing the given</span>
+<span class="sd">        modelclass(es).</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * modelclass (subclass of :class:`~hydpy.core.models.Model`):</span>
+<span class="sd">              Model type(s) as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Elements</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;For element `</span><span class="si">%s</span><span class="s1">` no model object has been &#39;</span>
+                                   <span class="s1">&#39;initialized so far, which is a necessary &#39;</span>
+                                   <span class="s1">&#39;condition to perform (de)selections based &#39;</span>
+                                   <span class="s1">&#39;on model classes.&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">modelclasses</span><span class="p">):</span>
+                <span class="n">elements</span> <span class="o">+=</span> <span class="n">element</span>
+        <span class="k">return</span> <span class="n">elements</span></div>
+
+<div class="viewcode-block" id="Selection.select_nodenames"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.select_nodenames">[docs]</a>    <span class="k">def</span> <span class="nf">select_nodenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substrings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Limits the current selection to all nodes with a name</span>
+<span class="sd">        containing the given substring(s).  (All elements are unaffected.)</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * substrings (:class:`str`): (Possible) Part(s) of the nodes</span>
+<span class="sd">              name as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_nodenames</span><span class="p">(</span><span class="o">*</span><span class="n">substrings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.deselect_nodenames"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.deselect_nodenames">[docs]</a>    <span class="k">def</span> <span class="nf">deselect_nodenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substrings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Limits the current selection to all nodes with a name</span>
+<span class="sd">        not containing the given substring(s).  (All elements are unaffected.)</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * substrings (:class:`str`): (Possible) Part(s) of the nodes</span>
+<span class="sd">              name as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_nodenames</span><span class="p">(</span><span class="o">*</span><span class="n">substrings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.getby_nodenames"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.getby_nodenames">[docs]</a>    <span class="k">def</span> <span class="nf">getby_nodenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substrings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns all nodes of the current selection with a name</span>
+<span class="sd">        containing the given substrings(s).</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * substrings (:class:`str`): (Possible) Part(s) of the nodes</span>
+<span class="sd">              name as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Nodes</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">substring</span> <span class="ow">in</span> <span class="n">substrings</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">substring</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                    <span class="n">nodes</span> <span class="o">+=</span> <span class="n">node</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="n">nodes</span></div>
+
+<div class="viewcode-block" id="Selection.select_elementnames"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.select_elementnames">[docs]</a>    <span class="k">def</span> <span class="nf">select_elementnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substrings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Limits the current selection to all elements with a name</span>
+<span class="sd">        containing the given substring(s).  (All nodes are unaffected.)</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * substrings (:class:`str`): (Possible) Part(s) of the elements</span>
+<span class="sd">              name as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_elementnames</span><span class="p">(</span><span class="o">*</span><span class="n">substrings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.deselect_elementnames"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.deselect_elementnames">[docs]</a>    <span class="k">def</span> <span class="nf">deselect_elementnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substrings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Limits the current selection to all elements with a name</span>
+<span class="sd">        not containing the given substring(s).  (All nodes are unaffected.)</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * substrings (:class:`str`): (Possible) Part(s) of the elements</span>
+<span class="sd">              name as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getby_elementnames</span><span class="p">(</span><span class="o">*</span><span class="n">substrings</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Selection.getby_elementnames"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.getby_elementnames">[docs]</a>    <span class="k">def</span> <span class="nf">getby_elementnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substrings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns all elements of the current selection with a name</span>
+<span class="sd">        containing the given substrings(s).</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * substrings (:class:`str`): (Possible) Part(s) of the elements</span>
+<span class="sd">              name as the selection criterion/criteria.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Elements</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">substring</span> <span class="ow">in</span> <span class="n">substrings</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">substring</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                    <span class="n">elements</span> <span class="o">+=</span> <span class="n">element</span>
+                    <span class="k">break</span>
+        <span class="k">return</span> <span class="n">elements</span></div>
+
+<div class="viewcode-block" id="Selection.copy"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a semi-deep copy of the current selection.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            * name (:class:`str`): Name of the new :class:`Selection` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Selection</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">+=</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">-=</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">-=</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Selection.assignrepr"><a class="viewcode-back" href="../../../selectiontools.html#hydpy.core.selectiontools.Selection.assignrepr">[docs]</a>    <span class="k">def</span> <span class="nf">assignrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a :func:`repr` string with an prefixed assignement.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * prefix(:class:`str`): Usually something like &#39;x = &#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefixblanks</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Selection(&quot;</span><span class="si">%s</span><span class="s1">&quot;,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span>
+        <span class="n">blanks</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">+</span> <span class="mi">22</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">names</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">          nodes=Nodes(&quot;</span><span class="si">%s</span><span class="s1">&quot;,&#39;</span>
+                         <span class="o">%</span> <span class="p">(</span><span class="n">prefixblanks</span><span class="p">,</span> <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&quot;,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">blanks</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;),&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Selection(nodes=Nodes(),&#39;</span>
+                         <span class="o">%</span> <span class="n">prefixblanks</span><span class="p">)</span>
+        <span class="n">blanks</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">+</span> <span class="mi">28</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">names</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">          elements=Elements(&quot;</span><span class="si">%s</span><span class="s1">&quot;,&#39;</span>
+                         <span class="o">%</span> <span class="p">(</span><span class="n">prefixblanks</span><span class="p">,</span> <span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&quot;,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">blanks</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;))&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">          elements=Elements())&#39;</span>
+                         <span class="o">%</span> <span class="n">prefixblanks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;deselect_elementnames&#39;</span><span class="p">,</span> <span class="s1">&#39;deselect_modelclasses&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;deselect_nodenames&#39;</span><span class="p">,</span> <span class="s1">&#39;deselect_upstream&#39;</span><span class="p">,</span> <span class="s1">&#39;elements&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;getby_elementnames&#39;</span><span class="p">,</span> <span class="s1">&#39;getby_modelclasses&#39;</span><span class="p">,</span> <span class="s1">&#39;getby_nodenames&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;getby_upstream&#39;</span><span class="p">,</span> <span class="s1">&#39;nodes&#39;</span><span class="p">,</span> <span class="s1">&#39;select_elementnames&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;select_modelclasses&#39;</span><span class="p">,</span> <span class="s1">&#39;select_nodenames&#39;</span><span class="p">,</span> <span class="s1">&#39;select_upstream&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;assignrepr&#39;</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

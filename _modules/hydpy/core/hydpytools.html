@@ -1,0 +1,455 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.core.hydpytools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.core.hydpytools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">filetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">devicetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">selectiontools</span>
+
+
+<div class="viewcode-block" id="HydPy"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy">[docs]</a><span class="k">class</span> <span class="nc">HydPy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;HydPy for single processing.&quot;&quot;&quot;</span>
+
+    <span class="c1"># A counter for the number of HydPy instances.</span>
+    <span class="n">nmb_instances</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">printprogress</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;HydPy initialization started at&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">))</span>
+
+        <span class="c1"># Increment and check number of HydPy instances.</span>
+        <span class="n">HydPy</span><span class="o">.</span><span class="n">nmb_instances</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">HydPy</span><span class="o">.</span><span class="n">nmb_instances</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Currently </span><span class="si">%d</span><span class="s1"> instances of HydPy are initialized &#39;</span>
+                          <span class="s1">&#39;within the same process.  It is strongly &#39;</span>
+                          <span class="s1">&#39;recommended to initialize only one instance at a &#39;</span>
+                          <span class="s1">&#39;time.  Consider deleting all instances and &#39;</span>
+                          <span class="s1">&#39;initializing a new one, unless you are fully aware &#39;</span>
+                          <span class="s1">&#39;in what manner HydPy is relying on some global &#39;</span>
+                          <span class="s1">&#39;information stored in modules.&#39;</span>
+                          <span class="o">%</span> <span class="n">HydPy</span><span class="o">.</span><span class="n">nmb_instances</span><span class="p">)</span>
+
+        <span class="c1"># Store public information in a seperate module.</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">projectname</span> <span class="o">=</span> <span class="n">projectname</span>
+        <span class="k">if</span> <span class="n">projectname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">filemanager</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">networkmanager</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">sequencemanager</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">filemanager</span> <span class="o">=</span> <span class="n">filetools</span><span class="o">.</span><span class="n">MainManager</span><span class="p">()</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">networkmanager</span> <span class="o">=</span> <span class="n">filetools</span><span class="o">.</span><span class="n">NetworkManager</span><span class="p">()</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span> <span class="o">=</span> <span class="n">filetools</span><span class="o">.</span><span class="n">ControlManager</span><span class="p">()</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">sequencemanager</span> <span class="o">=</span> <span class="n">filetools</span><span class="o">.</span><span class="n">SequenceManager</span><span class="p">()</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span> <span class="o">=</span> <span class="n">filetools</span><span class="o">.</span><span class="n">ConditionManager</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">printprogress</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;HydPy initialization ended at&#39;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%X</span><span class="s1">&#39;</span><span class="p">))</span>
+
+<div class="viewcode-block" id="HydPy.preparenetwork"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.preparenetwork">[docs]</a>    <span class="k">def</span> <span class="nf">preparenetwork</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">selections</span> <span class="o">=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selections</span><span class="p">()</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">selections</span> <span class="o">+=</span> <span class="n">pub</span><span class="o">.</span><span class="n">networkmanager</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updatedevices</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">selections</span><span class="o">.</span><span class="n">complete</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.initmodels"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.initmodels">[docs]</a>    <span class="k">def</span> <span class="nf">initmodels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">warn</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnsimulationstep</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnsimulationstep</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">element</span><span class="o">.</span><span class="n">initmodel</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="s1">&#39;While trying to load the control file&#39;</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">temp</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span> <span class="ow">and</span>
+                            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnmissingcontrolfile</span><span class="p">):</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No model could be initialized for &#39;</span>
+                                      <span class="s1">&#39;element `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span>
+                            <span class="s1">&#39;While trying to initialize the model of &#39;</span>
+                            <span class="s1">&#39;element `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                    <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnsimulationstep</span> <span class="o">=</span> <span class="n">warn</span></div>
+
+<div class="viewcode-block" id="HydPy.savecontrols"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.savecontrols">[docs]</a>    <span class="k">def</span> <span class="nf">savecontrols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controldirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">projectdirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">parameterstep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">simulationstep</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">_controldirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">_controldirectory</span>
+        <span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">_projectdirectory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">controldirectory</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">controldirectory</span> <span class="o">=</span> <span class="n">controldirectory</span>
+            <span class="k">if</span> <span class="n">projectdirectory</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">projectdirectory</span> <span class="o">=</span> <span class="n">projectdirectory</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">savecontrols</span><span class="p">(</span><span class="n">parameterstep</span><span class="p">,</span>
+                                                      <span class="n">simulationstep</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">_controldirectory</span> <span class="o">=</span> <span class="n">_controldirectory</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">_projectdirectory</span></div>
+
+<div class="viewcode-block" id="HydPy.loadconditions"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.loadconditions">[docs]</a>    <span class="k">def</span> <span class="nf">loadconditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditiondirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">controldirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">projectdirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ioconditions</span><span class="p">(</span><span class="n">conditiondirectory</span><span class="p">,</span>  <span class="n">controldirectory</span><span class="p">,</span>
+                           <span class="n">projectdirectory</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.saveconditions"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.saveconditions">[docs]</a>    <span class="k">def</span> <span class="nf">saveconditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditiondirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">controldirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">projectdirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ioconditions</span><span class="p">(</span><span class="n">conditiondirectory</span><span class="p">,</span>  <span class="n">controldirectory</span><span class="p">,</span>
+                           <span class="n">projectdirectory</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_ioconditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conditiondirectory</span><span class="p">,</span> <span class="n">controldirectory</span><span class="p">,</span>
+                      <span class="n">projectdirectory</span><span class="p">,</span> <span class="n">loadflag</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">loadflag</span><span class="p">:</span>
+            <span class="n">_conditiondirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">_loaddirectory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_conditiondirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">_savedirectory</span>
+        <span class="n">_controldirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">_controldirectory</span>
+        <span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">_projectdirectory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">projectdirectory</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">projectdirectory</span> <span class="o">=</span> <span class="n">projectdirectory</span>
+            <span class="k">if</span> <span class="n">conditiondirectory</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">loadflag</span><span class="p">:</span>
+                    <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">loaddirectory</span> <span class="o">=</span> <span class="n">conditiondirectory</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">savedirectory</span> <span class="o">=</span> <span class="n">conditiondirectory</span>
+            <span class="k">if</span> <span class="n">controldirectory</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">controldirectory</span> <span class="o">=</span> <span class="n">controldirectory</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">loadflag</span><span class="p">:</span>
+                    <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">loadconditions</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">saveconditions</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">loadflag</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">_loaddirectory</span> <span class="o">=</span> <span class="n">_conditiondirectory</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">_savedirectory</span> <span class="o">=</span> <span class="n">_conditiondirectory</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">_controldirectory</span> <span class="o">=</span> <span class="n">_controldirectory</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">_projectdirectory</span>
+
+<div class="viewcode-block" id="HydPy.trimconditions"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.trimconditions">[docs]</a>    <span class="k">def</span> <span class="nf">trimconditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">trimconditions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HydPy.resetconditions"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.resetconditions">[docs]</a>    <span class="k">def</span> <span class="nf">resetconditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HydPy.connect"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">network_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of nodes: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of elements: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of end nodes: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endnodes</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of distinct networks: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distinct_networks</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Applied node variables: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">distinct_networks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sels1</span> <span class="o">=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selections</span><span class="p">()</span>
+        <span class="n">sels2</span> <span class="o">=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selections</span><span class="p">()</span>
+        <span class="n">complete</span> <span class="o">=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selection</span><span class="p">(</span><span class="s1">&#39;complete&#39;</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">endnodes</span><span class="p">:</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="n">complete</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">select_upstream</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="n">sels1</span> <span class="o">+=</span> <span class="n">sel</span>
+            <span class="n">sels2</span> <span class="o">+=</span> <span class="n">sel</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">sel1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sels1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">sel2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sels2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name1</span> <span class="o">!=</span> <span class="n">name2</span><span class="p">:</span>
+                    <span class="n">sel1</span> <span class="o">-=</span> <span class="n">sel2</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">sels1</span><span class="o">.</span><span class="n">names</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sels1</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">sels1</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">sels1</span>
+
+    <span class="k">def</span> <span class="nf">_updatedeviceorder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">endnodes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nextnode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_nextnode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">exits</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">receivers</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_nextelement</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nextelement</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_nextelement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">outlets</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nextnode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">element</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">inlets</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nextnode</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">endnodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">endnodes</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Nodes</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">exits</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="p">(</span><span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">receivers</span><span class="p">)):</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">endnodes</span> <span class="o">+=</span> <span class="n">node</span>
+        <span class="k">return</span> <span class="n">endnodes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="n">variables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">simindices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">firstdate</span><span class="p">],</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">lastdate</span><span class="p">])</span>
+
+<div class="viewcode-block" id="HydPy.openfiles"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.openfiles">[docs]</a>    <span class="k">def</span> <span class="nf">openfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">openfiles</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">openfiles</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.closefiles"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.closefiles">[docs]</a>    <span class="k">def</span> <span class="nf">closefiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">closefiles</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">closefiles</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HydPy.updatedevices"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.updatedevices">[docs]</a>    <span class="k">def</span> <span class="nf">updatedevices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">nodes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">elements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_updatedeviceorder</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">funcorder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">funcs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">routingmode</span> <span class="o">==</span> <span class="s1">&#39;oldsim&#39;</span><span class="p">:</span>
+                <span class="n">funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">_loaddata_sim</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">use_ext</span><span class="p">:</span>
+                <span class="n">funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">_loaddata_obs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">receivers</span><span class="p">:</span>
+                <span class="n">funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">updatereceivers</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">routingmode</span> <span class="o">!=</span> <span class="s1">&#39;oldsim&#39;</span><span class="p">:</span>
+                <span class="n">funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">reset</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviceorder</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Element</span><span class="p">):</span>
+                <span class="n">funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">doit</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">senders</span><span class="p">:</span>
+                <span class="n">funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">updatesenders</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">routingmode</span> <span class="o">!=</span> <span class="s1">&#39;oldsim&#39;</span><span class="p">:</span>
+                <span class="n">funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">_savedata_sim</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">funcs</span>
+
+<div class="viewcode-block" id="HydPy.doit"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.doit">[docs]</a>    <span class="k">def</span> <span class="nf">doit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">idx_start</span><span class="p">,</span> <span class="n">idx_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simindices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">openfiles</span><span class="p">(</span><span class="n">idx_start</span><span class="p">)</span>
+        <span class="n">funcorder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">funcorder</span>
+        <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">printprogress</span><span class="p">:</span>
+            <span class="n">maxcounter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">idx_end</span><span class="o">-</span><span class="n">idx_start</span><span class="p">)</span><span class="o">/</span><span class="mf">20.</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="mi">18</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">maxcounter</span> <span class="o">=</span> <span class="n">idx_end</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_start</span><span class="p">,</span> <span class="n">idx_end</span><span class="p">):</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">&gt;</span> <span class="n">maxcounter</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">funcorder</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">printprogress</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closefiles</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HydPy.prepare_modelseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.prepare_modelseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_modelseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">prepare_allseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.prepare_inputseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.prepare_inputseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_inputseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">prepare_inputseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.prepare_fluxseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.prepare_fluxseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_fluxseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">prepare_fluxseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.prepare_stateseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.prepare_stateseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_stateseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">prepare_stateseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.prepare_nodeseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.prepare_nodeseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_nodeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">prepare_allseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.prepare_simseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.prepare_simseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_simseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">prepare_simseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.prepare_obsseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.prepare_obsseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_obsseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="o">.</span><span class="n">prepare_obsseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.save_modelseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.save_modelseries">[docs]</a>    <span class="k">def</span> <span class="nf">save_modelseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_inputseries</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_fluxseries</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_stateseries</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HydPy.save_inputseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.save_inputseries">[docs]</a>    <span class="k">def</span> <span class="nf">save_inputseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_modelseries</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="n">pub</span><span class="o">.</span><span class="n">sequencemanager</span><span class="o">.</span><span class="n">inputoverwrite</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.save_fluxseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.save_fluxseries">[docs]</a>    <span class="k">def</span> <span class="nf">save_fluxseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_modelseries</span><span class="p">(</span><span class="s1">&#39;fluxes&#39;</span><span class="p">,</span> <span class="n">pub</span><span class="o">.</span><span class="n">sequencemanager</span><span class="o">.</span><span class="n">outputoverwrite</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.save_stateseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.save_stateseries">[docs]</a>    <span class="k">def</span> <span class="nf">save_stateseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_modelseries</span><span class="p">(</span><span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="n">pub</span><span class="o">.</span><span class="n">sequencemanager</span><span class="o">.</span><span class="n">outputoverwrite</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_save_modelseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_subseqs</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span>
+            <span class="n">subseqs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">name_subseqs</span><span class="p">,</span> <span class="p">())</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">memoryflag</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">filepath_ext</span><span class="p">):</span>
+                        <span class="n">seq</span><span class="o">.</span><span class="n">save_ext</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Due to the argument `overwrite` beeing &#39;</span>
+                                      <span class="s1">&#39;`False` it is not allowed to overwrite &#39;</span>
+                                      <span class="s1">&#39;the already existing file `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                                      <span class="o">%</span> <span class="n">seq</span><span class="o">.</span><span class="n">filepath_ext</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HydPy.save_nodeseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.save_nodeseries">[docs]</a>    <span class="k">def</span> <span class="nf">save_nodeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_simseries</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_obsseries</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="HydPy.save_simseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.save_simseries">[docs]</a>    <span class="k">def</span> <span class="nf">save_simseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_nodeseries</span><span class="p">(</span><span class="s1">&#39;sim&#39;</span><span class="p">,</span> <span class="n">pub</span><span class="o">.</span><span class="n">sequencemanager</span><span class="o">.</span><span class="n">simoverwrite</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HydPy.save_obsseries"><a class="viewcode-back" href="../../../hydpytools.html#hydpy.core.hydpytools.HydPy.save_obsseries">[docs]</a>    <span class="k">def</span> <span class="nf">save_obsseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_nodeseries</span><span class="p">(</span><span class="s1">&#39;obs&#39;</span><span class="p">,</span> <span class="n">pub</span><span class="o">.</span><span class="n">sequencemanager</span><span class="o">.</span><span class="n">obsoverwrite</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_save_nodeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seqname</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="n">seqname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">memoryflag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">filepath_ext</span><span class="p">):</span>
+                    <span class="n">seq</span><span class="o">.</span><span class="n">save_ext</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Due to the argument `overwrite` beeing &#39;</span>
+                                  <span class="s1">&#39;`False` it is not allowed to overwrite &#39;</span>
+                                  <span class="s1">&#39;the already existing file `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                                  <span class="o">%</span> <span class="n">seq</span><span class="o">.</span><span class="n">filepath_ext</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

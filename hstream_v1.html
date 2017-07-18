@@ -1,0 +1,209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hstream_v1 (HBV96 version of HydPy-H-Stream) &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="hbranch_v1 (HBV96 version of HydPy-H-Branch)" href="hbranch_v1.html" />
+    <link rel="prev" title="hland_v1 (HBV96 version of HydPy-H-Land)" href="hland_v1.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hbranch_v1.html" title="hbranch_v1 (HBV96 version of HydPy-H-Branch)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="hland_v1.html" title="hland_v1 (HBV96 version of HydPy-H-Land)"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-H.html" accesskey="U">HydPy-H (HBV)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-hydpy.models.hstream_v1">
+<span id="hstream-v1-hbv96-version-of-hydpy-h-stream"></span><span id="hstream-v1"></span><h1>hstream_v1 (HBV96 version of HydPy-H-Stream)<a class="headerlink" href="#module-hydpy.models.hstream_v1" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="hydpy.models.hstream_v1.Model">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream_v1.</code><code class="descname">Model</code><a class="reference internal" href="_modules/hydpy/models/hstream_v1.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream_v1.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modeltools.html#hydpy.core.modeltools.Model" title="hydpy.core.modeltools.Model"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.modeltools.Model</span></code></a></p>
+<p>The HBV96 version of HydPy-H-Stream (hstream_v1).</p>
+<dl class="docutils">
+<dt>The following “run methods” are called each simulation step run in the given sequence:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_model.calc_qjoints_v1" title="hydpy.models.hstream.hstream_model.calc_qjoints_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qjoints_v1()</span></code></a> <cite>Apply the routing equation.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_model.update_inlets_v1" title="hydpy.models.hstream.hstream_model.update_inlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_inlets_v1()</span></code></a> <cite>Assign the actual value of the inlet sequence to the upper joint of the subreach upstream.</cite></li>
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_model.update_outlets_v1" title="hydpy.models.hstream.hstream_model.update_outlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_outlets_v1()</span></code></a> <cite>Assing the actual value of the lower joint of of the subreach downstream to the outlet sequence.</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream_v1.ControlParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream_v1.</code><code class="descname">ControlParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream_v1.html#ControlParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream_v1.ControlParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Control parameters of hstream_v1, directly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_control.Lag" title="hydpy.models.hstream.hstream_control.Lag"><code class="xref py py-class docutils literal"><span class="pre">Lag</span></code></a> <cite>Time lag between inflow and outflow [T].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_control.Damp" title="hydpy.models.hstream.hstream_control.Damp"><code class="xref py py-class docutils literal"><span class="pre">Damp</span></code></a> <cite>Damping of the hydrograph [-].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream_v1.DerivedParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream_v1.</code><code class="descname">DerivedParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream_v1.html#DerivedParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream_v1.DerivedParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Derived parameters of hstream_v1, indirectly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_derived.NmbSegments" title="hydpy.models.hstream.hstream_derived.NmbSegments"><code class="xref py py-class docutils literal"><span class="pre">NmbSegments</span></code></a> <cite>Number of river segments [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_derived.C1" title="hydpy.models.hstream.hstream_derived.C1"><code class="xref py py-class docutils literal"><span class="pre">C1</span></code></a> <cite>First coefficient of the muskingum working formula [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_derived.C2" title="hydpy.models.hstream.hstream_derived.C2"><code class="xref py py-class docutils literal"><span class="pre">C2</span></code></a> <cite>Second coefficient of the muskingum working formula [-].</cite></li>
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_derived.C3" title="hydpy.models.hstream.hstream_derived.C3"><code class="xref py py-class docutils literal"><span class="pre">C3</span></code></a> <cite>Third coefficient of the muskingum working formula [-].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream_v1.StateSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream_v1.</code><code class="descname">StateSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream_v1.html#StateSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream_v1.StateSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequences" title="hydpy.core.sequencetools.StateSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequences</span></code></a></p>
+<p>State sequences of hstream_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_states.QJoints" title="hydpy.models.hstream.hstream_states.QJoints"><code class="xref py py-class docutils literal"><span class="pre">QJoints</span></code></a> <cite>Runoff at the segment junctions [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream_v1.InletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream_v1.</code><code class="descname">InletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream_v1.html#InletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream_v1.InletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Upstream link sequences of stream_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_inlets.Q" title="hydpy.models.hstream.hstream_inlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Runoff [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream_v1.OutletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream_v1.</code><code class="descname">OutletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream_v1.html#OutletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream_v1.OutletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Downstream link sequences of hstream_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-H-Stream.html#hydpy.models.hstream.hstream_outlets.Q" title="hydpy.models.hstream.hstream_outlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Runoff [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="hland_v1.html"
+                        title="previous chapter">hland_v1 (HBV96 version of HydPy-H-Land)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="hbranch_v1.html"
+                        title="next chapter">hbranch_v1 (HBV96 version of HydPy-H-Branch)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/hstream_v1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hbranch_v1.html" title="hbranch_v1 (HBV96 version of HydPy-H-Branch)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="hland_v1.html" title="hland_v1 (HBV96 version of HydPy-H-Land)"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-H.html" >HydPy-H (HBV)</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,672 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.hland.hland_parameters &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.hland.hland_parameters</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...third party</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+<span class="c1"># ...model specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.hland.hland_constants</span> <span class="k">import</span> <span class="n">FIELD</span><span class="p">,</span> <span class="n">FOREST</span><span class="p">,</span> <span class="n">ILAKE</span><span class="p">,</span> <span class="n">GLACIER</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.hland.hland_constants</span> <span class="k">import</span> <span class="n">CONSTANTS</span>
+
+
+<div class="viewcode-block" id="MultiParameter"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.MultiParameter">[docs]</a><span class="k">class</span> <span class="nc">MultiParameter</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">ZipParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of the HydPy-H-Land model</span>
+<span class="sd">    (potentially) handling multiple values.</span>
+
+<span class="sd">    Due to inheriting from :class:`~hydpy.core.parametertools.ZipParameter`,</span>
+<span class="sd">    additional keyword zipping functionality is offered.  The optional</span>
+<span class="sd">    `kwargs` are checked for the keywords `field`, `forest`, `glacier`,</span>
+<span class="sd">    `ilake,` and `default`.  If available, the respective values are used to</span>
+<span class="sd">    define the values of those 1-dimensional arrays, whose entries are related</span>
+<span class="sd">    to the different zone types. Also the method</span>
+<span class="sd">    :func:`~MultiParameter.compressrepr` tries to find compressed string</span>
+<span class="sd">    representations based on the mentioned zone types.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        Prepare a :class:`MultiParameter` instance:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.hland.hland_parameters import MultiParameter</span>
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; mp = MultiParameter()</span>
+<span class="sd">        &gt;&gt;&gt; mp.DIM, mp.TYPE, mp.TIME = 1, float, None</span>
+<span class="sd">        &gt;&gt;&gt; mp.subpars = control</span>
+
+<span class="sd">        Usually, one would indirectly define its shape through parameter</span>
+<span class="sd">        :class:`~hydpy.models.hland.hland_control.NmbZones`:</span>
+
+<span class="sd">        &gt;&gt;&gt; mp.shape</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        RuntimeError: Shape information for parameter `multiparameter` can only be retrieved after it has been defined.  You can do this manually, but usually it is done automatically by defining the value of parameter `nmbzones` first in each parameter control file.</span>
+
+<span class="sd">        But here it is set manually to the value 5 for representing</span>
+<span class="sd">        five different zone types:</span>
+
+<span class="sd">        &gt;&gt;&gt; zonetype.shape = 5</span>
+<span class="sd">        &gt;&gt;&gt; zonetype(FIELD, FOREST, GLACIER, ILAKE, FIELD)</span>
+<span class="sd">        &gt;&gt;&gt; mp.shape = 5</span>
+
+<span class="sd">        Assign values to all four zone types explicitely:</span>
+
+<span class="sd">        &gt;&gt;&gt; mp(field=2., forest=1., glacier=4., ilake=3.)</span>
+<span class="sd">        &gt;&gt;&gt; mp</span>
+<span class="sd">        multiparameter(field=2.0, forest=1.0, glacier=4.0, ilake=3.0)</span>
+<span class="sd">        &gt;&gt;&gt; mp.values</span>
+<span class="sd">        array([ 2.,  1.,  4.,  3.,  2.])</span>
+
+<span class="sd">        Specify a default value for all zone types not included in the</span>
+<span class="sd">        keyword list:</span>
+
+<span class="sd">        &gt;&gt;&gt; mp(field=2., forest=1., default=9.)</span>
+<span class="sd">        &gt;&gt;&gt; mp</span>
+<span class="sd">        multiparameter(field=2.0, forest=1.0, glacier=9.0, ilake=9.0)</span>
+<span class="sd">        &gt;&gt;&gt; mp.values</span>
+<span class="sd">        array([ 2.,  1.,  9.,  9.,  2.])</span>
+
+<span class="sd">        If no default value is given, numpys `nan` is applied:</span>
+
+<span class="sd">        &gt;&gt;&gt; mp(field=2., forest=1.)</span>
+<span class="sd">        &gt;&gt;&gt; mp</span>
+<span class="sd">        multiparameter(field=2.0, forest=1.0, glacier=nan, ilake=nan)</span>
+<span class="sd">        &gt;&gt;&gt; mp.values</span>
+<span class="sd">        array([  2.,   1.,  nan,  nan,   2.])</span>
+
+<span class="sd">        Of course, the usual value assignments remain unaffected:</span>
+
+<span class="sd">        &gt;&gt;&gt; mp.values = 5.</span>
+<span class="sd">        &gt;&gt;&gt; mp</span>
+<span class="sd">        multiparameter(5.0)</span>
+<span class="sd">        &gt;&gt;&gt; mp.values</span>
+<span class="sd">        array([ 5.,  5.,  5.,  5.,  5.])</span>
+
+<span class="sd">        &gt;&gt;&gt; mp.values = 5., 4., 3., 2., 1.</span>
+<span class="sd">        &gt;&gt;&gt; mp</span>
+<span class="sd">        multiparameter(5.0, 4.0, 3.0, 2.0, 1.0)</span>
+<span class="sd">        &gt;&gt;&gt; mp.values</span>
+<span class="sd">        array([ 5.,  4.,  3.,  2.,  1.])</span>
+
+<span class="sd">    Another feature of :class:`MultiParameter` is that it relates the property</span>
+<span class="sd">    :func:`~MultiParameter.verifymask` to the defined zone types.</span>
+<span class="sd">    This requires the definition of the class attribute</span>
+<span class="sd">    :const:`~MultiParameter.REQUIRED_VALUES` for :class:`MultiParameter`</span>
+<span class="sd">    subclasses.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        When values for all zone types are required, all entries of the</span>
+<span class="sd">        verification mask are `True`:</span>
+
+<span class="sd">        &gt;&gt;&gt; mp.REQUIRED_VALUES = (FIELD, FOREST, GLACIER, ILAKE)</span>
+<span class="sd">        &gt;&gt;&gt; mp.verifymask</span>
+<span class="sd">        array([ True,  True,  True,  True,  True], dtype=bool)</span>
+
+<span class="sd">        When values for field and forest zones are required only, the</span>
+<span class="sd">        entries related to glacier and ilake zones are `False`:</span>
+
+<span class="sd">        &gt;&gt;&gt; mp.REQUIRED_VALUES = (FIELD, FOREST)</span>
+<span class="sd">        &gt;&gt;&gt; mp.verifymask</span>
+<span class="sd">        array([ True,  True, False, False,  True], dtype=bool)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="n">FIELD</span><span class="p">,</span> <span class="n">FOREST</span><span class="p">,</span> <span class="n">GLACIER</span><span class="p">,</span> <span class="n">ILAKE</span><span class="p">)</span>
+    <span class="n">MODEL_CONSTANTS</span> <span class="o">=</span> <span class="n">CONSTANTS</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">refparameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alias for the associated instance of</span>
+<span class="sd">        :class:`~hydpy.models.hland.hland_control.ZoneType`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">pars</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">zonetype</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shapeparameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alias for the associated instance of</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_control.NmbZones`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">pars</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">nmbzones</span></div>
+
+
+<div class="viewcode-block" id="MultiParameterSoil"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.MultiParameterSoil">[docs]</a><span class="k">class</span> <span class="nc">MultiParameterSoil</span><span class="p">(</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of the hland model (potentially)</span>
+<span class="sd">    handling multiple values relevant for `soil zones` (and interception).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="n">FIELD</span><span class="p">,</span> <span class="n">FOREST</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiParameterLand"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.MultiParameterLand">[docs]</a><span class="k">class</span> <span class="nc">MultiParameterLand</span><span class="p">(</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of the hland model (potentially)</span>
+<span class="sd">    handling multiple values relevant for all `land zones`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="n">FIELD</span><span class="p">,</span> <span class="n">FOREST</span><span class="p">,</span> <span class="n">GLACIER</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiParameterLake"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.MultiParameterLake">[docs]</a><span class="k">class</span> <span class="nc">MultiParameterLake</span><span class="p">(</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of the hland model (potentially)</span>
+<span class="sd">    handling multiple values relevant for `lake zones` only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="n">ILAKE</span><span class="p">,)</span></div>
+
+
+<div class="viewcode-block" id="MultiParameterGlacier"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.MultiParameterGlacier">[docs]</a><span class="k">class</span> <span class="nc">MultiParameterGlacier</span><span class="p">(</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of the hland model (potentially)</span>
+<span class="sd">    handling multiple values relevant for `glacier zones` only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="n">GLACIER</span><span class="p">,)</span></div>
+
+
+<div class="viewcode-block" id="MultiParameterNoGlacier"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.MultiParameterNoGlacier">[docs]</a><span class="k">class</span> <span class="nc">MultiParameterNoGlacier</span><span class="p">(</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of the hland model (potentially)</span>
+<span class="sd">    handling multiple values relevant for `glacier free zones` only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="p">(</span><span class="n">FIELD</span><span class="p">,</span> <span class="n">FOREST</span><span class="p">,</span> <span class="n">ILAKE</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Parameters"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters">[docs]</a><span class="k">class</span> <span class="nc">Parameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">Parameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;All parameters of the hland model.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Parameters.update"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine the values of the parameters handled by</span>
+<span class="sd">        :class:`DerivedParameters` based on the values of the parameters</span>
+<span class="sd">        handled by :class:`ControlParameters`.  The results of the different</span>
+<span class="sd">        methods are not interdependend, meaning their order could be changed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_relzonearea</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_landzonearea</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_soilarea</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_ttm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_dt</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_nmbuh_uh</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_qfactor</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Parameters.calc_relzonearea"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.calc_relzonearea">[docs]</a>    <span class="k">def</span> <span class="nf">calc_relzonearea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the relative areas of all zones within the subbasin.</span>
+
+<span class="sd">        Required control parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.ZoneArea`</span>
+
+<span class="sd">        Calculated derived parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.RelZoneArea`</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            With one single zone, its relative area is one by definition:</span>
+
+<span class="sd">            &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">            &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; nmbzones(1)</span>
+<span class="sd">            &gt;&gt;&gt; zonearea(1111.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_relzonearea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.relzonearea</span>
+<span class="sd">            relzonearea(1.0)</span>
+
+<span class="sd">            An example for three zones of different sizes:</span>
+
+<span class="sd">            &gt;&gt;&gt; nmbzones(3)</span>
+<span class="sd">            &gt;&gt;&gt; zonearea(1., 3., 2.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_relzonearea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.relzonearea</span>
+<span class="sd">            relzonearea(0.166667, 0.5, 0.333333)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>
+        <span class="n">der</span><span class="o">.</span><span class="n">relzonearea</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">zonearea</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">zonearea</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Parameters.calc_landzonearea"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.calc_landzonearea">[docs]</a>    <span class="k">def</span> <span class="nf">calc_landzonearea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the fraction of the summed area of all &quot;land zones&quot;</span>
+<span class="sd">        (of type FIELD, FOREST, or ILAKE) and the total subbasin area, and</span>
+<span class="sd">        calculate the fractions of all &quot;land zones&quot; and the total &quot;land area&quot;</span>
+<span class="sd">        of the subbasin.</span>
+
+<span class="sd">        Required control parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.Area`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.ZoneArea`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.ZoneType`</span>
+
+<span class="sd">        Calculated derived parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.RelLandArea`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.RelLandZoneArea`</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            With all zones beeing &quot;land zones&quot;, the relative land area is</span>
+<span class="sd">            one by definition and the relative &quot;land zone&quot; areas are in</span>
+<span class="sd">            accordance with the original zone areas:</span>
+
+<span class="sd">            &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">            &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; nmbzones(3)</span>
+<span class="sd">            &gt;&gt;&gt; zonetype(FIELD, FOREST, GLACIER)</span>
+<span class="sd">            &gt;&gt;&gt; area(100.)</span>
+<span class="sd">            &gt;&gt;&gt; zonearea(25., 25., 50.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_landzonearea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.rellandarea</span>
+<span class="sd">            rellandarea(1.0)</span>
+<span class="sd">            &gt;&gt;&gt; derived.rellandzonearea</span>
+<span class="sd">            rellandzonearea(field=0.25, forest=0.25, glacier=0.5)</span>
+
+<span class="sd">            With one zone beeing a lake zone, the relative &quot;land area&quot; is</span>
+<span class="sd">            decreased and the relative &quot;land zone&quot; areas are increased ---</span>
+<span class="sd">            except the one related to the internal lake, which is set to zero:</span>
+
+<span class="sd">            &gt;&gt;&gt; zonetype(FIELD, FOREST, ILAKE)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_landzonearea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.rellandarea</span>
+<span class="sd">            rellandarea(0.5)</span>
+<span class="sd">            &gt;&gt;&gt; derived.rellandzonearea</span>
+<span class="sd">            rellandzonearea(field=0.5, forest=0.5, ilake=0.0)</span>
+
+<span class="sd">            With all zones beeing lake zones, all relative areas are zero:</span>
+
+<span class="sd">            &gt;&gt;&gt; zonetype(ILAKE, ILAKE, ILAKE)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_landzonearea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.rellandarea</span>
+<span class="sd">            rellandarea(0.0)</span>
+<span class="sd">            &gt;&gt;&gt; derived.rellandzonearea</span>
+<span class="sd">            rellandzonearea(0.0)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>
+        <span class="n">landzonearea</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">zonearea</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">landzonearea</span><span class="p">[</span><span class="n">con</span><span class="o">.</span><span class="n">zonetype</span> <span class="o">==</span> <span class="n">ILAKE</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">landarea</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">landzonearea</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">landarea</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">rellandzonearea</span><span class="p">(</span><span class="n">landzonearea</span><span class="o">/</span><span class="n">landarea</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">rellandzonearea</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+        <span class="n">der</span><span class="o">.</span><span class="n">rellandarea</span><span class="p">(</span><span class="n">landarea</span><span class="o">/</span><span class="n">con</span><span class="o">.</span><span class="n">area</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Parameters.calc_soilarea"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.calc_soilarea">[docs]</a>    <span class="k">def</span> <span class="nf">calc_soilarea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the fraction of the summed area of all &quot;soil zones&quot;</span>
+<span class="sd">        (of type FIELD or FOREST) and the total subbasin area, and</span>
+<span class="sd">        calculate the fractions of all &quot;soil zones&quot; and the total &quot;soil area&quot;</span>
+<span class="sd">        of the subbasin.</span>
+
+<span class="sd">        Required control parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.Area`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.ZoneArea`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.ZoneType`</span>
+
+<span class="sd">        Calculated derived parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.RelSoilArea`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.RelSoilZoneArea`</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            With all zones beeing &quot;soil zones&quot;, the relative land area is</span>
+<span class="sd">            one by definition and the relative &quot;soil zone&quot; areas are in</span>
+<span class="sd">            accordance with the original zone areas:</span>
+
+<span class="sd">            &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">            &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; nmbzones(4)</span>
+<span class="sd">            &gt;&gt;&gt; zonetype(FIELD, FOREST, FIELD, FOREST)</span>
+<span class="sd">            &gt;&gt;&gt; area(100.)</span>
+<span class="sd">            &gt;&gt;&gt; zonearea(25., 25., 25., 25.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_soilarea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.relsoilarea</span>
+<span class="sd">            relsoilarea(1.0)</span>
+<span class="sd">            &gt;&gt;&gt; derived.relsoilzonearea</span>
+<span class="sd">            relsoilzonearea(0.25)</span>
+
+<span class="sd">            With one zone beeing a lake zone one one zone beeing a glacier</span>
+<span class="sd">            zone, the relative &quot;soil area&quot; is decreased and the relative</span>
+<span class="sd">            &quot;soil zone&quot; areas are increased --- except the ones related to</span>
+<span class="sd">            the internal lake and the glacier, which are set to zero:</span>
+
+<span class="sd">            &gt;&gt;&gt; zonetype(FIELD, FOREST, GLACIER, ILAKE)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_soilarea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.relsoilarea</span>
+<span class="sd">            relsoilarea(0.5)</span>
+<span class="sd">            &gt;&gt;&gt; derived.relsoilzonearea</span>
+<span class="sd">            relsoilzonearea(field=0.5, forest=0.5, glacier=0.0, ilake=0.0)</span>
+
+<span class="sd">            With all zones beeing lake or glacier zones, all relative areas</span>
+<span class="sd">            are zero:</span>
+
+<span class="sd">            &gt;&gt;&gt; zonetype(GLACIER, GLACIER, ILAKE, ILAKE)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_soilarea()</span>
+<span class="sd">            &gt;&gt;&gt; derived.relsoilarea</span>
+<span class="sd">            relsoilarea(0.0)</span>
+<span class="sd">            &gt;&gt;&gt; derived.relsoilzonearea</span>
+<span class="sd">            relsoilzonearea(0.0)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>
+        <span class="n">soilzonearea</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">zonearea</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">soilzonearea</span><span class="p">[</span><span class="n">con</span><span class="o">.</span><span class="n">zonetype</span> <span class="o">==</span> <span class="n">GLACIER</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">soilzonearea</span><span class="p">[</span><span class="n">con</span><span class="o">.</span><span class="n">zonetype</span> <span class="o">==</span> <span class="n">ILAKE</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">soilarea</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">soilzonearea</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">soilarea</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">relsoilzonearea</span><span class="p">(</span><span class="n">soilzonearea</span><span class="o">/</span><span class="n">soilarea</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">relsoilzonearea</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+        <span class="n">der</span><span class="o">.</span><span class="n">relsoilarea</span><span class="p">(</span><span class="n">soilarea</span><span class="o">/</span><span class="n">con</span><span class="o">.</span><span class="n">area</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Parameters.calc_ttm"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.calc_ttm">[docs]</a>    <span class="k">def</span> <span class="nf">calc_ttm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the threshold temperature for melting and refreezing.</span>
+
+<span class="sd">        Required control parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.TT`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.DTTM`</span>
+
+<span class="sd">        Calculated derived parameter:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.TTM`</span>
+
+<span class="sd">        Basic equation:</span>
+<span class="sd">          :math:`TTM = TT+DTTM`</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">            &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">            &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; nmbzones(1)</span>
+<span class="sd">            &gt;&gt;&gt; tt(1.)</span>
+<span class="sd">            &gt;&gt;&gt; dttm(-2.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_ttm()</span>
+<span class="sd">            &gt;&gt;&gt; derived.ttm</span>
+<span class="sd">            ttm(-1.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>
+        <span class="n">der</span><span class="o">.</span><span class="n">ttm</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">tt</span><span class="o">+</span><span class="n">con</span><span class="o">.</span><span class="n">dttm</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Parameters.calc_dt"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.calc_dt">[docs]</a>    <span class="k">def</span> <span class="nf">calc_dt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine the relative time step size for solving the upper</span>
+<span class="sd">        zone layer routine.</span>
+
+<span class="sd">        Required control parameter:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.RecStep`</span>
+
+<span class="sd">        Calculated derived parameter:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.DT`</span>
+
+<span class="sd">        Basic equation:</span>
+<span class="sd">          :math:`DT = \\frac{1}{RecStep}`</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">            &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; recstep(2.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_dt()</span>
+<span class="sd">            &gt;&gt;&gt; derived.dt</span>
+<span class="sd">            dt(1.0)</span>
+<span class="sd">            &gt;&gt;&gt; recstep(10.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_dt()</span>
+<span class="sd">            &gt;&gt;&gt; derived.dt</span>
+<span class="sd">            dt(0.2)</span>
+
+<span class="sd">            Note that the value assigned to recstep is related to the given</span>
+<span class="sd">            parameter step size of one day.  The actually applied recstep of</span>
+<span class="sd">            the last example is:</span>
+
+<span class="sd">            &gt;&gt;&gt; recstep.value</span>
+<span class="sd">            5</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>
+        <span class="n">der</span><span class="o">.</span><span class="n">dt</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">con</span><span class="o">.</span><span class="n">recstep</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Parameters.calc_qfactor"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.calc_qfactor">[docs]</a>    <span class="k">def</span> <span class="nf">calc_qfactor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine the factor for converting values of</span>
+<span class="sd">        :class:`~hydpy.models.hland.hland_fluxes.QT` [mm/T] to values of</span>
+<span class="sd">        :class:`~hydpy.models.hland.hland_outlets.Q` [m³/s].</span>
+
+<span class="sd">        Required control parameter:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.Area`</span>
+
+<span class="sd">        Required property of</span>
+<span class="sd">        :class:`~hydpy.core.parametertools.Parameter`:</span>
+
+<span class="sd">          :attr:`~hydpy.core.parametertools.Parameter.seconds`</span>
+
+<span class="sd">        Calculated derived parameter:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.QFactor`</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">            &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">            &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; area(50.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_qfactor()</span>
+<span class="sd">            &gt;&gt;&gt; derived.qfactor</span>
+<span class="sd">            qfactor(1.157407)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>
+        <span class="n">der</span><span class="o">.</span><span class="n">qfactor</span><span class="p">(</span><span class="n">con</span><span class="o">.</span><span class="n">area</span><span class="o">*</span><span class="mf">1000.</span><span class="o">/</span><span class="n">der</span><span class="o">.</span><span class="n">qfactor</span><span class="o">.</span><span class="n">simulationstep</span><span class="o">.</span><span class="n">seconds</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Parameters.calc_nmbuh_uh"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_parameters.Parameters.calc_nmbuh_uh">[docs]</a>    <span class="k">def</span> <span class="nf">calc_nmbuh_uh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the ordinates of the triangle unit hydrograph.</span>
+
+<span class="sd">        Note that also the shape of sequence</span>
+<span class="sd">        :class:`~hydpy.models.hland.hland_logs.QUH` is defined in accordance</span>
+<span class="sd">        with :class:`~hydpy.models.hland.hland_derived.NmbUH`.</span>
+
+<span class="sd">        Required control parameter:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_control.MaxBaz`</span>
+
+<span class="sd">        Calculated derived parameters:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.NmbUH`</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_derived.UH`</span>
+
+<span class="sd">        Prepared log sequence:</span>
+<span class="sd">          :class:`~hydpy.models.hland.hland_logs.QUH`</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            MaxBaz determines the end point of the triangle.  A value of</span>
+<span class="sd">            MaxBaz beeing not larger than the simulation step size is</span>
+<span class="sd">            identical with applying no unit hydrograph at all:</span>
+
+<span class="sd">            &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">            &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; maxbaz(0.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_nmbuh_uh()</span>
+<span class="sd">            &gt;&gt;&gt; derived.nmbuh</span>
+<span class="sd">            nmbuh(1)</span>
+<span class="sd">            &gt;&gt;&gt; logs.quh.shape</span>
+<span class="sd">            (1,)</span>
+<span class="sd">            &gt;&gt;&gt; derived.uh</span>
+<span class="sd">            uh(1.0)</span>
+
+<span class="sd">            Note that, due to difference of the parameter and the simulation</span>
+<span class="sd">            step size in the given example, the largest assignement resulting</span>
+<span class="sd">            in a `inactive` unit hydrograph is 1/2:</span>
+
+<span class="sd">            &gt;&gt;&gt; maxbaz(0.5)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_nmbuh_uh()</span>
+<span class="sd">            &gt;&gt;&gt; derived.nmbuh</span>
+<span class="sd">            nmbuh(1)</span>
+<span class="sd">            &gt;&gt;&gt; logs.quh.shape</span>
+<span class="sd">            (1,)</span>
+<span class="sd">            &gt;&gt;&gt; derived.uh</span>
+<span class="sd">            uh(1.0)</span>
+
+<span class="sd">            When MaxBaz is in accordance with two simulation steps, both</span>
+<span class="sd">            unit hydrograph ordinats must be 1/2, due to symmetry of the</span>
+<span class="sd">            triangle:</span>
+
+<span class="sd">            &gt;&gt;&gt; maxbaz(1.)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_nmbuh_uh()</span>
+<span class="sd">            &gt;&gt;&gt; derived.nmbuh</span>
+<span class="sd">            nmbuh(2)</span>
+<span class="sd">            &gt;&gt;&gt; logs.quh.shape</span>
+<span class="sd">            (2,)</span>
+<span class="sd">            &gt;&gt;&gt; derived.uh</span>
+<span class="sd">            uh(0.5)</span>
+
+<span class="sd">            A MaxBaz value in accordance with three simulation steps results</span>
+<span class="sd">            --- when expressed as fractions --- in the ordinate values 2/9,</span>
+<span class="sd">            5/9, and 2/9:</span>
+
+<span class="sd">            &gt;&gt;&gt; maxbaz(1.5)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_nmbuh_uh()</span>
+<span class="sd">            &gt;&gt;&gt; derived.nmbuh</span>
+<span class="sd">            nmbuh(3)</span>
+<span class="sd">            &gt;&gt;&gt; logs.quh.shape</span>
+<span class="sd">            (3,)</span>
+<span class="sd">            &gt;&gt;&gt; derived.uh</span>
+<span class="sd">            uh(0.222222, 0.555556, 0.222222)</span>
+
+<span class="sd">            And a final example, where the end of the triangle lies within</span>
+<span class="sd">            a simulation step, resulting in the fractions 8/49, 23/49, 16/49,</span>
+<span class="sd">            and 2/49:</span>
+
+<span class="sd">            &gt;&gt;&gt; maxbaz(1.75)</span>
+<span class="sd">            &gt;&gt;&gt; model.parameters.calc_nmbuh_uh()</span>
+<span class="sd">            &gt;&gt;&gt; derived.nmbuh</span>
+<span class="sd">            nmbuh(4)</span>
+<span class="sd">            &gt;&gt;&gt; logs.quh.shape</span>
+<span class="sd">            (4,)</span>
+<span class="sd">            &gt;&gt;&gt; derived.uh</span>
+<span class="sd">            uh(0.163265, 0.469388, 0.326531, 0.040816)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span>
+        <span class="n">der</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derived</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">logs</span>
+        <span class="c1"># Determine UH parameters...</span>
+        <span class="k">if</span> <span class="n">con</span><span class="o">.</span><span class="n">maxbaz</span> <span class="o">&lt;=</span> <span class="mf">1.</span><span class="p">:</span>
+            <span class="c1"># ...when MaxBaz smaller than or equal to the simulation time step.</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">nmbuh</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">quh</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># ...when MaxBaz is greater than the simulation time step.</span>
+            <span class="c1"># Define some shortcuts for the following calculations.</span>
+            <span class="n">full</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">maxbaz</span><span class="o">.</span><span class="n">value</span>
+            <span class="c1"># Now comes a terrible trick due to rounding problems coming from</span>
+            <span class="c1"># the conversation of the SMHI parameter set to the HydPy</span>
+            <span class="c1"># parameter set.  Time to get rid of it...</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">full</span> <span class="o">%</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-4</span><span class="p">:</span>
+                <span class="n">full</span> <span class="o">//=</span> <span class="mf">1.</span>
+            <span class="n">full_f</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">full</span><span class="p">))</span>
+            <span class="n">full_c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">full</span><span class="p">))</span>
+            <span class="n">half</span> <span class="o">=</span> <span class="n">full</span><span class="o">/</span><span class="mf">2.</span>
+            <span class="n">half_f</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">half</span><span class="p">))</span>
+            <span class="n">half_c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">half</span><span class="p">))</span>
+            <span class="n">full_2</span> <span class="o">=</span> <span class="n">full</span><span class="o">**</span><span class="mf">2.</span>
+            <span class="c1"># Calculate the triangle ordinate(s)...</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">nmbuh</span><span class="p">(</span><span class="n">full_c</span><span class="p">)</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">full_c</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">quh</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">full_c</span>
+            <span class="c1"># ...of the rising limb.</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">half_f</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="p">[:</span><span class="n">half_f</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">points</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">full_2</span><span class="p">)</span>
+            <span class="c1"># ...around the peak (if it exists).</span>
+            <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">half</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="p">[</span><span class="n">half_f</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="p">((</span><span class="n">half_c</span><span class="o">-</span><span class="n">half</span><span class="p">)</span><span class="o">/</span><span class="n">full</span> <span class="o">+</span>
+                     <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">half</span><span class="o">**</span><span class="mf">2.</span><span class="o">-</span><span class="n">half_f</span><span class="o">**</span><span class="mf">2.</span><span class="o">-</span><span class="n">half_c</span><span class="o">**</span><span class="mf">2.</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">full_2</span><span class="p">))</span>
+            <span class="c1"># ...of the falling limb (eventually except the last one).</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">half_c</span><span class="o">+</span><span class="mf">1.</span><span class="p">,</span> <span class="n">full_f</span><span class="o">+</span><span class="mf">1.</span><span class="p">)</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="p">[</span><span class="n">half_c</span><span class="p">:</span><span class="n">full_f</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">full</span><span class="o">-</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">points</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">full_2</span><span class="p">)</span>
+            <span class="c1"># ...at the end (if not already done).</span>
+            <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">full</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">!=</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="p">[</span><span class="n">full_f</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">full</span><span class="o">-</span><span class="n">full_f</span><span class="p">)</span><span class="o">/</span><span class="n">full</span> <span class="o">-</span>
+                                  <span class="p">(</span><span class="n">full_2</span><span class="o">-</span><span class="n">full_f</span><span class="o">**</span><span class="mf">2.</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">full_2</span><span class="p">))</span>
+            <span class="c1"># Normalize the ordinates.</span>
+            <span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="p">(</span><span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">der</span><span class="o">.</span><span class="n">uh</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

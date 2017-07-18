@@ -1,0 +1,953 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>sequencetools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="timetools" href="timetools.html" />
+    <link rel="prev" title="selectiontools" href="selectiontools.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="timetools.html" title="timetools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="selectiontools.html" title="selectiontools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" accesskey="U">Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sequencetools">
+<span id="id1"></span><h1>sequencetools<a class="headerlink" href="#sequencetools" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.core.sequencetools"></span><p>Created on Tue Dec 27 23:23:53 2016</p>
+<p>&#64;author: tyralla</p>
+<dl class="class">
+<dt id="hydpy.core.sequencetools.Sequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">Sequences</code><span class="sig-paren">(</span><em>kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Base class for handling all sequences of a specific model.</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.set_initvals">
+<code class="descname">set_initvals</code><span class="sig-paren">(</span><em>info</em>, <em>idx_date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.set_initvals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.set_initvals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.activate_disk">
+<code class="descname">activate_disk</code><span class="sig-paren">(</span><em>names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.activate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.activate_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.deactivate_disk">
+<code class="descname">deactivate_disk</code><span class="sig-paren">(</span><em>names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.deactivate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.deactivate_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.activate_ram">
+<code class="descname">activate_ram</code><span class="sig-paren">(</span><em>names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.activate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.activate_ram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.deactivate_ram">
+<code class="descname">deactivate_ram</code><span class="sig-paren">(</span><em>names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.deactivate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.deactivate_ram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.openfiles">
+<code class="descname">openfiles</code><span class="sig-paren">(</span><em>idx=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.openfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.openfiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.closefiles">
+<code class="descname">closefiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.closefiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.closefiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.loaddata">
+<code class="descname">loaddata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.loaddata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.loaddata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.savedata">
+<code class="descname">savedata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.savedata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.savedata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequences.conditions">
+<code class="descname">conditions</code><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generator object yielding all conditions (class:<cite>StateSequence</cite> and
+<a class="reference internal" href="#hydpy.core.sequencetools.LogSequence" title="hydpy.core.sequencetools.LogSequence"><code class="xref py py-class docutils literal"><span class="pre">LogSequence</span></code></a> objects).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequences.hasconditions">
+<code class="descname">hasconditions</code><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.hasconditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>True or False, whether the <a class="reference internal" href="#hydpy.core.sequencetools.Sequences" title="hydpy.core.sequencetools.Sequences"><code class="xref py py-class docutils literal"><span class="pre">Sequences</span></code></a> object handles at
+conditions (at least one <a class="reference internal" href="#hydpy.core.sequencetools.StateSequence" title="hydpy.core.sequencetools.StateSequence"><code class="xref py py-class docutils literal"><span class="pre">StateSequence</span></code></a> or <a class="reference internal" href="#hydpy.core.sequencetools.LogSequence" title="hydpy.core.sequencetools.LogSequence"><code class="xref py py-class docutils literal"><span class="pre">LogSequence</span></code></a>
+object)  or not.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.loadconditions">
+<code class="descname">loadconditions</code><span class="sig-paren">(</span><em>filename=None</em>, <em>dirname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.loadconditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.loadconditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load initial conditions from a file and assign them to the
+respective sequences.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.saveconditions">
+<code class="descname">saveconditions</code><span class="sig-paren">(</span><em>filename=None</em>, <em>dirname=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.saveconditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.saveconditions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequences.trimconditions">
+<code class="descname">trimconditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequences.trimconditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequences.trimconditions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.MetaSubSequencesType">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">MetaSubSequencesType</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#MetaSubSequencesType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.MetaSubSequencesType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#type" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">type</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.MetaSubSequencesClass">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">MetaSubSequencesClass</code><a class="headerlink" href="#hydpy.core.sequencetools.MetaSubSequencesClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.SubSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">SubSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#SubSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.SubSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.MetaSubSequencesClass" title="hydpy.core.sequencetools.MetaSubSequencesClass"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.MetaSubSequencesClass</span></code></a></p>
+<p>Base class for handling subgroups of sequences.</p>
+<dl class="docutils">
+<dt>Attributes:</dt>
+<dd><ul class="first last simple">
+<li>seqs: The parent <a class="reference internal" href="#hydpy.core.sequencetools.Sequences" title="hydpy.core.sequencetools.Sequences"><code class="xref py py-class docutils literal"><span class="pre">Sequences</span></code></a> object.</li>
+<li>fastaccess: The  <a class="reference internal" href="#hydpy.core.sequencetools.FastAccess" title="hydpy.core.sequencetools.FastAccess"><code class="xref py py-class docutils literal"><span class="pre">FastAccess</span></code></a> object allowing fast access to
+the sequence values. In <cite>Cython</cite> mode, model specific cdef
+classes are applied.</li>
+</ul>
+</dd>
+</dl>
+<p>Additional attributes are the actual <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a> instances,
+representing the individual time series.  These need to be defined in
+<a class="reference internal" href="#hydpy.core.sequencetools.SubSequences" title="hydpy.core.sequencetools.SubSequences"><code class="xref py py-class docutils literal"><span class="pre">SubSequences</span></code></a> subclass.  Therefore, one needs to collect the
+appropriate <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a> subclasses in the (hidden) class attribute
+<code class="xref py py-attr docutils literal"><span class="pre">_SEQCLASSES</span></code>, as shown in the following example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.sequencetools</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Temperature</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Precipitation</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">InputSequences</span><span class="p">(</span><span class="n">SubSequences</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">Temperature</span><span class="p">,</span> <span class="n">Precipitation</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="n">InputSequences</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="c1"># Assign `None` for brevity.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span>
+<span class="go">temperature(nan)</span>
+<span class="go">precipitation(nan)</span>
+</pre></div>
+</div>
+<p>The order within the tuple determines the order of iteration, hence:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">sequence</span><span class="p">)</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+<span class="go">temperature(nan)</span>
+<span class="go">precipitation(nan)</span>
+</pre></div>
+</div>
+<p>If one forgets to define a <cite>_SEQCLASSES</cite> tuple so (and maybe tries to add
+the sequences in the constructor of the subclass of
+<a class="reference internal" href="#hydpy.core.sequencetools.SubSequences" title="hydpy.core.sequencetools.SubSequences"><code class="xref py py-class docutils literal"><span class="pre">SubSequences</span></code></a>, the following error is raised:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">InputSequences</span><span class="p">(</span><span class="n">SubSequences</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">NotImplementedError</span>: <span class="n">For class `InputSequences`, the required tuple `_SEQCLASSES` is not defined.  Please see the documentation of class `SubSequences` of module `sequencetools` for further information.</span>
+</pre></div>
+</div>
+<dl class="classmethod">
+<dt id="hydpy.core.sequencetools.SubSequences.getname">
+<em class="property">classmethod </em><code class="descname">getname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#SubSequences.getname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.SubSequences.getname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.SubSequences.name">
+<code class="descname">name</code><a class="headerlink" href="#hydpy.core.sequencetools.SubSequences.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.IOSubSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">IOSubSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.SubSequences" title="hydpy.core.sequencetools.SubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.SubSequences</span></code></a></p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.openfiles">
+<code class="descname">openfiles</code><span class="sig-paren">(</span><em>idx=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.openfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.openfiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.closefiles">
+<code class="descname">closefiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.closefiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.closefiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.activate_ram">
+<code class="descname">activate_ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.activate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.activate_ram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.deactivate_ram">
+<code class="descname">deactivate_ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.deactivate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.deactivate_ram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.activate_disk">
+<code class="descname">activate_disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.activate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.activate_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.deactivate_disk">
+<code class="descname">deactivate_disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.deactivate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.deactivate_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.ram2disk">
+<code class="descname">ram2disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.ram2disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.ram2disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSubSequences.disk2ram">
+<code class="descname">disk2ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSubSequences.disk2ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSubSequences.disk2ram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.InputSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">InputSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#InputSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.InputSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.IOSubSequences" title="hydpy.core.sequencetools.IOSubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.IOSubSequences</span></code></a></p>
+<p>Base class for handling input sequences.</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.InputSequences.loaddata">
+<code class="descname">loaddata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#InputSequences.loaddata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.InputSequences.loaddata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.FluxSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">FluxSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FluxSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FluxSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.IOSubSequences" title="hydpy.core.sequencetools.IOSubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.IOSubSequences</span></code></a></p>
+<p>Base class for handling flux sequences.</p>
+<dl class="classmethod">
+<dt id="hydpy.core.sequencetools.FluxSequences.getname">
+<em class="property">classmethod </em><code class="descname">getname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FluxSequences.getname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FluxSequences.getname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.FluxSequences.savedata">
+<code class="descname">savedata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FluxSequences.savedata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FluxSequences.savedata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.StateSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">StateSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#StateSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.StateSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.IOSubSequences" title="hydpy.core.sequencetools.IOSubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.IOSubSequences</span></code></a></p>
+<p>Base class for handling state sequences.</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.StateSequences.new2old">
+<code class="descname">new2old</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#StateSequences.new2old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.StateSequences.new2old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign the new/final state values of the actual time step to the
+new/initial state values of the next time step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.StateSequences.savedata">
+<code class="descname">savedata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#StateSequences.savedata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.StateSequences.savedata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.StateSequences.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#StateSequences.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.StateSequences.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.LogSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">LogSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#LogSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.LogSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.SubSequences" title="hydpy.core.sequencetools.SubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.SubSequences</span></code></a></p>
+<p>Base class for handling log sequences.</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.LogSequences.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#LogSequences.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.LogSequences.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.AideSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">AideSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#AideSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.AideSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.SubSequences" title="hydpy.core.sequencetools.SubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.SubSequences</span></code></a></p>
+<p>Base class for handling aide sequences.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.LinkSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">LinkSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#LinkSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.LinkSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.SubSequences" title="hydpy.core.sequencetools.SubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.SubSequences</span></code></a></p>
+<p>Base class for handling link sequences.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.Sequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">Sequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="objecttools.html#hydpy.core.objecttools.ValueMath" title="hydpy.core.objecttools.ValueMath"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.objecttools.ValueMath</span></code></a></p>
+<p>Only for inheritance.</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sequence.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sequence.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequence.initvalue">
+<code class="descname">initvalue</code><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.initvalue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequence.name">
+<code class="descname">name</code><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the sequence, which is the name if the instantiating
+subclass of <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a> in lower case letters.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequence.value">
+<code class="descname">value</code><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual time series value(s) handled by the respective
+<a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a> instance.  For consistency, <cite>value</cite> and <cite>values</cite>
+can always be used interchangeably.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequence.values">
+<code class="descname">values</code><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual time series value(s) handled by the respective
+<a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a> instance.  For consistency, <cite>value</cite> and <cite>values</cite>
+can always be used interchangeably.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequence.shape">
+<code class="descname">shape</code><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple containing the lengths in all dimensions of the sequence
+values at a specific time point.  Note that setting a new shape
+results in a loss of the actual values of the respective sequence.
+For 0-dimensional sequences <a class="reference internal" href="#hydpy.core.sequencetools.Sequence.shape" title="hydpy.core.sequencetools.Sequence.shape"><code class="xref py py-attr docutils literal"><span class="pre">shape</span></code></a> is always an empty tuple.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequence.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sequence.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.core.sequencetools.Sequence.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.IOSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">IOSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.Sequence</span></code></a></p>
+<p>Only for inheritance.</p>
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.filetype_ext">
+<code class="descname">filetype_ext</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.filetype_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ending of the external data file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.filename_ext">
+<code class="descname">filename_ext</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.filename_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complete filename of the external data file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.filename_int">
+<code class="descname">filename_int</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.filename_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complete filename of the internal data file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.dirpath_ext">
+<code class="descname">dirpath_ext</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.dirpath_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute path of the directory of the external data file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.dirpath_int">
+<code class="descname">dirpath_int</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.dirpath_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute path of the directory of the internal data file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.filepath_ext">
+<code class="descname">filepath_ext</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.filepath_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute path to the external data file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.filepath_int">
+<code class="descname">filepath_int</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.filepath_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute path to the internal data file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.update_fastaccess">
+<code class="descname">update_fastaccess</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.update_fastaccess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.update_fastaccess" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.diskflag">
+<code class="descname">diskflag</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.diskflag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.ramflag">
+<code class="descname">ramflag</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.ramflag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.memoryflag">
+<code class="descname">memoryflag</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.memoryflag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.seriesshape">
+<code class="descname">seriesshape</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.seriesshape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shape of the whole time series (time beeing the first dimension).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.series">
+<code class="descname">series</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.series" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.load_ext">
+<code class="descname">load_ext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.load_ext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.load_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the external data series in accordance with
+<code class="xref py py-attr docutils literal"><span class="pre">timegrid_init</span></code> and store it as internal data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.save_ext">
+<code class="descname">save_ext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.save_ext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.save_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the internal data into an external data file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.zero_int">
+<code class="descname">zero_int</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.zero_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.zero_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the internal data series with zero values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.activate_disk">
+<code class="descname">activate_disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.activate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.activate_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Demand reading/writing internal data from/to hard disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.deactivate_disk">
+<code class="descname">deactivate_disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.deactivate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.deactivate_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevent from reading/writing internal data from/to hard disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.activate_ram">
+<code class="descname">activate_ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.activate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.activate_ram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Demand reading/writing internal data from/to hard disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.deactivate_ram">
+<code class="descname">deactivate_ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.deactivate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.deactivate_ram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevent from reading/writing internal data from/to hard disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.disk2ram">
+<code class="descname">disk2ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.disk2ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.disk2ram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move internal data from disk to RAM.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.IOSequence.ram2disk">
+<code class="descname">ram2disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#IOSequence.ram2disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.ram2disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move internal data from RAM to disk.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.IOSequence.shape">
+<code class="descname">shape</code><a class="headerlink" href="#hydpy.core.sequencetools.IOSequence.shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple containing the lengths in all dimensions of the sequence
+values at a specific time point.  Note that setting a new shape
+results in a loss of the actual values of the respective sequence.
+For 0-dimensional sequences <a class="reference internal" href="#hydpy.core.sequencetools.IOSequence.shape" title="hydpy.core.sequencetools.IOSequence.shape"><code class="xref py py-attr docutils literal"><span class="pre">shape</span></code></a> is always an empty tuple.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.ModelIOSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">ModelIOSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#ModelIOSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.ModelIOSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.IOSequence" title="hydpy.core.sequencetools.IOSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.IOSequence</span></code></a></p>
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.ModelIOSequence.rawfilename">
+<code class="descname">rawfilename</code><a class="headerlink" href="#hydpy.core.sequencetools.ModelIOSequence.rawfilename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filename without ending for external and internal date files.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.InputSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">InputSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#InputSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.InputSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.ModelIOSequence" title="hydpy.core.sequencetools.ModelIOSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.ModelIOSequence</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.FluxSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">FluxSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FluxSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FluxSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.ModelIOSequence" title="hydpy.core.sequencetools.ModelIOSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.ModelIOSequence</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.LeftRightSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">LeftRightSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#LeftRightSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.LeftRightSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.ModelIOSequence" title="hydpy.core.sequencetools.ModelIOSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.ModelIOSequence</span></code></a></p>
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LeftRightSequence.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.core.sequencetools.LeftRightSequence.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LeftRightSequence.left">
+<code class="descname">left</code><a class="headerlink" href="#hydpy.core.sequencetools.LeftRightSequence.left" title="Permalink to this definition">¶</a></dt>
+<dd><p>The “left” value of the actual parameter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LeftRightSequence.l">
+<code class="descname">l</code><a class="headerlink" href="#hydpy.core.sequencetools.LeftRightSequence.l" title="Permalink to this definition">¶</a></dt>
+<dd><p>The “left” value of the actual parameter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LeftRightSequence.right">
+<code class="descname">right</code><a class="headerlink" href="#hydpy.core.sequencetools.LeftRightSequence.right" title="Permalink to this definition">¶</a></dt>
+<dd><p>The “right” value of the actual parameter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LeftRightSequence.r">
+<code class="descname">r</code><a class="headerlink" href="#hydpy.core.sequencetools.LeftRightSequence.r" title="Permalink to this definition">¶</a></dt>
+<dd><p>The “right” value of the actual parameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.ConditionSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">ConditionSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#ConditionSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.ConditionSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.ConditionSequence.trim">
+<code class="descname">trim</code><span class="sig-paren">(</span><em>lower=None</em>, <em>upper=None</em><span class="sig-paren">)</span><a class="headerlink" href="#hydpy.core.sequencetools.ConditionSequence.trim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trim the value(s) of  a <code class="xref py py-class docutils literal"><span class="pre">ValueMath</span></code> instance.</p>
+<p>One can pass the lower and/or the upper boundary as a function argument.
+Otherwise, boundary values are taken from the class attribute <cite>SPAN</cite>
+of the given <code class="xref py py-class docutils literal"><span class="pre">ValueMath</span></code> instance, if available.</p>
+<p>Note that method <a class="reference internal" href="#hydpy.core.sequencetools.ConditionSequence.trim" title="hydpy.core.sequencetools.ConditionSequence.trim"><code class="xref py py-func docutils literal"><span class="pre">trim()</span></code></a> works differently on <code class="xref py py-class docutils literal"><span class="pre">ValueMath</span></code>
+instances handling values of different types.  For floating point values,
+an actual trimming is performed.  Additionally, a warning message is
+raised if the trimming results in a change in value exceeding the
+threshold value defined by function <code class="xref py py-func docutils literal"><span class="pre">_tolerance()</span></code>.  (This warning
+message can be suppressed by setting the related option flag to False.)
+For integer values, instead of a warning an exception is raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.ConditionSequence.warntrim">
+<code class="descname">warntrim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#ConditionSequence.warntrim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.ConditionSequence.warntrim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.ConditionSequence.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#ConditionSequence.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.ConditionSequence.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.StateSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">StateSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#StateSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.StateSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.ModelIOSequence" title="hydpy.core.sequencetools.ModelIOSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.ModelIOSequence</span></code></a>, <a class="reference internal" href="#hydpy.core.sequencetools.ConditionSequence" title="hydpy.core.sequencetools.ConditionSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.ConditionSequence</span></code></a></p>
+<p>Handler for state time series.</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.StateSequence.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#StateSequence.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.StateSequence.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.StateSequence.shape">
+<code class="descname">shape</code><a class="headerlink" href="#hydpy.core.sequencetools.StateSequence.shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple containing the lengths in all dimensions of the sequence
+values at a specific time point.  Note that setting a new shape
+results in a loss of the actual values of the respective sequence.
+For 0-dimensional sequences <a class="reference internal" href="#hydpy.core.sequencetools.StateSequence.shape" title="hydpy.core.sequencetools.StateSequence.shape"><code class="xref py py-attr docutils literal"><span class="pre">shape</span></code></a> is always an empty tuple.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.StateSequence.new">
+<code class="descname">new</code><a class="headerlink" href="#hydpy.core.sequencetools.StateSequence.new" title="Permalink to this definition">¶</a></dt>
+<dd><p>Complete access to the state value(s), which will be used in the next
+calculation steps.  Note that <a class="reference internal" href="#hydpy.core.sequencetools.StateSequence.new" title="hydpy.core.sequencetools.StateSequence.new"><code class="xref py py-attr docutils literal"><span class="pre">new</span></code></a> is a synonym of
+<code class="xref py py-attr docutils literal"><span class="pre">value</span></code>.  Use this property to modify the initial
+condition(s) of a single <a class="reference internal" href="#hydpy.core.sequencetools.StateSequence" title="hydpy.core.sequencetools.StateSequence"><code class="xref py py-class docutils literal"><span class="pre">StateSequence</span></code></a> object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.StateSequence.old">
+<code class="descname">old</code><a class="headerlink" href="#hydpy.core.sequencetools.StateSequence.old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assess to the state value(s) at beginning of the time step, which
+has been processed most recently.  When using <a class="reference internal" href="index.html#hydpy"><span class="std std-ref">HydPy</span></a> in the
+normal manner.  But it can be helpful for demonstration and debugging
+purposes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.StateSequence.new2old">
+<code class="descname">new2old</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#StateSequence.new2old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.StateSequence.new2old" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.LogSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">LogSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#LogSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.LogSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.Sequence</span></code></a>, <a class="reference internal" href="#hydpy.core.sequencetools.ConditionSequence" title="hydpy.core.sequencetools.ConditionSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.ConditionSequence</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.AideSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">AideSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#AideSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.AideSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.Sequence</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.LinkSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">LinkSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#LinkSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.LinkSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.Sequence</span></code></a></p>
+<p>2</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.LinkSequence.setpointer">
+<code class="descname">setpointer</code><span class="sig-paren">(</span><em>double</em>, <em>idx=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#LinkSequence.setpointer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.LinkSequence.setpointer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LinkSequence.value">
+<code class="descname">value</code><a class="headerlink" href="#hydpy.core.sequencetools.LinkSequence.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>ToDo</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LinkSequence.values">
+<code class="descname">values</code><a class="headerlink" href="#hydpy.core.sequencetools.LinkSequence.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>ToDo</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.LinkSequence.shape">
+<code class="descname">shape</code><a class="headerlink" href="#hydpy.core.sequencetools.LinkSequence.shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.NodeSequence">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">NodeSequence</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#NodeSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.NodeSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.IOSequence" title="hydpy.core.sequencetools.IOSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.IOSequence</span></code></a></p>
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.NodeSequence.rawfilename">
+<code class="descname">rawfilename</code><a class="headerlink" href="#hydpy.core.sequencetools.NodeSequence.rawfilename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filename without ending for external and internal date files.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.NodeSequence.values">
+<code class="descname">values</code><a class="headerlink" href="#hydpy.core.sequencetools.NodeSequence.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actual value(s) handled by the sequence.  For consistency,
+<cite>value</cite> and <cite>values</cite> can always be used interchangeably.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.NodeSequence.value">
+<code class="descname">value</code><a class="headerlink" href="#hydpy.core.sequencetools.NodeSequence.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actual value(s) handled by the sequence.  For consistency,
+<cite>value</cite> and <cite>values</cite> can always be used interchangeably.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.Sim">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">Sim</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.NodeSequence" title="hydpy.core.sequencetools.NodeSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.NodeSequence</span></code></a></p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sim.activate_disk">
+<code class="descname">activate_disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sim.activate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sim.activate_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Sim.activate_ram">
+<code class="descname">activate_ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Sim.activate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Sim.activate_ram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sim.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.core.sequencetools.Sim.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Sim.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.core.sequencetools.Sim.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.Obs">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">Obs</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Obs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Obs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.NodeSequence" title="hydpy.core.sequencetools.NodeSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.NodeSequence</span></code></a></p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Obs.activate_disk">
+<code class="descname">activate_disk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Obs.activate_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Obs.activate_disk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.Obs.activate_ram">
+<code class="descname">activate_ram</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#Obs.activate_ram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.Obs.activate_ram" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Obs.series_complete">
+<code class="descname">series_complete</code><a class="headerlink" href="#hydpy.core.sequencetools.Obs.series_complete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Obs.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.core.sequencetools.Obs.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.sequencetools.Obs.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.core.sequencetools.Obs.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.NodeSequences">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">NodeSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#NodeSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.NodeSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.sequencetools.IOSubSequences" title="hydpy.core.sequencetools.IOSubSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.IOSubSequences</span></code></a></p>
+<p>Base class for handling node sequences.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.core.sequencetools.Sim" title="hydpy.core.sequencetools.Sim"><code class="xref py py-class docutils literal"><span class="pre">Sim</span></code></a> <cite>no description available</cite></li>
+<li><a class="reference internal" href="#hydpy.core.sequencetools.Obs" title="hydpy.core.sequencetools.Obs"><code class="xref py py-class docutils literal"><span class="pre">Obs</span></code></a> <cite>no description available</cite></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.NodeSequences.loaddata">
+<code class="descname">loaddata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#NodeSequences.loaddata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.NodeSequences.loaddata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.NodeSequences.savedata">
+<code class="descname">savedata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#NodeSequences.savedata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.NodeSequences.savedata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.sequencetools.FastAccess">
+<em class="property">class </em><code class="descclassname">hydpy.core.sequencetools.</code><code class="descname">FastAccess</code><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FastAccess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FastAccess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Provides fast access to the values of the sequences of a sequence
+subgroup and supports the handling of internal data series during
+simulations.</p>
+<p>The following details are of relevance for <a class="reference internal" href="index.html#hydpy"><span class="std std-ref">HydPy</span></a> developers only.</p>
+<p><a class="reference internal" href="#hydpy.core.sequencetools.FastAccess" title="hydpy.core.sequencetools.FastAccess"><code class="xref py py-class docutils literal"><span class="pre">FastAccess</span></code></a> is applied in Python mode only.  In Cython mode,
+specialized and more efficient cdef classes replace it.  For
+compatibility with these cdef classes, <a class="reference internal" href="#hydpy.core.sequencetools.FastAccess" title="hydpy.core.sequencetools.FastAccess"><code class="xref py py-class docutils literal"><span class="pre">FastAccess</span></code></a> objects
+work with dynamically set instance members.  Suppose there is a
+sequence named <cite>seq1</cite> which is 2-dimensional, then its associated
+attributes are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>seq1 (<code class="xref py py-class docutils literal"><span class="pre">ndarray</span></code>): The actual sequence values.</li>
+<li>_seq1_ndim (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>): Number of dimensions.</li>
+<li>_seq1_length_0 (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>): Length in the first dimension.</li>
+<li>_seq1_length_1 (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a>): Length in the second dimension.</li>
+<li>_seq1_ramflag (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>): Handle internal data in RAM?</li>
+<li>_seq1_diskflag (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a>): Handle internal data on disk?</li>
+<li>_seq1_path (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Path of the internal data file.</li>
+<li>_seq1_file (<code class="xref py py-class docutils literal"><span class="pre">file</span></code>): Object handling the internal data file.</li>
+</ul>
+</div></blockquote>
+<p>Note that all these dynamical attributes and the following methods are
+initialised, changed or applied by the respective <a class="reference internal" href="#hydpy.core.sequencetools.SubSequences" title="hydpy.core.sequencetools.SubSequences"><code class="xref py py-class docutils literal"><span class="pre">SubSequences</span></code></a>
+and <a class="reference internal" href="#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a> objects.  Handling them directly is error prone
+and thus not recommended.</p>
+<dl class="method">
+<dt id="hydpy.core.sequencetools.FastAccess.openfiles">
+<code class="descname">openfiles</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FastAccess.openfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FastAccess.openfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open all files with an activated disk flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.FastAccess.closefiles">
+<code class="descname">closefiles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FastAccess.closefiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FastAccess.closefiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close all files with an activated disk flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.FastAccess.loaddata">
+<code class="descname">loaddata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FastAccess.loaddata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FastAccess.loaddata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the internal data of all sequences.  Load from file if the
+corresponding disk flag is activated, otherwise load from RAM.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.sequencetools.FastAccess.savedata">
+<code class="descname">savedata</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/sequencetools.html#FastAccess.savedata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.sequencetools.FastAccess.savedata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the internal data of all sequences with an activated flag.
+Write to file if the corresponding disk flag is activated; store
+in working memory if the corresponding ram flag is activated.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="selectiontools.html"
+                        title="previous chapter">selectiontools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="timetools.html"
+                        title="next chapter">timetools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sequencetools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="timetools.html" title="timetools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="selectiontools.html" title="selectiontools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" >Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

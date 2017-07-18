@@ -1,0 +1,943 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>timetools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cythons Modules" href="cythons.html" />
+    <link rel="prev" title="sequencetools" href="sequencetools.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cythons.html" title="Cythons Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="sequencetools.html" title="sequencetools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" accesskey="U">Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="timetools">
+<span id="id1"></span><h1>timetools<a class="headerlink" href="#timetools" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.core.timetools"></span><p>This module specifies how  dates and periods are handled in HydPy.</p>
+<dl class="docutils">
+<dt>The following classes are implemented:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a>: Defines a single time point.</li>
+<li><a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a>: Defines a single time duration.</li>
+<li><a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a>: Defines an equidistant sequence of time points.</li>
+<li><a class="reference internal" href="#hydpy.core.timetools.Timegrids" title="hydpy.core.timetools.Timegrids"><code class="xref py py-class docutils literal"><span class="pre">Timegrids</span></code></a>: Handles all <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> instances of a
+HydPy project.</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="date-and-period">
+<h2>Date and Period<a class="headerlink" href="#date-and-period" title="Permalink to this headline">¶</a></h2>
+<p>Both classes <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> and <a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a> are build on top of the Python
+module <a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#module-datetime" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">datetime</span></code></a>. In essence, they wrap the <a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#module-datetime" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">datetime</span></code></a> classes
+<a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.datetime" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">datetime</span></code></a> and <a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.timedelta" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">timedelta</span></code></a>, and are supposed
+to specialise these general classes on the needs of HydPy users.</p>
+<p>Be aware of the different minimum time resolution of module <a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#module-datetime" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">datetime</span></code></a>
+(microseconds) and module <a class="reference internal" href="#module-hydpy.core.timetools" title="hydpy.core.timetools"><code class="xref py py-mod docutils literal"><span class="pre">timetools</span></code></a> (seconds).</p>
+<p><a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> objects can be initialized via <a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.datetime" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">datetime</span></code></a>
+objects directly, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Date</span>
+
+<span class="c1"># Initialize a `datetime` object...</span>
+<span class="n">datetime_object</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1996</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1"># ...and use it to initialise a `Date` object.</span>
+<span class="n">date1</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="n">datetime_object</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, one can use <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> objects as initialization arguments,
+which need to match one of the following format styles:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># The `os` style without empty space and colon, which is applied in</span>
+<span class="c1"># text files and folder names:</span>
+<span class="n">date2</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1997_11_01_00_00_00&#39;</span><span class="p">)</span>
+<span class="c1"># The `iso` style, which is more legible and in accordance with the</span>
+<span class="c1"># international ISO norm:</span>
+<span class="n">date2</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1997.11.01 00:00:00&#39;</span><span class="p">)</span>
+<span class="c1"># The `din` style, which is more legible for users in countries where the</span>
+<span class="c1"># position of day and year are interchanged (DIN refers to a german norm):</span>
+<span class="n">date2</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;01.11.1997 00:00:00&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> keeps the chosen style in mind and uses it for printing.  But
+the user is also allowed to change it:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Print in accordance with the `iso` style...</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">date2</span><span class="o">.</span><span class="n">string</span><span class="p">(</span><span class="s1">&#39;iso&#39;</span><span class="p">))</span>
+<span class="c1"># ...without changing the memorized `din` style:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">date2</span><span class="o">.</span><span class="n">style</span><span class="p">)</span>
+<span class="c1"># Alternatively, the style property can be set permanentely:</span>
+<span class="n">date2</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="s1">&#39;iso&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">date2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is allowed to abbreviate the input strings. Using the <cite>iso</cite> style as an
+example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># The following three input arguments...</span>
+<span class="n">test1</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.11.01 00:00:00&#39;</span><span class="p">)</span>
+<span class="n">test2</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.11.01 00:00&#39;</span><span class="p">)</span>
+<span class="n">test3</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.11.01 00&#39;</span><span class="p">)</span>
+<span class="n">test4</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.11.01&#39;</span><span class="p">)</span>
+<span class="c1"># ...all lead to identical `Date` instances.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">test1</span><span class="p">,</span> <span class="n">test2</span><span class="p">,</span> <span class="n">test3</span><span class="p">,</span> <span class="n">test4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> has not been initialized via a <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> object and the
+style property has not been set manually, the default style <cite>iso</cite> is selected.</p>
+<p>One can change the year, month… of a <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> object via numbers:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Assign an integer...</span>
+<span class="n">test4</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">1997</span>
+<span class="c1"># ...or something that can be converted to an integer.</span>
+<span class="n">test4</span><span class="o">.</span><span class="n">month</span> <span class="o">=</span> <span class="s1">&#39;10&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">test4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>One can ask for the actual water year, which depends on the selected
+reference month:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">oct</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.10.01&#39;</span><span class="p">)</span>
+<span class="n">nov</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.11.01&#39;</span><span class="p">)</span>
+<span class="c1"># Under the standard settings, the water year is assumed to start November.</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">oct</span><span class="o">.</span><span class="n">wateryear</span><span class="p">,</span> <span class="n">nov</span><span class="o">.</span><span class="n">wateryear</span><span class="p">)</span>
+<span class="c1"># Changing the reference month via one `Date` object affects all objects.</span>
+<span class="n">test4</span><span class="o">.</span><span class="n">refmonth</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">oct</span><span class="o">.</span><span class="n">wateryear</span><span class="p">,</span> <span class="n">nov</span><span class="o">.</span><span class="n">wateryear</span><span class="p">)</span>
+<span class="n">test4</span><span class="o">.</span><span class="n">refmonth</span> <span class="o">=</span> <span class="s1">&#39;November&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">oct</span><span class="o">.</span><span class="n">wateryear</span><span class="p">,</span> <span class="n">nov</span><span class="o">.</span><span class="n">wateryear</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a> objects can be directly initialized via
+<a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.timedelta" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">timedelta</span></code></a> objects, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Period</span>
+
+<span class="c1"># Initialize a `timedelta` object...</span>
+<span class="n">timedelta_object</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1"># ...and use it to initialise a `Period` object</span>
+<span class="n">period</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="n">timedelta_object</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, one can initialize from <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> objects.  These must
+consist of some characters defining an integer value directly followed by
+a single character defining the unit:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># 30 seconds:</span>
+<span class="n">period</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;30s&#39;</span><span class="p">)</span>
+<span class="c1"># 5 minutes:</span>
+<span class="n">period</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;5m&#39;</span><span class="p">)</span>
+<span class="c1"># 6 hours:</span>
+<span class="n">period</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;6h&#39;</span><span class="p">)</span>
+<span class="c1"># 1 day:</span>
+<span class="n">period</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a> always determines the unit leading to the most legigible
+print out:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Print using the unit leading to the smallest integer value:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+<span class="c1"># Alternatively, the values of all time units are directly available as</span>
+<span class="c1"># `float` objects:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">days</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">hours</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">minutes</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">seconds</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If considered useful, logic and arithmetic operations are supported.
+Some examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Determine the period length between two dates.</span>
+<span class="n">wholeperiod</span> <span class="o">=</span> <span class="n">date2</span> <span class="o">-</span> <span class="n">date1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wholeperiod</span><span class="p">)</span>
+<span class="c1"># Determine, how often one period fits into the other.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">wholeperiod</span> <span class="o">/</span> <span class="n">period</span><span class="p">)</span>
+<span class="c1"># Get one sixths of period:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+<span class="c1"># But when trying to get one seventh of period:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="mi">7</span><span class="p">)</span>
+<span class="c1"># Double a period duration.</span>
+<span class="n">period</span> <span class="o">*=</span> <span class="mi">2</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+<span class="c1"># Shift a date.</span>
+<span class="n">date1</span> <span class="o">-=</span> <span class="n">period</span>
+<span class="c1"># Note that the modulo operator returns a boolean value, indicating</span>
+<span class="c1"># whether the remainder is zero or not:</span>
+<span class="c1"># print(Period(&#39;1d&#39;) % Period(&#39;12h&#39;))</span>
+<span class="c1"># print(Period(&#39;1d&#39;) % Period(&#39;13h&#39;))</span>
+<span class="c1"># Following the same line of thinking, floor division leads to the</span>
+<span class="c1"># opposite results:</span>
+<span class="c1"># print(Period(&#39;1d&#39;) // Period(&#39;12h&#39;))</span>
+<span class="c1"># print(Period(&#39;1d&#39;) // Period(&#39;13h&#39;))</span>
+<span class="c1"># Compare dates or periods.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">date1</span> <span class="o">&lt;</span> <span class="n">date2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span> <span class="n">date2</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span> <span class="o">==</span> <span class="n">wholeperiod</span><span class="p">)</span>
+<span class="c1"># Operations on initialisation arguments are supported.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">date1</span> <span class="o">+</span> <span class="s1">&#39;5m&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period</span> <span class="o">!=</span> <span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> and <a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a> objects are mutable.  Use their
+<cite>copy</cite> methods whenever this might lead to unintentional results:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># A date example:</span>
+<span class="n">date1</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.11.01 00:00&#39;</span><span class="p">)</span>
+<span class="n">date2</span> <span class="o">=</span> <span class="n">date1</span>
+<span class="n">date3</span> <span class="o">=</span> <span class="n">date1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">date1</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="mi">1997</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">date1</span><span class="p">,</span> <span class="n">date2</span><span class="p">,</span> <span class="n">date3</span><span class="p">)</span>
+<span class="c1"># A period example:</span>
+<span class="n">period1</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1h&#39;</span><span class="p">)</span>
+<span class="n">period2</span> <span class="o">=</span> <span class="n">period1</span>
+<span class="n">period3</span> <span class="o">=</span> <span class="n">period1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">period1</span> <span class="o">-=</span> <span class="s1">&#39;2h&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">period1</span><span class="p">,</span> <span class="n">period2</span><span class="p">,</span> <span class="n">period3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="timegrid-and-timegrids">
+<h2>Timegrid and Timegrids<a class="headerlink" href="#timegrid-and-timegrids" title="Permalink to this headline">¶</a></h2>
+<p>In hydrological modelling, input (and output) data are usually only available
+with a certain resolution, which also determines the possible resolution
+of the actual simulation.  This is reflected by the class <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a>,
+which represents the first and the last date of e.g. a simulation period as
+well as the intermediate dates. A <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> object is initialized
+by defining its first date, its last date and its stepsize:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Date</span><span class="p">,</span> <span class="n">Period</span><span class="p">,</span> <span class="n">Timegrid</span>
+
+<span class="c1"># Either pass the proper attributes directly...</span>
+<span class="n">firstdate</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996.11.01&#39;</span><span class="p">)</span>
+<span class="n">lastdate</span> <span class="o">=</span> <span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1997.11.01&#39;</span><span class="p">)</span>
+<span class="n">stepsize</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="n">timegrid_sim</span> <span class="o">=</span> <span class="n">Timegrid</span><span class="p">(</span><span class="n">firstdate</span><span class="p">,</span> <span class="n">lastdate</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">)</span>
+<span class="c1"># ...or pass their initialization arguments:</span>
+<span class="n">timegrid_sim</span> <span class="o">=</span> <span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;1996.11.01&#39;</span><span class="p">,</span> <span class="s1">&#39;1997.11.01&#39;</span><span class="p">,</span> <span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> provides functionalities to ease and secure the handling
+of dates in HydPy. Here some examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Retrieve a date via indexing, e.g. the second one:</span>
+<span class="n">date</span> <span class="o">=</span> <span class="n">timegrid_sim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+<span class="c1"># Or the other way round, retrieve the index belonging to a date:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_sim</span><span class="p">[</span><span class="n">date</span><span class="p">])</span>
+<span class="c1"># Indexing beyond the ranges of the actual time period is allowed:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_sim</span><span class="p">[</span><span class="o">-</span><span class="mi">366</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_sim</span><span class="p">[</span><span class="n">timegrid_sim</span><span class="p">[</span><span class="n">date</span><span class="o">+</span><span class="s1">&#39;365d&#39;</span><span class="p">]])</span>
+<span class="c1"># Iterate through all time grid points (e.g. to print the first day of</span>
+<span class="c1"># each month):</span>
+<span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">timegrid_sim</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">date</span><span class="o">.</span><span class="n">day</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span> <span class="n">date</span>
+</pre></div>
+</div>
+<p>After doing some changes one should call the <a class="reference internal" href="#hydpy.core.timetools.Timegrid.verify" title="hydpy.core.timetools.Timegrid.verify"><code class="xref py py-func docutils literal"><span class="pre">verify()</span></code></a> method:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># `verify` keeps silent if everything seems to be alright...</span>
+<span class="n">timegrid_sim</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+<span class="c1"># ...but raises an suitable exception otherwise:</span>
+<span class="n">timegrid_sim</span><span class="o">.</span><span class="n">firstdate</span><span class="o">.</span><span class="n">minute</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">timegrid_sim</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>One can check two <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> instances for equality:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Make a deep copy of the timegrid already existing.</span>
+<span class="n">timegrid_test</span> <span class="o">=</span> <span class="n">timegrid_sim</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="c1"># Test for equality and non-equality.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_sim</span> <span class="o">==</span> <span class="n">timegrid_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_sim</span> <span class="o">!=</span> <span class="n">timegrid_test</span><span class="p">)</span>
+<span class="c1"># Modify one date of the new timegrid.</span>
+<span class="n">timegrid_test</span><span class="o">.</span><span class="n">firstdate</span> <span class="o">+=</span> <span class="s1">&#39;1d&#39;</span>
+<span class="c1"># Again, test for equality and non-equality.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_sim</span> <span class="o">==</span> <span class="n">timegrid_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_sim</span> <span class="o">!=</span> <span class="n">timegrid_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Also, one can check if a date or even whole timegrid lies within a span
+defined by a <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> instance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Define a long timegrid...</span>
+<span class="n">timegrid_long</span> <span class="o">=</span> <span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;1996.11.01&#39;</span><span class="p">,</span> <span class="s1">&#39;2006.11.01&#39;</span><span class="p">,</span> <span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="c1"># ...and check different dates for lying in the defined time period:</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1996.10.31&#39;</span> <span class="ow">in</span> <span class="n">timegrid_long</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1996.11.01&#39;</span> <span class="ow">in</span> <span class="n">timegrid_long</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1996.11.02&#39;</span> <span class="ow">in</span> <span class="n">timegrid_long</span><span class="p">)</span>
+<span class="c1"># For dates not alligned on the grid `False` is returned:</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;1996.11.01 12:00&#39;</span> <span class="ow">in</span> <span class="n">timegrid_long</span><span class="p">)</span>
+
+<span class="c1"># Now define a timegrid containing only the first year of the long one:</span>
+<span class="n">timegrid_short</span> <span class="o">=</span> <span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;1996.11.01&#39;</span><span class="p">,</span> <span class="s1">&#39;1997.11.01&#39;</span><span class="p">,</span> <span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="c1"># Check which timegrid is contained by the other:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_short</span> <span class="ow">in</span> <span class="n">timegrid_long</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_long</span> <span class="ow">in</span> <span class="n">timegrid_short</span><span class="p">)</span>
+<span class="c1"># For timegrids with different stepsizes `False` is returned:</span>
+<span class="n">timegrid_short</span><span class="o">.</span><span class="n">stepsize</span> <span class="o">=</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1h&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">timegrid_short</span> <span class="ow">in</span> <span class="n">timegrid_long</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The HydPy framework distinguishes three <cite>time frames</cite>, one associated with the
+input date available on disk (<cite>data</cite>), one associated, with the initialisation
+period (<cite>init</cite>) and and one associated with the actual simulation period
+(<cite>sim</cite>).  Each time frame is represented by a single <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> object
+and all together are handled by one class <a class="reference internal" href="#hydpy.core.timetools.Timegrids" title="hydpy.core.timetools.Timegrids"><code class="xref py py-class docutils literal"><span class="pre">Timegrids</span></code></a> object.</p>
+<p>There is usually only one <a class="reference internal" href="#hydpy.core.timetools.Timegrids" title="hydpy.core.timetools.Timegrids"><code class="xref py py-class docutils literal"><span class="pre">Timegrids</span></code></a> object required within each
+HydPy project.  It is automatically added to the module
+<code class="xref py py-mod docutils literal"><span class="pre">pub</span></code> during the initialization of a
+<code class="xref py py-class docutils literal"><span class="pre">HydPy</span></code> object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">pub</span>
+
+<span class="n">hydpy</span> <span class="o">=</span> <span class="n">HydPy</span><span class="p">(</span><span class="s1">&#39;tutorial_1&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some examples on the usage of this <a class="reference internal" href="#hydpy.core.timetools.Timegrids" title="hydpy.core.timetools.Timegrids"><code class="xref py py-class docutils literal"><span class="pre">Timegrids</span></code></a> instance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Get the factor to convert `mm/stepsize` to m^3/s for an area of 36 km^2:</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">qfactor</span><span class="p">(</span><span class="mf">36.</span><span class="p">))</span>
+<span class="c1"># Get the index of the first values of the `data time frame` which belong</span>
+<span class="c1"># to the `initialisation time frame`.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">firstdate</span><span class="p">])</span>
+<span class="c1"># Or, as a similar example, get the index of the first values of the</span>
+<span class="c1"># `initialisation time frame` which belong to the `simulation time frame`.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">firstdate</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Notice, that the latter index is zero.  This is due to the simulation time
+frame beeing identical with the initialisation time frame, if not specified
+otherwise in the main control file or by manually changing the simulation time
+frame.</p>
+<p>Each manual change should be followed by calling the
+<a class="reference internal" href="#hydpy.core.timetools.Timegrids.verify" title="hydpy.core.timetools.Timegrids.verify"><code class="xref py py-func docutils literal"><span class="pre">verify()</span></code></a> method, which calls the <a class="reference internal" href="#hydpy.core.timetools.Timegrid.verify" title="hydpy.core.timetools.Timegrid.verify"><code class="xref py py-func docutils literal"><span class="pre">verify()</span></code></a>
+method of the single <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> instances and performs some additional
+tests:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Postponing the `simulation time frame` one stepsize is fine...</span>
+<span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">firstdate</span> <span class="o">+=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">stepsize</span>
+<span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+<span class="c1"># ...but shifting it outside the `initialisation time frame` or setting</span>
+<span class="c1"># it in  between the time grid points results in an error:</span>
+<span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">firstdate</span> <span class="o">-=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">stepsize</span>
+<span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+<span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">firstdate</span> <span class="o">+=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">stepsize</span>
+<span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">firstdate</span><span class="o">.</span><span class="n">minute</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To facilitate printing to configuration files, both classes <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a>
+and <a class="reference internal" href="#hydpy.core.timetools.Timegrids" title="hydpy.core.timetools.Timegrids"><code class="xref py py-class docutils literal"><span class="pre">Timegrids</span></code></a> allow for a extended canonical string representations
+of their objects:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># The string representation is generally formated with indentation.</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="p">))</span>
+<span class="c1"># The class specific `assignrepr` methods allow for inserting assignements.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="s1">&#39;timegrid_data = &#39;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="s1">&#39;timegrids_all = &#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="details">
+<h2>Details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hydpy.core.timetools.Date">
+<em class="property">class </em><code class="descclassname">hydpy.core.timetools.</code><code class="descname">Date</code><span class="sig-paren">(</span><em>date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Handles a single date.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>date (<a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.datetime" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">datetime</span></code></a> or <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Initialization
+date.</li>
+</ul>
+</dd>
+<dt>Attribute:</dt>
+<dd><ul class="first last simple">
+<li>datetime (<a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.datetime" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">datetime</span></code></a>): The core of <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a>.</li>
+</ul>
+</dd>
+</dl>
+<dl class="classmethod">
+<dt id="hydpy.core.timetools.Date.fromarray">
+<em class="property">classmethod </em><code class="descname">fromarray</code><span class="sig-paren">(</span><em>array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Date.fromarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Date.fromarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> instance based on date information (year,
+month, day, hour, minute, second) stored as the first entries of the
+successive rows of a <code class="xref py py-class docutils literal"><span class="pre">ndarray</span></code> object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Date.toarray">
+<code class="descname">toarray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Date.toarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Date.toarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a 1-dimensional <code class="xref py py-mod docutils literal"><span class="pre">numpy</span></code> <code class="xref py py-class docutils literal"><span class="pre">ndarray</span></code> with
+six entries defining the actual date (year, month, day, hour, minute,
+second).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.refmonth">
+<code class="descname">refmonth</code><a class="headerlink" href="#hydpy.core.timetools.Date.refmonth" title="Permalink to this definition">¶</a></dt>
+<dd><p>First month of the hydrological year. The default value is 11
+(November which is the german reference month). Setting it e.g. to 10
+(October is another common reference month many different countries)
+affects all <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> instances.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.style">
+<code class="descname">style</code><a class="headerlink" href="#hydpy.core.timetools.Date.style" title="Permalink to this definition">¶</a></dt>
+<dd><p>Date format style to be applied in printing.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.second">
+<code class="descname">second</code><a class="headerlink" href="#hydpy.core.timetools.Date.second" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual second.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.minute">
+<code class="descname">minute</code><a class="headerlink" href="#hydpy.core.timetools.Date.minute" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual minute.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.hour">
+<code class="descname">hour</code><a class="headerlink" href="#hydpy.core.timetools.Date.hour" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual hour.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.day">
+<code class="descname">day</code><a class="headerlink" href="#hydpy.core.timetools.Date.day" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual day.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.month">
+<code class="descname">month</code><a class="headerlink" href="#hydpy.core.timetools.Date.month" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual month.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.year">
+<code class="descname">year</code><a class="headerlink" href="#hydpy.core.timetools.Date.year" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual year.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.wateryear">
+<code class="descname">wateryear</code><a class="headerlink" href="#hydpy.core.timetools.Date.wateryear" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual hydrological year according selected reference month.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.dayofyear">
+<code class="descname">dayofyear</code><a class="headerlink" href="#hydpy.core.timetools.Date.dayofyear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Day of year as an integer value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Date.leapyear">
+<code class="descname">leapyear</code><a class="headerlink" href="#hydpy.core.timetools.Date.leapyear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the actual date falls in a leap year or not.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Date.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Date.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Date.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a deep copy of the <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Date.string">
+<code class="descname">string</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Date.string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Date.string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> object representing the actual date in
+accordance with the given style.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.timetools.Period">
+<em class="property">class </em><code class="descclassname">hydpy.core.timetools.</code><code class="descname">Period</code><span class="sig-paren">(</span><em>period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Period" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Handles the length of a single time period.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>period (<a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.timedelta" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">timedelta</span></code></a> or <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Period length.</li>
+</ul>
+</dd>
+<dt>Attribute:</dt>
+<dd><ul class="first last simple">
+<li>datetime (<a class="reference external" href="https://docs.python.org/2.7/library/datetime.html#datetime.timedelta" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">timedelta</span></code></a>): The core of <a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a>.</li>
+</ul>
+</dd>
+</dl>
+<dl class="classmethod">
+<dt id="hydpy.core.timetools.Period.fromseconds">
+<em class="property">classmethod </em><code class="descname">fromseconds</code><span class="sig-paren">(</span><em>seconds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Period.fromseconds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Period.fromseconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a> instance based on a given number of
+seconds.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Period.unit">
+<code class="descname">unit</code><a class="headerlink" href="#hydpy.core.timetools.Period.unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Guess the unit of the period as the largest one, which results in
+an integer duration.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Period.seconds">
+<code class="descname">seconds</code><a class="headerlink" href="#hydpy.core.timetools.Period.seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Period length in seconds.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Period.minutes">
+<code class="descname">minutes</code><a class="headerlink" href="#hydpy.core.timetools.Period.minutes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Period length in minutes.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Period.hours">
+<code class="descname">hours</code><a class="headerlink" href="#hydpy.core.timetools.Period.hours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Period length in hours.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Period.days">
+<code class="descname">days</code><a class="headerlink" href="#hydpy.core.timetools.Period.days" title="Permalink to this definition">¶</a></dt>
+<dd><p>Period length in days.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Period.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Period.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Period.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a deep copy of the <a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a> instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.timetools.Timegrid">
+<em class="property">class </em><code class="descclassname">hydpy.core.timetools.</code><code class="descname">Timegrid</code><span class="sig-paren">(</span><em>firstdate</em>, <em>lastdate</em>, <em>stepsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Handle a time period defined by to dates and a step size in between.</p>
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Timegrid.firstdate">
+<code class="descname">firstdate</code><a class="headerlink" href="#hydpy.core.timetools.Timegrid.firstdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Timegrid.lastdate">
+<code class="descname">lastdate</code><a class="headerlink" href="#hydpy.core.timetools.Timegrid.lastdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Timegrid.stepsize">
+<code class="descname">stepsize</code><a class="headerlink" href="#hydpy.core.timetools.Timegrid.stepsize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="hydpy.core.timetools.Timegrid.fromarray">
+<em class="property">classmethod </em><code class="descname">fromarray</code><span class="sig-paren">(</span><em>array</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrid.fromarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrid.fromarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> instance based on two date and one
+period information stored in the first 13 rows of a
+<code class="xref py py-class docutils literal"><span class="pre">ndarray</span></code> object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrid.toarray">
+<code class="descname">toarray</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrid.toarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrid.toarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a 1-dimensional <code class="xref py py-mod docutils literal"><span class="pre">numpy</span></code> <code class="xref py py-class docutils literal"><span class="pre">ndarray</span></code> with
+thirteen entries first defining the start date, secondly defining the
+end date and thirdly the step size.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrid.verify">
+<code class="descname">verify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrid.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrid.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise an <a class="reference external" href="https://docs.python.org/2.7/library/exceptions.html#exceptions.ValueError" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">ValueError</span></code></a> if the dates or the
+step size of the time frame are inconsistent.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrid.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrid.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrid.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a deep copy of the <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrid.assignrepr">
+<code class="descname">assignrepr</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrid.assignrepr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrid.assignrepr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a> string with an prefixed assignement.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>prefix(<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Usually something like ‘x = ‘.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.timetools.Timegrids">
+<em class="property">class </em><code class="descclassname">hydpy.core.timetools.</code><code class="descname">Timegrids</code><span class="sig-paren">(</span><em>data</em>, <em>init=None</em>, <em>sim=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Handle all <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> instances of a HydPy application.</p>
+<dl class="docutils">
+<dt>Arguments and Attributes:</dt>
+<dd><ul class="first last simple">
+<li>data (<a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a>): For the available data stored on disk.</li>
+<li>init (<a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a>, optional): For the initialisation
+period.  If not supplied, the specifications of the <cite>data</cite>
+<a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> are applied.</li>
+<li>sim (<a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a>, optional): For the simulation period.
+If not supplied, the specifications of the <cite>init</cite> <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a>
+are applied.</li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="hydpy.core.timetools.Timegrids.stepsize">
+<code class="descname">stepsize</code><a class="headerlink" href="#hydpy.core.timetools.Timegrids.stepsize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stepsize of all handled <a class="reference internal" href="#hydpy.core.timetools.Timegrid" title="hydpy.core.timetools.Timegrid"><code class="xref py py-class docutils literal"><span class="pre">Timegrid</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrids.verify">
+<code class="descname">verify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrids.verify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrids.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise an <a class="reference external" href="https://docs.python.org/2.7/library/exceptions.html#exceptions.RuntimeError" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">RuntimeError</span></code></a> it the different
+time grids are inconsistent.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrids.qfactor">
+<code class="descname">qfactor</code><span class="sig-paren">(</span><em>area</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrids.qfactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrids.qfactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the factor for converting <cite>mm/stepsize</cite> to <cite>m^3/s</cite>.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>area (<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">float</span></code></a>): Reference area, which must be given in
+the unit <cite>km^2</cite>.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrids.parfactor">
+<code class="descname">parfactor</code><span class="sig-paren">(</span><em>stepsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrids.parfactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrids.parfactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the factor for converting parameter to simulation step size.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>stepsize (<a class="reference internal" href="#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a> or an suitable initialization argument
+thereof): Time interval, to which the parameter values refer.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrids.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrids.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrids.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a deep copy of the <a class="reference internal" href="#hydpy.core.timetools.Timegrids" title="hydpy.core.timetools.Timegrids"><code class="xref py py-class docutils literal"><span class="pre">Timegrids</span></code></a> instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.timetools.Timegrids.assignrepr">
+<code class="descname">assignrepr</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#Timegrids.assignrepr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.Timegrids.assignrepr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a> string with an prefixed assignement.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>prefix(<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Usually something like ‘x = ‘.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.timetools.TOY">
+<em class="property">class </em><code class="descclassname">hydpy.core.timetools.</code><code class="descname">TOY</code><span class="sig-paren">(</span><em>value=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/timetools.html#TOY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.timetools.TOY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Time of year handler.</p>
+<p><a class="reference internal" href="#hydpy.core.timetools.TOY" title="hydpy.core.timetools.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a> objects are used to define certain things that are true for
+a certain time point in each year.  The smallest supported time unit is
+seconds.</p>
+<p>Normally, for initialization a string is passed, defining the month, the
+day, the hour, the minute and the second in the order they are mentioned,
+seperated by a single underscore:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">TOY</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;3_13_23_33_43&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">month</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">day</span>
+<span class="go">13</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">hour</span>
+<span class="go">23</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">minute</span>
+<span class="go">33</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">second</span>
+<span class="go">43</span>
+</pre></div>
+</div>
+<p>If a lower precision is required, one can shorten the string, which
+implicitely sets the omitted property to the lowest possible value:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;3_13_23_33&#39;</span><span class="p">)</span>
+<span class="go">TOY(&#39;3_13_23_33_0&#39;)</span>
+</pre></div>
+</div>
+<p>The most extreme example would be, to pass not string at all:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">()</span>
+<span class="go">TOY(&#39;1_1_0_0_0&#39;)</span>
+</pre></div>
+</div>
+<p>One can prefix some information to the string, which is usefull when the
+string is to be used as a valid variable name somewhere else:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;something_3_13_23_33_2&#39;</span><span class="p">)</span>
+<span class="go">TOY(&#39;3_13_23_33_2&#39;)</span>
+</pre></div>
+</div>
+<p>As one can see, the prefixed information is lost in the printed string
+representation.  But a string with a standard prefix is returned through
+applying <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> on <a class="reference internal" href="#hydpy.core.timetools.TOY" title="hydpy.core.timetools.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a> instances:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;something_3_13_23_33_2&#39;</span><span class="p">))</span>
+<span class="go">&#39;toy_3_13_23_33_2&#39;</span>
+</pre></div>
+</div>
+<p>Alternatively, one can use a <a class="reference internal" href="#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> object as a initialization
+argument, ommitting the year:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="n">Date</span><span class="p">(</span><span class="s1">&#39;2001.02.03 04:05:06&#39;</span><span class="p">))</span>
+<span class="go">TOY(&#39;2_3_4_5_6&#39;)</span>
+</pre></div>
+</div>
+<p>It is only allowed to modify the mentioned properties, not to define new
+ones:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">microsecond</span> <span class="o">=</span> <span class="mi">53</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">TOY (time of year) objects only allow to set the properties month, day, hour, minute or second, but `microsecond` is given.</span>
+</pre></div>
+</div>
+<p>It is allowed to pass objects that can be converted to integers:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="s1">&#39;53&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">second</span>
+<span class="go">53</span>
+</pre></div>
+</div>
+<p>If the passed object cannot be converted properly, an exception is raised:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="s1">&#39;fiftythree&#39;</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">For TOY (time of year) objects, all properties must be of type `int`, but the value `fiftythree` of type `str` given for property `second` cannot be converted to `int`.</span>
+</pre></div>
+</div>
+<p>Additionally, given values are checked to lie within a suitable range:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">second</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">The value of property `second` of TOY (time of year) objects must lie within the range `(0, 59)`, but the given value is `60`.</span>
+</pre></div>
+</div>
+<p>Note that the allowed values for <cite>month</cite> and <cite>day</cite> depend on each other,
+which is why the order one defines them might be of importance.  So, if
+January is predefined, one can set day to the 31th:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">month</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">day</span> <span class="o">=</span> <span class="mi">31</span>
+</pre></div>
+</div>
+<p>But afterwards one cannot directly change the month to February:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">month</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">The value of property `month` of the actual TOY (time of year) object must not be the given value `2`, as the day has already been set to `31`.</span>
+</pre></div>
+</div>
+<p>Hence first set <cite>day</cite> to a smaller value and then change <cite>month</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">day</span> <span class="o">=</span> <span class="mi">28</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">month</span> <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>For February it is important to note, that the 29th is generally
+disallowed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">day</span> <span class="o">=</span> <span class="mi">29</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">The value of property `day` of the actual TOY (time of year) object must lie within the range `(1, 28)`, as the month has already been set to `2`, but the given value is `29`.</span>
+</pre></div>
+</div>
+<p>It is possible to compare two <a class="reference internal" href="#hydpy.core.timetools.TOY" title="hydpy.core.timetools.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a> instances:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="o">=</span> <span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">),</span> <span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t1</span> <span class="o">&lt;</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">&lt;</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t2</span> <span class="o">&lt;</span> <span class="n">t1</span><span class="p">)</span>
+<span class="go">(False, True, False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t1</span> <span class="o">&lt;=</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">&lt;=</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t2</span> <span class="o">&lt;=</span> <span class="n">t1</span><span class="p">)</span>
+<span class="go">(True, True, False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t1</span> <span class="o">==</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">==</span> <span class="n">t2</span><span class="p">)</span>
+<span class="go">(True, False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t1</span> <span class="o">!=</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">!=</span> <span class="n">t2</span><span class="p">)</span>
+<span class="go">(False, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t1</span> <span class="o">&gt;=</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">&gt;=</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t2</span> <span class="o">&gt;=</span> <span class="n">t1</span><span class="p">)</span>
+<span class="go">(True, False, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">t1</span> <span class="o">&gt;</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t1</span> <span class="o">&gt;</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t2</span> <span class="o">&gt;</span> <span class="n">t1</span><span class="p">)</span>
+<span class="go">(False, False, True)</span>
+</pre></div>
+</div>
+<p>Subtracting two <a class="reference internal" href="#hydpy.core.timetools.TOY" title="hydpy.core.timetools.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a> object gives their time difference in seconds:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;1_1_0_3_0&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;1_1_0_1_30&#39;</span><span class="p">)</span>
+<span class="go">90</span>
+</pre></div>
+</div>
+<p>Instead of negative values, it is always assumed that the first
+<a class="reference internal" href="#hydpy.core.timetools.TOY" title="hydpy.core.timetools.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a> object lies within the future (eventually within the
+subsequent year):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;1_1_0_1_30&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;12_31_23_58_30&#39;</span><span class="p">)</span>
+<span class="go">180</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="hydpy.core.timetools.TOY.passed_seconds">
+<code class="descname">passed_seconds</code><a class="headerlink" href="#hydpy.core.timetools.TOY.passed_seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Amount of time passed in seconds since the beginning of the year.</p>
+<p>In the first example, the year is only one minute and thirty seconds
+old:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">TOY</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;1_1_0_1_30&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">passed_seconds</span>
+<span class="go">90</span>
+</pre></div>
+</div>
+<p>The second example shows that the 29th February is generally included:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">passed_seconds</span>
+<span class="go">5184000</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.timetools.TOY.left_seconds">
+<code class="descname">left_seconds</code><a class="headerlink" href="#hydpy.core.timetools.TOY.left_seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remaining part of the year in seconds.</p>
+<p>In the first example, only one minute and thirty seconds of the year
+remain:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">TOY</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;12_31_23_58_30&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">left_seconds</span>
+<span class="go">90</span>
+</pre></div>
+</div>
+<p>The second example shows that the 29th February is generally included:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TOY</span><span class="p">(</span><span class="s1">&#39;2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">left_seconds</span>
+<span class="go">28944000</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">timetools</a><ul>
+<li><a class="reference internal" href="#date-and-period">Date and Period</a></li>
+<li><a class="reference internal" href="#timegrid-and-timegrids">Timegrid and Timegrids</a></li>
+<li><a class="reference internal" href="#details">Details</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sequencetools.html"
+                        title="previous chapter">sequencetools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cythons.html"
+                        title="next chapter">Cythons Modules</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/timetools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cythons.html" title="Cythons Modules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="sequencetools.html" title="sequencetools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" >Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

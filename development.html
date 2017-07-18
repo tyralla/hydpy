@@ -1,0 +1,924 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Development &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Project Structure" href="projectstructure.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="projectstructure.html" title="Project Structure"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="development">
+<span id="id1"></span><h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
+<p>You can install HydPy from the <a class="reference external" href="https://pypi.python.org/pypi">hydpy package</a> available on the
+<a class="reference external" href="https://pypi.python.org/pypi">Python package index</a> or fork from this <a class="reference external" href="https://github.com/tyralla/hydpy">GitHub repository</a> available
+on <a class="reference external" href="https://github.com">GitHub</a>.  Afterwards, you can implement your own models or
+change the frameworks structure in a manner that meets your personal
+goals and preferences.  There are many other Python tools freely
+available, which will be of great help while trying to achieve more
+complex tasks like paramater calibration or regionalization.  Cherry
+picking from many different Python packages can be a huge time-saving.
+Very often it is not necessary to write a “real” Python program.
+Instead, just writing a simple script calling different functionalities
+of different packages in the correct order often gets the job done.</p>
+<p>However, if you intend to contribute to the further development of HydPy
+(hopefully you will!), you must abdicate some parts of the freedom and
+ease of use Python offers.  The number of depencencies to other Python
+packages, in particular those with some relevant shortcomings and those
+which might not be further supported in the future, should be kept as
+small as possible.  Otherwise it would be to hard to guarantee the
+long-term applicability of HydPy.  Additionally, the Python code
+contributed by different developers should be as consistent as possible.
+Otherwise there would be a risk of the code base becoming opaque, making
+future extensions of HydPy impossible.</p>
+<p>The following sections try to define a strategy allowing HydPy to be
+developed as an open source project while maintaining sufficiently
+high quality standards for practical applications.  The hydrological
+modelling community has not made that much progress in this field yet.
+This is why the outlined strategy his highly influenced from other
+non-hydrological open source projects like <a class="reference external" href="http://pandas-docs.github.io/pandas-docs-travis/contributing.html">pandas</a>.  Discussions on
+how to improve the outlined strategy are welcome!</p>
+<div class="section" id="how-to-contribute">
+<h2>How to contribute?<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h2>
+<p>To work in collaboration on the same software code requires some kind
+of version control.  It must be clear who is working on which part of
+the code, when (and why) code changes were conducted, and which code
+sections of one developer are compatible with some code sections of
+another developer (or not).  Also, one always needs the possibility to
+fall back on an older code version whenever some current changes turned
+out to be a dead end.</p>
+<p>For HydPy, we selected the version control software Git for these tasks.
+The main <a class="reference external" href="https://github.com/tyralla/hydpy">GitHub repository</a> is available on <a class="reference external" href="https://github.com">GitHub</a>.  So the first
+step should be to sing up for a <a class="reference external" href="https://github.com/signup/free">free GitHub account</a>.  After that,
+you could contribute to HydPy online without to install anything on
+your own computer.  If your only aim is to improve the documentation,
+this could be reasonable.  But normally you need to handle Git
+repositories on your own computer.  Git itself works via command lines.
+Most likely, you would prefer to install Git together with a graphical
+user interface like <a class="reference external" href="https://www.sourcetreeapp.com/">source tree</a>.</p>
+<p>To contribute to HydPy requires essentially three or four steps, no matter
+if working directy online on GitHub or with your local Git software.  For
+simplicity and generality, these steps are explained using the example
+of a single change to the documentation via GitHub:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Go to this <a class="reference external" href="https://github.com/tyralla/hydpy">GitHub repository</a> and click on “Fork”.  This is how you
+create your own working copy of HydPy, allowing you to add, change,
+or delete any files without interfering in the original repository.</p>
+</li>
+<li><p class="first">Click on “Branch: master”, type a name that reflects what you want
+to accomplish and press enter. Now that you have created a new
+branch, you can experiment without affecting the orginal branch or your
+own  master branch. (This step is not really required; you could
+apply the following steps on your own master branch likewise.
+But to create branches for different tasks helps structuring your
+work and to cooperate with others.)</p>
+</li>
+<li><dl class="first docutils">
+<dt>Change something.  For example</dt>
+<dd><ul class="first last simple">
+<li>click on “.gitignore”</li>
+<li>click on the marker symbol (“Edit this file”)</li>
+<li>change the order of two lines (e.g. “<em>c.” and “</em>.h”)</li>
+<li>write something under “Commit changes” to explain your doing
+(e.g. “change order of lines in .gitignore”)</li>
+<li>click on the green “Commit changes” button</li>
+</ul>
+</dd>
+</dl>
+<p>Now you have changed the file .gitignore in your own branch
+specialized for this task.  Normally, you would commit multiple
+small changes to one branch.  Keeping single commits small allows
+for inspecting and reversing different changes.</p>
+</li>
+<li><p class="first">At last, you can suggest your changes to be included in HydPy’s
+main repository.  Click on “Compare” to visualize the relevant
+differences.  Click on “Create pull request” to ask others
+to diskuss your changes and to eventually merge them into their
+projects.  In other words: you request other people to pull (get)
+your own changes and to merge (incorporate) these changes into their
+repositories.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>Note that everyone is responsible for his or her own repository, you
+do not have to be afraid to break another persons repository accidentally.
+But you are responsibility the make pull requests focussing on one issue
+that is clearly explained.  Otherwise your contribution is likely to be
+refused.</p>
+<p>Of course, it is not always as easy as in the given example.  Not only
+your branches, but also the main line of development evolves.  Often,
+you will have to retrieve changes from the main branch and eventually
+resolve some conflicts before you can make “good” pull request.  See
+much more thorough explanations as <a class="reference external" href="https://progit2.s3.amazonaws.com/en/2016-03-22-f3531/progit-en.1084.pdf">Pro Git</a> on how to improve your
+skills in using Git.  Here is a very nice description on
+<a class="reference external" href="https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request">How to Rebase a Pull Request</a> (this could be good starting point for
+explaining how to add newly developed models into the main line in
+this documentation).</p>
+</div>
+<div class="section" id="hydpy-style-guide">
+<h2>HydPy Style Guide<a class="headerlink" href="#hydpy-style-guide" title="Permalink to this headline">¶</a></h2>
+<p>Python allows for writing concise and easily readable software code,
+that can be maintained and further developed with relative ease.
+However, code quality does also depend on the experience (and available
+time) of the programmer writing it.  In hydrology, much model code is
+written by PhD students and other young scientists, who — besides
+having participated in some more or less comprehensive introductory
+courses — have often little programming experience and who are under
+the pressure not only to get their model running, but also to tackle
+their scientific questions and to publish as many research articles
+as possible within a limited period of time.  The source code
+resulting from such a rush is understandably often a mess.  And even
+the better software results often prove inadequate when it comes
+to transfering the software into practical applications or sharing it
+with other researchers.</p>
+<p>This is why we defined the HydPy Style Guide, which is a refinement
+of <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a> — the “official” Style Guide for Python Code.
+<a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a> gives coding conventions that help to write clear code.
+And it eases diving into already existing source code, as one has
+less effort with unraveling the mysteries of overly creative
+programming solutions.</p>
+<p>In some regards the HydPy Style Guide deviates substantially from <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a>.
+This is mostly due to following two aims.  First, that the HydPy framework
+shall be applicable for hydrologists with little or even no programming
+experience.  Ideally, such framework users should not even notice that they
+are writing valid Python code while preparing their configuration files.
+Secondly, that the common gap between model code, model documentation and
+model testing should be closed as well as possible.  Understanding the
+model documentation of a certain HydPy version should be identical with
+understanding how the model actually works under the same HydPy version.
+These two points are elucidated in the following subsections.</p>
+<div class="section" id="general-framework-features">
+<h3>General framework features<a class="headerlink" href="#general-framework-features" title="Permalink to this headline">¶</a></h3>
+<p>When trying to contribute code to the core tools of HydPy (meaning
+basically everything except the actual model implementations), on has
+to be aware that even slight changes can have significant effects
+on the applicability of HydPy, and that future HydPy developers must
+cope with your contributions.   So, always make sure to check the effects
+of your code changes properly (as described below).  And try to structure
+your code in a readable, object-oriented design.  This section describes
+some conventions for the development of HydPy, but is no guidance on how
+to write good source code in general.  So, if you have little experience
+in programming, first make sure to learn the basics of Python through some
+<a class="reference external" href="https://www.python.org/about/gettingstarted/">Python tutorials</a>.  Afterwards, improve your  knowledge on code quality
+through reading more advanced literature like this
+<a class="reference external" href="http://www.itmaybeahack.com/homepage/books/oodesign.html">book on object-oriented design</a>.</p>
+<div class="section" id="python-version">
+<h4>Python Version<a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h4>
+<p>The <cite>End Of Life for Python 2.7</cite> is scheduled for 2020. Nevertheless,
+still many scientists are using it.  This is why HydPy is continuously
+tested both on Python 2 and Python 3. For the time beeing future HydPy
+versions should be applicable on both Python versions.</p>
+<p>Always insert</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+</pre></div>
+</div>
+<p>at the top of a new module.  This introduces the new (integer) division
+and print statement of Python 3 into Python 2 (when using Python 3, this
+import statement is automatically skipped).</p>
+<p>Whenever there are two multiple options to achieve something, prefer
+one that is fits best to Python 3.  For example, always use <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#range" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">range()</span></code></a>.
+While under Python three often <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#xrange" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">xrange()</span></code></a> would be preferable
+regarding time and memory efficiency, just using <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#range" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">range()</span></code></a> leads to
+a clean syntax and is future-proof.  (Have a look at the
+<a class="reference external" href="http://python-future.org/compatible_idioms.html">Python 2-3 cheat sheet</a> whenever in compatibility trouble.)</p>
+<p>Sometimes incompatibilities of Python 2 and Python 3 require that specific
+HydPy functionalities must be coded twice.  Use <cite>pyversion</cite> in these cases:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">traceback_</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">pyversion</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">exec</span><span class="p">(</span><span class="s2">&quot;raise SystemError, &#39;just a test&#39;, traceback_&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span><span class="s1">&#39;just a test&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">traceback_</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">SystemError</span>: <span class="n">just a test</span>
+</pre></div>
+</div>
+<p>(The example above is already taken into account by function
+<a class="reference internal" href="objecttools.html#hydpy.core.objecttools.augmentexcmessage" title="hydpy.core.objecttools.augmentexcmessage"><code class="xref py py-func docutils literal"><span class="pre">augmentexcmessage()</span></code></a>.)</p>
+</div>
+<div class="section" id="site-packages">
+<h4>Site Packages<a class="headerlink" href="#site-packages" title="Permalink to this headline">¶</a></h4>
+<p>Whenever reasonable, import only packages of the
+<a class="reference external" href="https://docs.python.org/2/library/">The Python Standard Library</a> or at least restrict yourself
+to mature and stable site packages.  At the moment, HydPy relies
+only on the highly accepted site packages <a class="reference external" href="http://www.cython.org/">Cython</a>, <a class="reference external" href="http://www.numpy.org/">NumPy</a>,
+and <a class="reference external" href="http://matplotlib.org/">matplotlib</a>.  Further developments of HydPy based on more
+specialized site packages (e.g. for plotting maps) might be
+useful.  But the related import commands should be secured in
+a way that allows for the application of HydPy without having
+these specialized site packages available.</p>
+</div>
+<div class="section" id="imports">
+<h4>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h4>
+<p>As recommended in <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a>, clarify the sources of your imports.
+Always use the following pattern at the top of a new module
+(with some example packages):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># import from...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ...the Python Standard Library</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ...site-packages</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># ...from HydPy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.cythons</span> <span class="k">import</span> <span class="n">pointer</span>
+</pre></div>
+</div>
+<p>Note that each import command has its own line.  Always import
+complete modules from HydPy without changing their names. —
+No wildcard imports!</p>
+<p>The wildcard ban is lifted when writing configuration files.
+Using the parameter control files as an example, it wouldn’t be nice to
+always write something like:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models</span> <span class="k">import</span> <span class="n">hland</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">hland</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">hland</span><span class="o">.</span><span class="n">Parameters</span><span class="p">({</span><span class="s1">&#39;model&#39;</span><span class="p">:</span><span class="n">model</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">hland</span><span class="o">.</span><span class="n">ControlParameters</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">nmbzones</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">nmbzones</span>
+<span class="go">nmbzones(2)</span>
+</pre></div>
+</div>
+<p>Here a wildcard import (and some magic, see below), allows for a much
+cleaner syntax:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="c1"># First delete the model instance of the example above.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now repeat the above example in a more intuitive manner.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.hland</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nmbzones</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nmbzones</span>
+<span class="go">nmbzones(2)</span>
+</pre></div>
+</div>
+<p>Note that the wildcard import is acceptable here, as there is only one
+import statement.  There is no danger of name conflicts.</p>
+</div>
+<div class="section" id="defensive-programming">
+<h4>Defensive Programming<a class="headerlink" href="#defensive-programming" title="Permalink to this headline">¶</a></h4>
+<p>HydPy is intended to be applicable by researchers and practitioners
+who are no Python experts and may have little experience in programming
+in general.  Hence it is desirable to anticipate errors due to misleading
+input as good as possible and report them as soon as possible.
+So, in contradiction to <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a>, it is recommended to not just expose
+the names of simple public attributes.  Instead, use protected attributes
+(usually properties) to assure that the internal states of objects remain
+consistent, whenever this appears to be useful. One example is that it
+is not allowed to assign an unknown string to the <cite>outputfiletype</cite> of a
+<a class="reference internal" href="filetools.html#hydpy.core.filetools.SequenceManager" title="hydpy.core.filetools.SequenceManager"><code class="xref py py-class docutils literal"><span class="pre">SequenceManager</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">SequenceManager</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span> <span class="o">=</span> <span class="n">SequenceManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span><span class="o">.</span><span class="n">outputfiletype</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="gr">NotImplementedError</span>: <span class="n">The given output file type `test` is not implemented yet.  Please choose one of the following file types: (&#39;npy&#39;, &#39;asc&#39;).</span>
+</pre></div>
+</div>
+<p>Of course, the extensive usage of protected attributes increases
+the length of the source code and slows computation time.  But,
+regarding the first point, writing a graphical user interface
+would require much more source code.  And, regarding the second
+point, the computation times of the general framework
+functionalities discussed here should be negligible in comparison
+with the computation times of the hydrological simulations,
+which are discussed below, in the majority of cases.</p>
+</div>
+<div class="section" id="exceptions">
+<h4>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h4>
+<p>Unmodified error messages of Python (and of the imported
+libraries) are often not helpful in the application of HydPy due
+to two reasons: First, they are probably read by someone who has
+no experience in understanding Pythons exception handling system.
+And secondly, they do not tell in which context a problem occurs.
+Here, “context” does not mean the relevant part of the source code,
+which is of course referenced in the traceback; instead it means
+things like the concerned geographical location.  It would, for example,
+be of little help to only know that the required value of a certain
+parameter is not available, when the same parameter is applied
+thousands of times in different subcatchments.  Try to add as much
+helpful information to error messages as possible, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;For parameter </span><span class="si">%s</span><span class="s1"> of element </span><span class="si">%s</span><span class="s1"> no value has been &#39;</span>
+                   <span class="s1">&#39;defined so far.  Hence it is not possible to...&#39;</span>
+                   <span class="o">%</span> <span class="p">(</span><span class="n">parameter</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">devicename</span><span class="p">(</span><span class="n">parameter</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>(The function <a class="reference internal" href="objecttools.html#hydpy.core.objecttools.devicename" title="hydpy.core.objecttools.devicename"><code class="xref py py-func docutils literal"><span class="pre">devicename()</span></code></a> tries
+to determine the name of the <a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a>
+or <a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a> instance (indirectly)
+containing the given object, which is in many cases the most relevant
+information for identifying the error source.)</p>
+<p>Whenever possible, us function
+<a class="reference internal" href="objecttools.html#hydpy.core.objecttools.augmentexcmessage" title="hydpy.core.objecttools.augmentexcmessage"><code class="xref py py-func docutils literal"><span class="pre">augmentexcmessage()</span></code></a> to augment
+standard Python error messages with <cite>HydPy information</cite>.</p>
+</div>
+<div class="section" id="naming-conventions">
+<h4>Naming Conventions<a class="headerlink" href="#naming-conventions" title="Permalink to this headline">¶</a></h4>
+<p>The naming conventions of <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP 8</a> apply.  Additionally, it is
+encouraged to name classes and their instances as similar as
+possible whenever reasonable, often simply switching from
+<strong>CamelCase</strong> to <strong>lowercase</strong>. This can be illustrated based
+on some classes for handling time series:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="13%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Class Name</th>
+<th class="head">Instance Name</th>
+<th class="head">Note</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Sequences</td>
+<td>sequences</td>
+<td>each Model instance handles exactly one Sequence instance: <cite>model.sequences</cite></td>
+</tr>
+<tr class="row-odd"><td>InputSequences</td>
+<td>inputs</td>
+<td>“inputsequences” would be redundant for attribute access: <cite>model.sequences.inputs</cite></td>
+</tr>
+</tbody>
+</table>
+<p>If possible, each instance should define its own preferred name via
+the property <cite>name</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.hland</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">InputSequences</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;inputs&#39;</span>
+</pre></div>
+</div>
+<p>For classes like <a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a> or
+<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a>, where names (and not
+namespaces) are used to differentiate between instances, the
+property <cite>name</cite> is also implemented, but — of course — not
+related to the class name, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">Node</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Node</span><span class="p">(</span><span class="s1">&#39;gauge1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;gauge1&#39;</span>
+</pre></div>
+</div>
+<p>In HydPy, instances of the same or similar type should be grouped in
+collection objects with a similar name, but with an attached letter “s”.
+Different <a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a> instances are stored
+in an instance of the class <a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Elements" title="hydpy.core.devicetools.Elements"><code class="xref py py-class docutils literal"><span class="pre">Elements</span></code></a>,
+different <a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> instances are stored in
+an instance of the class <a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Nodes" title="hydpy.core.devicetools.Nodes"><code class="xref py py-class docutils literal"><span class="pre">Nodes</span></code></a>…</p>
+</div>
+<div class="section" id="collection-classes">
+<h4>Collection Classes<a class="headerlink" href="#collection-classes" title="Permalink to this headline">¶</a></h4>
+<p>The naming (of the instances) of collection classes is discussed just
+above.  Additionally, try to follow the following recommendations.</p>
+<p>Each collection object should be iterable.  Normally, both the names of
+the handled objects (as known to the collection object) and the objects
+themself should be returned, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">Nodes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">=</span> <span class="n">Nodes</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">+=</span> <span class="s1">&#39;gauge1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">+=</span> <span class="s1">&#39;gauge2&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">name</span><span class="p">,</span> <span class="n">node</span>
+<span class="go">(&#39;gauge1&#39;, Node(&quot;gauge1&quot;, variable=&quot;Q&quot;))</span>
+<span class="go">(&#39;gauge2&#39;, Node(&quot;gauge2&quot;, variable=&quot;Q&quot;))</span>
+</pre></div>
+</div>
+<p>To ease working in the interactive mode, objects handled by a
+collection object should be accessible as attributes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span><span class="o">.</span><span class="n">gauge1</span>
+<span class="go">Node(&quot;gauge1&quot;, variable=&quot;Q&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span><span class="o">.</span><span class="n">gauge2</span>
+<span class="go">Node(&quot;gauge2&quot;, variable=&quot;Q&quot;)</span>
+</pre></div>
+</div>
+<p>Whenever usefull, define convenience functions which simplify the
+handling of collection objects, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">+=</span> <span class="n">Node</span><span class="p">(</span><span class="s1">&#39;gauge1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span><span class="o">.</span><span class="n">gauge1</span> <span class="ow">is</span> <span class="n">nodes</span><span class="p">[</span><span class="s1">&#39;gauge1&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;gauge1&#39;</span> <span class="ow">in</span> <span class="n">nodes</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span><span class="o">.</span><span class="n">gauge1</span> <span class="ow">in</span> <span class="n">nodes</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newnodes</span> <span class="o">=</span> <span class="n">nodes</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="ow">is</span> <span class="n">newnodes</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span><span class="o">.</span><span class="n">gauge1</span> <span class="ow">is</span> <span class="n">newnodes</span><span class="o">.</span><span class="n">gauge1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">-=</span> <span class="s1">&#39;gauge1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;gauge1&#39;</span> <span class="ow">in</span> <span class="n">nodes</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="string-representations">
+<h4>String Representations<a class="headerlink" href="#string-representations" title="Permalink to this headline">¶</a></h4>
+<p>Be aware of the difference between <code class="xref py py-func docutils literal"><span class="pre">str()</span></code> and <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a>.
+A good string representation (return value of <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a>) is one
+that a Non-Python-Programmer does not identify to be a string.
+The first ideal case is that copy-pasting the string representation
+within a command line to evaluate it returns a reference to the same
+object. A Python example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="go">&#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A HydPy example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">Node</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Node</span><span class="p">(</span><span class="s1">&#39;gauge1&#39;</span><span class="p">)</span>
+<span class="go">Node(&quot;gauge1&quot;, variable=&quot;Q&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;Node(&quot;gauge1&quot;, variable=&quot;Q&quot;)&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Node</span><span class="p">(</span><span class="s1">&#39;gauge1&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>In the second ideal case is that evaluating the string representation
+results in an equal object. A Python example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mf">1.5</span>
+<span class="go">1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;1.5&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="mf">1.5</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;1.5&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mf">1.5</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A HydPy example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">Period</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="go">Period(&quot;1d&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;Period(&quot;1d&quot;)&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;Period(&quot;1d&quot;)&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>For nested objects this might be more hard to accomplish, but sometimes it’s
+worth it.  A Python example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span>
+<span class="go">[1.0, &#39;a&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s2">&quot;[1.0, &#39;a&#39;]&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A HydPy example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">Timegrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;01.11.1996&#39;</span><span class="p">,</span> <span class="s1">&#39;1.11.2006&#39;</span><span class="p">,</span> <span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="go">Timegrid(&quot;01.11.1996 00:00:00&quot;,</span>
+<span class="go">         &quot;01.11.2006 00:00:00&quot;,</span>
+<span class="go">         &quot;1d&quot;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;Timegrid(&quot;01.11.1996 00:00:00&quot;, &quot;01.11.2006 00:00:00&quot;, &quot;1d&quot;)&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;01.11.1996&#39;</span><span class="p">,</span> <span class="s1">&#39;1.11.2006&#39;</span><span class="p">,</span> <span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>ToDo: For deeply nested objects, this strategy becomes infeasible, of course.
+SubParameters(None)…</p>
+<p>Sometimes, additional information might increase the value of a
+string representation.  Add comments in these cases, but only when
+the <code class="xref py py-attr docutils literal"><span class="pre">reprcomments</span></code> flag is activated:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.hland</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nmbzones</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nmbzones</span>
+<span class="go"># Number of zones (hydrological response units) in a subbasin [-].</span>
+<span class="go">nmbzones(2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nmbzones</span>
+<span class="go">nmbzones(2)</span>
+</pre></div>
+</div>
+<p>Such comments are of great importance, whenever the string representation
+might be misleading:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">percmax</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">percmax</span>
+<span class="go"># Maximum percolation rate [mm/T].</span>
+<span class="go"># The actual value representation depends on the actual parameter step size,</span>
+<span class="go"># which is `1d`.</span>
+<span class="go">percmax(2.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">percmax</span>
+<span class="go">percmax(2.0)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="introspection">
+<h4>Introspection<a class="headerlink" href="#introspection" title="Permalink to this headline">¶</a></h4>
+<p>One of Pythons major strengths is <cite>introspection</cite>, allowing you to analyze
+(and modify) objects fundamentally at runtime.  One simple example would
+be to access and change the documentation of a single HBV <cite>number of zones</cite>
+parameter initialized at runtime.  Here, the given string representation
+comment is simply the first line of the documentation string of class
+<a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.NmbZones" title="hydpy.models.hland.hland_control.NmbZones"><code class="xref py py-class docutils literal"><span class="pre">NmbZones</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.hland.hland_control</span> <span class="k">import</span> <span class="n">NmbZones</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NmbZones</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&#39;Number of zones (hydrological response units) in a subbasin [-].&#39;</span>
+</pre></div>
+</div>
+<p>However, we could define a unique documentation string for the specific
+<a class="reference internal" href="HydPy-H-Land.html#hydpy.models.hland.hland_control.NmbZones" title="hydpy.models.hland.hland_control.NmbZones"><code class="xref py py-class docutils literal"><span class="pre">NmbZones</span></code></a> instance defined above:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nmbzones</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">NmbZones</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;a subbasin&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                            <span class="s1">&#39;the amazonas basin&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now the representation string (only) of this instance is changed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nmbzones</span>
+<span class="go"># Number of zones (hydrological response units) in the amazonas basin [-].</span>
+<span class="go">nmbzones(2)</span>
+</pre></div>
+</div>
+<p>As you can see, it is easy to retrieve information from living objects
+and to adjust them to specific situations.  With little effort, one
+can do much more tricky things. But when writing production code, one
+has to be cautious.  First do not all Python implementations support
+each introspection feature of CPython.  Secondly is introspection often
+a possible source of confusion.  For HydPy, only the second issue is of
+importance, as the use of Cython rules out its application on alternative
+Python implementations as <a class="reference external" href="https://pypy.org/">PyPy</a>.  But the second issue needs to be
+taken into account more strongly.</p>
+<p>HydPy makes extensive use of Pythons introspection features, whenever it
+serves the purpose of relieving non-programmers from writing code lines
+that do not deal with hydrological modelling directly.  Section <a class="reference internal" href="#imports">Imports</a>
+discusses the usage of wildcard imports in parameter control files.
+However, the real comfort comes primarily from the <cite>magic</cite> implemented
+in the function <a class="reference internal" href="magictools.html#hydpy.core.magictools.parameterstep" title="hydpy.core.magictools.parameterstep"><code class="xref py py-func docutils literal"><span class="pre">parameterstep()</span></code></a>.  Through
+calling this function one does not only define a relevant time intervall
+length for the following parameter values.  One also initializes a new
+model instance (if such an instance does not already exist) and makes
+its control parameter objects available in the local namespace.  Hence,
+in the sake of the users comfort, each parameter control file purponts
+beeing a simple configuration file that somehow checks its own validity.
+On the downside, to modify the operating principle of HydPy’s parameter
+control files requires more thought than if everything would have
+been accomplished in a more direct manner.</p>
+<p>It is encouraged to implement additional introspection features into
+HydPy, as long as they improve the intuitive usability for non-programmers.
+But one should be particularly cautious when doing so and document the
+why and how thoroughly.  To ensure traceability, one should usually add
+such code to the modules <a class="reference internal" href="modelutils.html#module-hydpy.cythons.modelutils" title="hydpy.cythons.modelutils"><code class="xref py py-mod docutils literal"><span class="pre">modelutils</span></code></a> and
+<a class="reference internal" href="magictools.html#module-hydpy.core.magictools" title="hydpy.core.magictools"><code class="xref py py-mod docutils literal"><span class="pre">magictools</span></code></a>.  Module <a class="reference internal" href="modelutils.html#module-hydpy.cythons.modelutils" title="hydpy.cythons.modelutils"><code class="xref py py-mod docutils literal"><span class="pre">modelutils</span></code></a>
+deals with all introspection needed to <cite>cythonize</cite> Python models
+automatically.  Module <a class="reference internal" href="magictools.html#module-hydpy.core.magictools" title="hydpy.core.magictools"><code class="xref py py-mod docutils literal"><span class="pre">magictools</span></code></a> serves for
+(most of) the rest of HydPy’s magical introspection features.  Of course,
+it might be necessary to define other specialized inspection modules in
+the future.</p>
+</div>
+</div>
+<div class="section" id="model-specific-features">
+<h3>Model specific features<a class="headerlink" href="#model-specific-features" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="assuring-code-and-documentation-quality">
+<h2>Assuring code and documentation quality<a class="headerlink" href="#assuring-code-and-documentation-quality" title="Permalink to this headline">¶</a></h2>
+<p>From a theoretical or even a philosophical point of view, the
+capabilities and shortcomings of hydrological modelling have been
+discussed thoroughly.  The negative impacts of low data quality
+are addressed by many sensitivity studies.  By contrast, we are not
+aware of any study focussing on the compromising effects of bugs
+and misleading code documentation of hydrological computer models.
+(Of course, such a study would be hard to conduct due to several
+reasons.) Given the little attention paid during the peer-review
+process to the correctness of model code and its transparent
+documentation, the danger of scientific results beeing corrupted
+by such flaws can — carefully worded — at least not be ruled
+out.</p>
+<p>This sections describes strategies on how to keep the danger
+of severe bugs and outdated documentation to a (hopefully)
+reasonable degree.</p>
+<div class="section" id="conventional-unit-tests">
+<h3>Conventional Unit-Tests<a class="headerlink" href="#conventional-unit-tests" title="Permalink to this headline">¶</a></h3>
+<p>After installing HydPy through executing the <cite>setup.py</cite> module with
+the argument <cite>install</cite>, the module <code class="xref py py-mod docutils literal"><span class="pre">test_everything</span></code>
+is executed as well.  The first task of the latter module is to
+perform all <cite>conventional</cite> unit tests.  Therefore, all modules
+within the package <code class="xref py py-mod docutils literal"><span class="pre">tests</span></code> named ‘unittests_*.py’ are
+evaluated based on the unit testing framework <a class="reference external" href="https://docs.python.org/2.7/library/unittest.html#module-unittest" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">unittest</span></code></a> of
+Pythons standard library.  Each new HydPy module should be complemented
+by a corresponding unittest file, testing its functionality thoroughly.
+Just write test classes in each unittest file.  These are evaluated
+automatically by module <code class="xref py py-mod docutils literal"><span class="pre">test_everything</span></code>.  Let each
+class name start with ‘Test’, a consecutive number, and a description
+of the functionality to be testet.  Each test class must inherit from
+<a class="reference external" href="https://docs.python.org/2.7/library/unittest.html#unittest.TestCase" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">TestCase</span></code></a>, allowing for using its assert methods.
+Last but not least, add the different test methods.  Again, each
+name should start with ‘test’ and a consecutive number, but this time
+in lower case letters seperated by underscores. By way of example,
+consider a snipplet of the test class for the initialization of
+<a class="reference internal" href="timetools.html#hydpy.core.timetools.Date" title="hydpy.core.timetools.Date"><code class="xref py py-class docutils literal"><span class="pre">Date</span></code></a> objects:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">unittest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">timetools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Test01DateInitialization</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">refdate_day</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1996</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">refdate_hour</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1996</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">test_01_os_style_day</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refdate_day</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">timetools</span><span class="o">.</span><span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1996_11_01&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">test_02_os_style_hour</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refdate_hour</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">timetools</span><span class="o">.</span><span class="n">Date</span><span class="p">(</span><span class="s1">&#39;1997_11_01_12&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="xref py py-func docutils literal"><span class="pre">setUp()</span></code> method allows for some preparations
+that have to be conducted before the test methods can be called.  The status
+defined in the <code class="xref py py-func docutils literal"><span class="pre">setUp()</span></code> method is restored
+before each test method call, hence — normally — the single test
+methods do not affect each other (the consecutive numbers are only used
+for reporting the test results in a sorted manner).  In case the test
+methods affect some global variables, add a
+<code class="xref py py-func docutils literal"><span class="pre">tearDown()</span></code> method to your test class, which
+will be executed after each test method call. See the documentation
+on <a class="reference external" href="https://docs.python.org/2.7/library/unittest.html#unittest.TestCase" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">TestCase</span></code></a> regarding the available assert methods.</p>
+<p>To elaborate the example above, the two test methods are executed manually
+(normally, this is done by module <code class="xref py py-mod docutils literal"><span class="pre">test_everything</span></code>
+automatically).  First prepare an object for the test results:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">TestResult</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then initialize a test object engaging the first test method and run
+all assertions (in this case, there is only one assertion per method):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tester</span> <span class="o">=</span> <span class="n">Test01DateInitialization</span><span class="p">(</span><span class="s1">&#39;test_01_os_style_day&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">tester</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now do the same for the second test method:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tester</span> <span class="o">=</span> <span class="n">Test01DateInitialization</span><span class="p">(</span><span class="s1">&#39;test_02_os_style_hour&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">tester</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The test result object tells us that two tests have been executed, that
+no (unexpected) error occured, and that one test failed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>
+<span class="go">&lt;unittest.result.TestResult run=2 errors=0 failures=1&gt;</span>
+</pre></div>
+</div>
+<p>Here is the reason for the (intentional) failure in this example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">failures</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">AssertionError: datetime.datetime(1996, 11, 1, 12, 0) != datetime.datetime(1997, 11, 1, 12, 0)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="doctests">
+<h3>Doctests<a class="headerlink" href="#doctests" title="Permalink to this headline">¶</a></h3>
+<p>When defining <cite>conventional</cite> unit tests, one tries to achieve a large
+test coverage with few lines of code (don’t repeat yourself!).
+Therefore, sophisticated tools as the <a class="reference external" href="https://docs.python.org/3/library/unittest.mock.html">mock object library</a> are
+available.  Unit tests might also save the purpuse to explain the
+functioning of the main code, as they explicitely show how it can
+be used.  However, the latter is pie in the sky when the unit tests
+are interpreted by someone who has little experience in unit testing
+and maybe little experience in programming at all.  This might not be
+a relevant problem as long as we test such basic functionalities of
+the HydPy framework, the user is not really interested in directly or
+just expects to work.  However, at the latest when the implemented
+hydrological model are involved, the clarity of the defined unit tests
+is desirable even for non-programmers (and — in our opinion —
+it is scientifically necessary).</p>
+<p>Each model implemented in HydPy should be tested in manner that is
+as clear and comprehensible as possible.  To this end, the documentation
+test principle defined by the module <a class="reference external" href="https://docs.python.org/2.7/library/doctest.html#module-doctest" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">doctest</span></code></a> should be applied
+extensively.  At least, all code branches including (hydrological)
+equations should be captured completely via doctests. (More technical
+branches, e.g. those including the treatment of exceptions, can be
+left to conventional unit tests.)  Often only one or two sentences
+are required to expain a doctest in a way, allowing a non-programmer
+to understand and repeat it.  And through repetition, he learns to
+apply the model.</p>
+<p>Besides their intuitiveness, doctests offer the big advantage of
+keeping source code and documentation in sync.  Whenever either
+a source line or its associated doctest contains errors, or
+whenever the source code is updated but the associated doctests
+not (or the other way round), it is reported.  Hence all examples
+in the HydPy documentation should be written as doctests.  The more
+doctests the documentation includes, the merrier the danger of
+retaining outdated documentation sections.  In order to keep an
+eye on a concrete example: as long as this three-line doctest…</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objecttools</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="n">objecttools</span><span class="p">)</span>
+<span class="go">&#39;module&#39;</span>
+</pre></div>
+</div>
+<p>…remains in the documentation, one can be sure that the current
+core package contains a module named <cite>objecttools</cite>.</p>
+<p>To support the frequent usage of doctests, one is allowed to use
+them at any section of the documentation, accepting possible
+reduncancies with defined <cite>conventional</cite> unit tests.  The module
+<code class="xref py py-mod docutils literal"><span class="pre">test_everything</span></code> searches for doctests in
+all Python modules and all <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> files contained
+in the package hydpy and executes them.</p>
+</div>
+<div class="section" id="continuous-integration">
+<h3>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this headline">¶</a></h3>
+<p>To improve the code base of HydPy, you need your own working copy
+(your own fork, see section <a class="reference internal" href="#how-to-contribute">How to contribute?</a>).  The existance
+of multiple working copies inevitably leads to the danger of
+integration problems, meaning that different changes in different
+working copies lead to source code incompatibilities.  To reduce
+this risk, the different working copies should be merged <cite>continously</cite>.
+This decreases the likelihood of simultaneous changes to the same
+code sections and keeps the complexity of possible conflicts to
+a minimum.</p>
+<p>The current (online) development of HydPy relies, besides <a class="reference external" href="https://github.com">GitHub</a>,
+on <a class="reference external" href="https://travis-ci.com/">Travis CI</a>.  <a class="reference external" href="https://travis-ci.com/">Travis CI</a> is a hosted, distributed continuous
+integration service.  This <a class="reference external" href="https://travis-ci.org/tyralla/hydpy">Travis CI project</a> has been been linked
+to HydPy’s <a class="reference external" href="https://github.com/tyralla/hydpy">GitHub repository</a>.  It is configured to accomplish
+the following tasks for each new commit or pull request:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Install HydPy on the Debian based Linux operating system Ubuntu using
+different versions of CPython.</li>
+<li>Cythonize all implemented models on the different Python versions.</li>
+<li>Execute all <cite>conventional</cite> unit tests and all doctests on the
+different Python versions.</li>
+<li>Prepare a <a class="reference internal" href="#test-coverage">Test Coverage</a> report based on Python 2.7.</li>
+<li>Update this <a class="reference external" href="https://tyralla.github.io/hydpy/">online documentation</a> based on Python 2.7.</li>
+</ul>
+</div></blockquote>
+<p>Installation and testing is performed using Python 2.7, 3.4, 3.5 and 3.6.
+2.7 still seems to be the Python version most frequently used by scientists.
+Python versions 3.0 to 3.3 do not seem to be of great importance anymore.
+Additionally, installation and testing is performed using the development
+branches of version 3.5, 3.6 and (the still not released) version 3.7.
+This offers the advantage of anticipating future problems and to
+<a class="reference external" href="https://snarky.ca/how-to-use-your-project-travis-to-help-test-python-itself/">test future Python</a> itself, possibly helping to avoid future bugs.</p>
+<p>Whenever one single test fails under one single Python version, the total
+process (build) is regarded as defective and will not be merged into
+the master branch of the main fork.  The same is true, of course, when
+one installation process itself fails.  So make sure all your changes
+are compatible with each selected Python version.  But, in accordance with
+one of Python’s principle, it is easier to ask for forgiveness than
+permission: let Travis evaluate your current working branch and see what
+happens…</p>
+<p>Not only the source code, but also the contributed documentation
+text is checked in two ways. Doctesting is discussed above and always
+performed using each mentioned Python version.  Additionally, when
+using  Python 2.7 the properness of the whole documentation text is
+considered. <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> is applied to create the html pages of this
+<a class="reference external" href="https://tyralla.github.io/hydpy/">online documentation</a> based on the given <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> files.
+In case of occuring problems, e.g. due to faulty inline markup, the
+total build (including all Python versions) is regarded as defective.
+This assures that each new HydPy version is a accompanied by a
+functioning online documentation.  If nothing goes wrong, the
+<a class="reference external" href="https://github.com/Syntaf/travis-sphinx">travis-sphinx</a> script is used to push thefinal html pages to the
+<a class="reference external" href="https://github.com/tyralla/hydpy/tree/gh-pages">gh-pages branch</a> automatically, meaning, that this
+<a class="reference external" href="https://tyralla.github.io/hydpy/">online documentation</a> is updated immediately.  This deploy process
+is restricted to the <a class="reference external" href="https://github.com/tyralla/hydpy/tree/master">master branch</a> of the main development line
+and has disabled pull request option for savety reasons.</p>
+</div>
+<div class="section" id="test-coverage">
+<h3>Test Coverage<a class="headerlink" href="#test-coverage" title="Permalink to this headline">¶</a></h3>
+<p>This is the <a class="reference download internal" href="_downloads/coverage.html" download=""><code class="xref download docutils literal"><span class="pre">latest</span> <span class="pre">coverage</span> <span class="pre">report</span></code></a>.</p>
+<p>One can never be sure, that all important aspects of a software
+application are checked properly (instead, one can be quite certain,
+one has always missed something…).  However, one can at least evaluate
+the runtime behaviour of the tests themselves in order to find out
+which code sections they do invoke and which not.  HydPy’s
+<a class="reference external" href="https://travis-ci.org/tyralla/hydpy">Travis CI project</a> has been configured to perform such an evaluation
+automatically for each build process based on <a class="reference external" href="https://coverage.readthedocs.io/en/coverage-4.3.4/">Coverage.py</a>.  The
+resulting html report is linked to this <a class="reference external" href="https://tyralla.github.io/hydpy/">online documentation</a>
+automatically.</p>
+<p>The coverage report does only include modules with a percentage
+coverage less than 100 %, as only those need further attention.
+If a code section is covered one can at least be sure, that it does
+not cause an unhandled exception or a total program crash on the
+applied Python versions. But one cannot be sure, that the test(s)
+actually covering the code section are meaningful.</p>
+<p>Note that the coverage analysis is performed on Python 2.7 only.
+Hence code sections only relevant for Python 3 might be reported
+as uncovered erroneously.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Development</a><ul>
+<li><a class="reference internal" href="#how-to-contribute">How to contribute?</a></li>
+<li><a class="reference internal" href="#hydpy-style-guide">HydPy Style Guide</a><ul>
+<li><a class="reference internal" href="#general-framework-features">General framework features</a><ul>
+<li><a class="reference internal" href="#python-version">Python Version</a></li>
+<li><a class="reference internal" href="#site-packages">Site Packages</a></li>
+<li><a class="reference internal" href="#imports">Imports</a></li>
+<li><a class="reference internal" href="#defensive-programming">Defensive Programming</a></li>
+<li><a class="reference internal" href="#exceptions">Exceptions</a></li>
+<li><a class="reference internal" href="#naming-conventions">Naming Conventions</a></li>
+<li><a class="reference internal" href="#collection-classes">Collection Classes</a></li>
+<li><a class="reference internal" href="#string-representations">String Representations</a></li>
+<li><a class="reference internal" href="#introspection">Introspection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#model-specific-features">Model specific features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#assuring-code-and-documentation-quality">Assuring code and documentation quality</a><ul>
+<li><a class="reference internal" href="#conventional-unit-tests">Conventional Unit-Tests</a></li>
+<li><a class="reference internal" href="#doctests">Doctests</a></li>
+<li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
+<li><a class="reference internal" href="#test-coverage">Test Coverage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="projectstructure.html"
+                        title="previous chapter">Project Structure</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/development.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="projectstructure.html" title="Project Structure"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

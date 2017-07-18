@@ -1,0 +1,491 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>modelutils &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pointer" href="pointer.html" />
+    <link rel="prev" title="Cythons Modules" href="cythons.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pointer.html" title="pointer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cythons.html" title="Cythons Modules"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="cythons.html" accesskey="U">Cythons Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="modelutils">
+<span id="id1"></span><h1>modelutils<a class="headerlink" href="#modelutils" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.cythons.modelutils"></span><p>This module provides utilities to build and apply cython models.</p>
+<dl class="data">
+<dt id="hydpy.cythons.modelutils.dllextension">
+<code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">dllextension</code><em class="property"> = '.so'</em><a class="headerlink" href="#hydpy.cythons.modelutils.dllextension" title="Permalink to this definition">¶</a></dt>
+<dd><p>The dll file extension on the respective system.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="hydpy.cythons.modelutils.TYPE2STR">
+<code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">TYPE2STR</code><em class="property"> = {&lt;type 'bool'&gt;: 'bint', &lt;type 'int'&gt;: 'numpy.int64_t', &lt;type 'float'&gt;: 'double', None: 'void', &lt;type 'str'&gt;: 'str'}</em><a class="headerlink" href="#hydpy.cythons.modelutils.TYPE2STR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps Python types to Cython compatible type declarations.</p>
+<p>The Cython type belonging to Python’s <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a> is selected to be in
+agreement with numpy’s default integer type on the respective platform/system.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.cythons.modelutils.Lines">
+<em class="property">class </em><code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">Lines</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#Lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.Lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<p>Handles lines to be written into a <cite>.pyx</cite> file.</p>
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.Lines.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>indent</em>, <em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#Lines.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.Lines.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends the given text line with prefixed spaces in accordance with
+the given number of indentation levels.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.cythons.modelutils.Cythonizer">
+<em class="property">class </em><code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">Cythonizer</code><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#Cythonizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Handles the writing, compiling and initialization of cython models.</p>
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.Cythonizer.complete">
+<code class="descname">complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#Cythonizer.complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.complete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.Cythonizer.doit">
+<code class="descname">doit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#Cythonizer.doit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.doit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.pyname">
+<code class="descname">pyname</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.pyname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the compiled module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.cyname">
+<code class="descname">cyname</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.cyname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the compiled module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.cydirpath">
+<code class="descname">cydirpath</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.cydirpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute path of the directory containing the compiled modules.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.cymodule">
+<code class="descname">cymodule</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.cymodule" title="Permalink to this definition">¶</a></dt>
+<dd><p>The compiled module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.cyfilepath">
+<code class="descname">cyfilepath</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.cyfilepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute path of the compiled module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.buildpath">
+<code class="descname">buildpath</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.buildpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute path for temporarily build files.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.pyxwriter">
+<code class="descname">pyxwriter</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.pyxwriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the pyx file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.pysourcefiles">
+<code class="descname">pysourcefiles</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.pysourcefiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>All source files of the actual models Python classes and their
+respective base classes.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.Cythonizer.outdated">
+<code class="descname">outdated</code><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.outdated" title="Permalink to this definition">¶</a></dt>
+<dd><p>True if at least one of the <a class="reference internal" href="#hydpy.cythons.modelutils.Cythonizer.pysourcefiles" title="hydpy.cythons.modelutils.Cythonizer.pysourcefiles"><code class="xref py py-attr docutils literal"><span class="pre">pysourcefiles</span></code></a>
+is newer than the compiled file under <a class="reference internal" href="#hydpy.cythons.modelutils.Cythonizer.cyfilepath" title="hydpy.cythons.modelutils.Cythonizer.cyfilepath"><code class="xref py py-attr docutils literal"><span class="pre">cyfilepath</span></code></a>,
+otherwise False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.Cythonizer.compile_">
+<code class="descname">compile_</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#Cythonizer.compile_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.compile_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate cython code to C code and compile it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.Cythonizer.movedll">
+<code class="descname">movedll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#Cythonizer.movedll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.Cythonizer.movedll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to find the resulting dll file and to move it into the
+<cite>cythons</cite> package.</p>
+<dl class="docutils">
+<dt>Things to be aware of:</dt>
+<dd><ul class="first last simple">
+<li>The file extension either <cite>pyd</cite> (Window) or <cite>so</cite> (Linux).</li>
+<li>The folder containing the dll file is system dependend, but is
+always a subfolder of the <cite>cythons</cite> package.</li>
+<li>Under Linux, the filename might contain system information, e.g.
+…cpython-36m-x86_64-linux-gnu.so.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.cythons.modelutils.PyxWriter">
+<em class="property">class </em><code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">PyxWriter</code><span class="sig-paren">(</span><em>cythonizer</em>, <em>model</em>, <em>pyxpath</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Writes a new pyx file into framework.models.cython when initialized.</p>
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.write">
+<code class="descname">write</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.cythonoptions">
+<code class="descname">cythonoptions</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.cythonoptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython option lines.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.cimports">
+<code class="descname">cimports</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.cimports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import command lines.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.constants">
+<code class="descname">constants</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.constants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constants declaration lines.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.parameters">
+<code class="descname">parameters</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter declaration lines.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.sequences">
+<code class="descname">sequences</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequence declaration lines.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.iosequence">
+<code class="descname">iosequence</code><span class="sig-paren">(</span><em>seq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.iosequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.iosequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special declaration lines for the given
+<a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.IOSequence" title="hydpy.core.sequencetools.IOSequence"><code class="xref py py-class docutils literal"><span class="pre">IOSequence</span></code></a> object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.openfiles">
+<code class="descname">openfiles</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.openfiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.openfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open file statements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.closefiles">
+<code class="descname">closefiles</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.closefiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.closefiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close file statements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.loaddata">
+<code class="descname">loaddata</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.loaddata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.loaddata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load data statements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.savedata">
+<code class="descname">savedata</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.savedata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.savedata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save data statements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.setpointer">
+<code class="descname">setpointer</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.setpointer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.setpointer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setpointer functions for link sequences.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.setpointer0d">
+<code class="descname">setpointer0d</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.setpointer0d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.setpointer0d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setpointer function for 0-dimensional link sequences.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.alloc">
+<code class="descname">alloc</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.alloc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.alloc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allocate memory for 1-dimensional link sequences.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.dealloc">
+<code class="descname">dealloc</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.dealloc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.dealloc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deallocate memory for 1-dimensional link sequences.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.cythons.modelutils.PyxWriter.setpointer1d">
+<code class="descname">setpointer1d</code><span class="sig-paren">(</span><em>subseqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#PyxWriter.setpointer1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.setpointer1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setpointer function for 1-dimensional link sequences.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.modeldeclarations">
+<code class="descname">modeldeclarations</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.modeldeclarations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attribute declarations of the model class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.modelstandardfunctions">
+<code class="descname">modelstandardfunctions</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.modelstandardfunctions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard functions of the model class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.doit">
+<code class="descname">doit</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.doit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do (most of) it function of the model class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.iofunctions">
+<code class="descname">iofunctions</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.iofunctions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input/output functions of the model class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.new2old">
+<code class="descname">new2old</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.new2old" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.run">
+<code class="descname">run</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.listofmodeluserfunctions">
+<code class="descname">listofmodeluserfunctions</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.listofmodeluserfunctions" title="Permalink to this definition">¶</a></dt>
+<dd><p>User functions of the model class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.PyxWriter.modeluserfunctions">
+<code class="descname">modeluserfunctions</code><a class="headerlink" href="#hydpy.cythons.modelutils.PyxWriter.modeluserfunctions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.cythons.modelutils.FuncConverter">
+<em class="property">class </em><code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">FuncConverter</code><span class="sig-paren">(</span><em>model</em>, <em>funcname</em>, <em>func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#FuncConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.argnames">
+<code class="descname">argnames</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.argnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.varnames">
+<code class="descname">varnames</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.varnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.locnames">
+<code class="descname">locnames</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.locnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.sourcelines">
+<code class="descname">sourcelines</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.sourcelines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.collectornames">
+<code class="descname">collectornames</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.collectornames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.collectorshortcuts">
+<code class="descname">collectorshortcuts</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.collectorshortcuts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.untypedvarnames">
+<code class="descname">untypedvarnames</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.untypedvarnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.untypedarguments">
+<code class="descname">untypedarguments</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.untypedarguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.untypedinternalvarnames">
+<code class="descname">untypedinternalvarnames</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.untypedinternalvarnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.cleanlines">
+<code class="descname">cleanlines</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.cleanlines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleaned code lines.</p>
+<dl class="docutils">
+<dt>Implemented cleanups:</dt>
+<dd><ul class="first last simple">
+<li>eventually remove method version</li>
+<li>remove docstrings</li>
+<li>remove comments</li>
+<li>remove empty lines</li>
+<li>replace <cite>modelutils</cite> with nothing</li>
+<li>remove complete lines containing <cite>fastaccess</cite></li>
+<li>replace shortcuts with complete references</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.cythons.modelutils.FuncConverter.pyxlines">
+<code class="descname">pyxlines</code><a class="headerlink" href="#hydpy.cythons.modelutils.FuncConverter.pyxlines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython code lines.</p>
+<dl class="docutils">
+<dt>Assumptions:</dt>
+<dd><ul class="first last simple">
+<li>Function shall be a method</li>
+<li>Method shall be inlined</li>
+<li>Method returns nothing</li>
+<li>Method arguments are of type <cite>int</cite> (except self)</li>
+<li>Local variables are of type <cite>int</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.cythons.modelutils.exp">
+<code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">exp</code><span class="sig-paren">(</span><em>double</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#exp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.exp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython wrapper for numpys exp function applied on a single float.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.cythons.modelutils.fabs">
+<code class="descclassname">hydpy.cythons.modelutils.</code><code class="descname">fabs</code><span class="sig-paren">(</span><em>double</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/cythons/modelutils.html#fabs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.cythons.modelutils.fabs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython wrapper for maths fabs function applied on a single float.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cythons.html"
+                        title="previous chapter">Cythons Modules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pointer.html"
+                        title="next chapter">pointer</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modelutils.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pointer.html" title="pointer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cythons.html" title="Cythons Modules"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="cythons.html" >Cythons Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

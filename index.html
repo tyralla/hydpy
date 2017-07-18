@@ -1,0 +1,192 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HydPy &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction" href="introduction.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">HydPy 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hydpy">
+<span id="id1"></span><h1>HydPy<a class="headerlink" href="#hydpy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="an-interactive-framework-for-developing-and-applying-hydrological-models">
+<h2>An interactive framework for developing and applying hydrological models<a class="headerlink" href="#an-interactive-framework-for-developing-and-applying-hydrological-models" title="Permalink to this headline">¶</a></h2>
+<p><strong>This page is currently under construction and will be continuously updated
+over the coming weeks.</strong></p>
+<p><a class="reference internal" href="#hydpy"><span class="std std-ref">HydPy</span></a> is an interactive framework for developing and applying different
+types of hydrological models.  It is completely written in the easy to learn
+programming language <a class="reference external" href="http://www.python.org/">Python</a>.  Scientists and engineers not already familiar
+with <a class="reference external" href="http://www.python.org/">Python</a> will be surprised to discover the degree of flexibility
+<a class="reference internal" href="#hydpy"><span class="std std-ref">HydPy</span></a> allows for in defining highly specific und complex workflows.
+Furthermore, the transparent documentation of all model equations and the
+opportunity to change them with little effort makes it easy to truly understand
+and evaluate the underlying model concepts.  For those who are already familiar
+with <a class="reference external" href="http://www.python.org/">Python</a> and are aware of its low efficiency when it comes to pure
+mathematical calculations: <a class="reference internal" href="#hydpy"><span class="std std-ref">HydPy</span></a> includes an automated compiling
+mechanism based on the <a class="reference external" href="http://www.python.org/">Python</a> superset <a class="reference external" href="http://www.cython.org/">Cython</a>.  You can code all model
+equations in pure <a class="reference external" href="http://www.python.org/">Python</a> and — after successful testing — let
+<a class="reference internal" href="#hydpy"><span class="std std-ref">HydPy</span></a> do the compiling for you.</p>
+<p>If you are interested in the philosophy and primary goals of the
+developement if <a class="reference internal" href="#hydpy"><span class="std std-ref">HydPy</span></a>, you are referred to the <a class="reference internal" href="introduction.html#introduction"><span class="std std-ref">Introduction</span></a>
+section.  If you want to dive into model application or development directly,
+have a look at the  <a class="reference internal" href="tutorials.html#tutorials"><span class="std std-ref">Tutorials</span></a> section.  Thorough descriptions the
+features of the framework components and it models implemented so far are given
+in the sections <a class="reference internal" href="framework.html#framework"><span class="std std-ref">Framework Modules</span></a> and <a class="reference internal" href="modelcollection.html#modelcollection"><span class="std std-ref">Model Collection</span></a>. The section
+<a class="reference internal" href="projectstructure.html#projectstructure"><span class="std std-ref">Project Structure</span></a> explaines, how <a class="reference internal" href="#hydpy"><span class="std std-ref">HydPy</span></a> projects can be set up for
+different tasks.  And last but not least: <a class="reference internal" href="#hydpy"><span class="std std-ref">HydPy</span></a> is intended as an open
+source project — any help is greatly appreciated. If you want to contribute
+with bug reports, the extension of model collection, or the improvement of the
+framework itself, see the <a class="reference internal" href="development.html#development"><span class="std std-ref">Development</span></a> section:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#purpose">Purpose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#history">History</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#design">Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#license">License</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#interactive-introduction-of-the-hydpy-h-land-model">Interactive introduction of the HydPy-H-Land model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#defining-control-files">Defining control files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#developement-of-the-hydpy-g-land-model">Developement of the HydPy-G-Land model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="framework.html">Framework Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="devicetools.html">devicetools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="filetools.html">filetools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hydpytools.html">hydpytools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="indextools.html">indextools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="magictools.html">magictools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modeltools.html">modeltools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="objecttools.html">objecttools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parametertools.html">parametertools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pub.html">pub</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selectiontools.html">selectiontools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sequencetools.html">sequencetools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timetools.html">timetools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cythons.html">Cythons Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modelutils.html">modelutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pointer.html">pointer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modelcollection.html">Model Collection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="HydPy-H.html">HydPy-H (HBV)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="HydPy-L.html">HydPy-L (LARSIM)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="projectstructure.html">Project Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development.html#how-to-contribute">How to contribute?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#hydpy-style-guide">HydPy Style Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#assuring-code-and-documentation-quality">Assuring code and documentation quality</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HydPy</a><ul>
+<li><a class="reference internal" href="#an-interactive-framework-for-developing-and-applying-hydrological-models">An interactive framework for developing and applying hydrological models</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="introduction.html"
+                        title="next chapter">Introduction</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="Introduction"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">HydPy 2.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

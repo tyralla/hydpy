@@ -1,0 +1,181 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lstream.lstream_fluxes &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lstream.lstream_fluxes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+
+
+<div class="viewcode-block" id="QRef"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.QRef">[docs]</a><span class="k">class</span> <span class="nc">QRef</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Referenzabfluss (reference flow) [m³/s].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="H"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.H">[docs]</a><span class="k">class</span> <span class="nc">H</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wasserstand (water stage) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.AM">[docs]</a><span class="k">class</span> <span class="nc">AM</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchflossene Fläche Hauptgerinne (flown through area of the</span>
+<span class="sd">    main channel) [m²].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.AV">[docs]</a><span class="k">class</span> <span class="nc">AV</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LeftRightSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchflossene Fläche Vorländer (flown through area of both forelands)</span>
+<span class="sd">    [m²].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AVR"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.AVR">[docs]</a><span class="k">class</span> <span class="nc">AVR</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LeftRightSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchflossene Fläche Vorlandränder (flown through area of both outer</span>
+<span class="sd">    embankments) [m²].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AG"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.AG">[docs]</a><span class="k">class</span> <span class="nc">AG</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchflossene Fläche gesamt  (total flown through area) [m²].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.UM">[docs]</a><span class="k">class</span> <span class="nc">UM</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Benetzter Umfang Hauptgerinne (wetted perimeter of the</span>
+<span class="sd">    main channel) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.UV">[docs]</a><span class="k">class</span> <span class="nc">UV</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LeftRightSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Benetzter Umfang Vorländer (wetted perimeter of both forelands) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UVR"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.UVR">[docs]</a><span class="k">class</span> <span class="nc">UVR</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LeftRightSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Benetzter Umfang Vorlandränder (wetted perimeter of both outer</span>
+<span class="sd">    embankments) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UG"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.UG">[docs]</a><span class="k">class</span> <span class="nc">UG</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchflossene Fläche gesamt  (total wetted perimeter) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.QM">[docs]</a><span class="k">class</span> <span class="nc">QM</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchfluss Hauptgerinne (discharge of the main channel) [m³].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.QV">[docs]</a><span class="k">class</span> <span class="nc">QV</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LeftRightSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchfluss Voränder (discharge of both forelands) [m³].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QVR"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.QVR">[docs]</a><span class="k">class</span> <span class="nc">QVR</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LeftRightSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchfluss Vorlandränder (discharge of both outer embankment) [m³].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QG"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.QG">[docs]</a><span class="k">class</span> <span class="nc">QG</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Durchfluss gesamt (total discharge) [m³].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RK"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.RK">[docs]</a><span class="k">class</span> <span class="nc">RK</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Schwerpunktlaufzeit (traveling time) [s].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FluxSequences"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_fluxes.FluxSequences">[docs]</a><span class="k">class</span> <span class="nc">FluxSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flux sequences of HydPy-L-Stream.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">QRef</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">AM</span><span class="p">,</span> <span class="n">AV</span><span class="p">,</span> <span class="n">AVR</span><span class="p">,</span> <span class="n">AG</span><span class="p">,</span> <span class="n">UM</span><span class="p">,</span> <span class="n">UV</span><span class="p">,</span> <span class="n">UVR</span><span class="p">,</span> <span class="n">UG</span><span class="p">,</span>
+                   <span class="n">QM</span><span class="p">,</span> <span class="n">QV</span><span class="p">,</span> <span class="n">QVR</span><span class="p">,</span> <span class="n">QG</span><span class="p">,</span> <span class="n">RK</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

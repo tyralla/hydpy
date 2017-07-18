@@ -1,0 +1,876 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.core.objecttools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.core.objecttools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="c1"># ...from site-packages</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy.cythons</span> <span class="k">import</span> <span class="n">pointer</span>
+<span class="c1"># from hydpy.pub import ... (actual import commands moved to</span>
+<span class="c1"># different functions below to avoid circular dependencies)</span>
+
+<span class="n">_INT_NAN</span> <span class="o">=</span> <span class="o">-</span><span class="mi">999999</span>
+<span class="sd">&quot;&quot;&quot;Surrogate for `nan`, which is available for floating point values</span>
+<span class="sd">but not for integer values.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="dir_"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.dir_">[docs]</a><span class="k">def</span> <span class="nf">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The prefered way for HydPy objects to respond to :func:`dir`.</span>
+
+<span class="sd">    Note thedepencence on the `pub.options.dirverbose`.  If this option is</span>
+<span class="sd">    set `True`, all attributes and methods of the given instance and its</span>
+<span class="sd">    class (including those inherited from the parent classes) are returned:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.pub import options</span>
+<span class="sd">    &gt;&gt;&gt; options.dirverbose = True</span>
+<span class="sd">    &gt;&gt;&gt; from hydpy.core.objecttools import dir_</span>
+<span class="sd">    &gt;&gt;&gt; class Test(object):</span>
+<span class="sd">    ...     only_public_attribute =  None</span>
+<span class="sd">    &gt;&gt;&gt; print(len(dir_(Test())) &gt; 1) # Long list, try it yourself...</span>
+<span class="sd">    True</span>
+
+<span class="sd">    If the option is set to `False`, only the `public` attributes and methods</span>
+<span class="sd">    (which do need begin with `_`) are returned:</span>
+
+<span class="sd">    &gt;&gt;&gt; options.dirverbose = False</span>
+<span class="sd">    &gt;&gt;&gt; print(dir_(Test())) # Short list with one single entry...</span>
+<span class="sd">    [&#39;only_public_attribute&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getmro</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">dirverbose</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="n">names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">names</span></div>
+
+
+<div class="viewcode-block" id="classname"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.classname">[docs]</a><span class="k">def</span> <span class="nf">classname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the class name of the given instance object or class.</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core.objecttools import classname</span>
+<span class="sd">    &gt;&gt;&gt; from hydpy.pub import options</span>
+<span class="sd">    &gt;&gt;&gt; print(classname(float))</span>
+<span class="sd">    float</span>
+<span class="sd">    &gt;&gt;&gt; print(classname(options))</span>
+<span class="sd">    Options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="instancename"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.instancename">[docs]</a><span class="k">def</span> <span class="nf">instancename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the class name of the given instance object or class in lower</span>
+<span class="sd">    case letters.</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core.objecttools import instancename</span>
+<span class="sd">    &gt;&gt;&gt; from hydpy.pub import options</span>
+<span class="sd">    &gt;&gt;&gt; print(instancename(options))</span>
+<span class="sd">    options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">classname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="modulename"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.modulename">[docs]</a><span class="k">def</span> <span class="nf">modulename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the module name of the given instance object.</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core.objecttools import modulename</span>
+<span class="sd">    &gt;&gt;&gt; from hydpy.pub import options</span>
+<span class="sd">    &gt;&gt;&gt; print(modulename(options))</span>
+<span class="sd">    objecttools</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="devicename"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.devicename">[docs]</a><span class="k">def</span> <span class="nf">devicename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Try to return the name of the (indirect) master</span>
+<span class="sd">    :class:`~hydpy.core.devicetools.Node` or</span>
+<span class="sd">    :class:`~hydpy.core.devicetools.Element` instance,</span>
+<span class="sd">    otherwise return `?`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;element&#39;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;node&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">device</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;seqs&#39;</span><span class="p">,</span> <span class="s1">&#39;subseqs&#39;</span><span class="p">,</span> <span class="s1">&#39;pars&#39;</span><span class="p">,</span> <span class="s1">&#39;subpars&#39;</span><span class="p">):</span>
+            <span class="n">master</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">master</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span> <span class="o">=</span> <span class="n">master</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;?&#39;</span></div>
+
+
+<div class="viewcode-block" id="augmentexcmessage"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.augmentexcmessage">[docs]</a><span class="k">def</span> <span class="nf">augmentexcmessage</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Augment an exception message with additional information while keeping</span>
+<span class="sd">    the original traceback.</span>
+
+<span class="sd">    You can prefix and/or suffix text.  If you prefix something (which happens</span>
+<span class="sd">    much more often in the HydPy framework), the sub-clause &#39;, the following</span>
+<span class="sd">    error occured:&#39; is automatically included:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core import objecttools</span>
+<span class="sd">    &gt;&gt;&gt; import textwrap</span>
+<span class="sd">    &gt;&gt;&gt; try:</span>
+<span class="sd">    ...     1 + &#39;1&#39;</span>
+<span class="sd">    ... except TypeError:</span>
+<span class="sd">    ...     try:</span>
+<span class="sd">    ...         prefix = &#39;While showing how prefixing works&#39;</span>
+<span class="sd">    ...         suffix = &#39;(This is a final remark.)&#39;</span>
+<span class="sd">    ...         objecttools.augmentexcmessage(prefix, suffix)</span>
+<span class="sd">    ...     except TypeError as exc:</span>
+<span class="sd">    ...         for line in textwrap.wrap(exc.args[0], width=76):</span>
+<span class="sd">    ...             print(line)</span>
+<span class="sd">    While showing how prefixing works, the following error occured: unsupported</span>
+<span class="sd">    operand type(s) for +: &#39;int&#39; and &#39;str&#39; (This is a final remark.)</span>
+
+<span class="sd">    Note that the ancillary purpose of function :func:`augmentexcmessage` is</span>
+<span class="sd">    to make re-raising exceptions compatible with both Python 2 and 3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">pyversion</span>
+    <span class="n">exception</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">traceback_</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">, the following error occured: </span><span class="si">%s</span><span class="s1">&#39;</span>
+                   <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">message</span><span class="p">,</span> <span class="n">suffix</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">pyversion</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">exec</span><span class="p">(</span><span class="s1">&#39;raise exception, message, traceback_&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">exception</span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="o">.</span><span class="n">with_traceback</span><span class="p">(</span><span class="n">traceback_</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="description"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.description">[docs]</a><span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the first &quot;paragraph&quot; of the docstring of the given object.</span>
+
+<span class="sd">    Note that ugly things like multiple whitespaces and newline characters</span>
+<span class="sd">    are removed:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core import objecttools</span>
+<span class="sd">    &gt;&gt;&gt; objecttools.description(objecttools.augmentexcmessage)</span>
+<span class="sd">    &#39;Augment an exception message with additional information while keeping the original traceback.&#39;</span>
+
+<span class="sd">    In case the given object does not define a docstring, the following</span>
+<span class="sd">    is returned:</span>
+<span class="sd">    &gt;&gt;&gt; objecttools.description(type(&#39;Test&#39;, (), {}))</span>
+<span class="sd">    &#39;no description available&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;no description available&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="repr_"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.repr_">[docs]</a><span class="k">def</span> <span class="nf">repr_</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Modifies :func:`repr` for strings and floats, mainly for supporting</span>
+<span class="sd">    clean float representations that are compatible with :mod:`doctest`.</span>
+
+<span class="sd">    When value is a string, it is returned without any modification:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core.objecttools import repr_</span>
+<span class="sd">    &gt;&gt;&gt; repr(&#39;test&#39;)</span>
+<span class="sd">    &quot;&#39;test&#39;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; repr_(&#39;test&#39;)</span>
+<span class="sd">    &#39;test&#39;</span>
+
+<span class="sd">    When value is a float, the result depends on how the option</span>
+<span class="sd">    :attr:`~Options.reprdigits` is set. If it is :class:`None`, :func:`repr`</span>
+<span class="sd">    defines the number of digits in the usual, system dependend manner:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.pub import options</span>
+<span class="sd">    &gt;&gt;&gt; options.reprdigits = None</span>
+<span class="sd">    &gt;&gt;&gt; repr(1./3.) == repr_(1./3.)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    Through setting :attr:`~Options.reprdigits` to a positive integer value,</span>
+<span class="sd">    one defines the maximum number of decimal places, which allows for</span>
+<span class="sd">    doctesting across different systems and Python versions:</span>
+
+<span class="sd">    &gt;&gt;&gt; options.reprdigits = 6</span>
+<span class="sd">    &gt;&gt;&gt; repr_(1./3.)</span>
+<span class="sd">    &#39;0.333333&#39;</span>
+<span class="sd">    &gt;&gt;&gt; repr_(2./3.)</span>
+<span class="sd">    &#39;0.666667&#39;</span>
+<span class="sd">    &gt;&gt;&gt; repr_(1./2.)</span>
+<span class="sd">    &#39;0.5&#39;</span>
+
+<span class="sd">    :func:`repr_` can also be applied on numpy&#39;s float types:</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy</span>
+<span class="sd">    &gt;&gt;&gt; repr_(numpy.float(1./3.))</span>
+<span class="sd">    &#39;0.333333&#39;</span>
+<span class="sd">    &gt;&gt;&gt; repr_(numpy.float64(1./3.))</span>
+<span class="sd">    &#39;0.333333&#39;</span>
+<span class="sd">    &gt;&gt;&gt; repr_(numpy.float32(1./3.))</span>
+<span class="sd">    &#39;0.333333&#39;</span>
+<span class="sd">    &gt;&gt;&gt; repr_(numpy.float16(1./3.))</span>
+<span class="sd">    &#39;0.333252&#39;</span>
+
+<span class="sd">    Note that the deviation from the `true` result in the last example is due</span>
+<span class="sd">    to the low precision of :class:`~numpy.float16`.</span>
+
+<span class="sd">    On all types not mentioned above, the usual :func:`repr` function is</span>
+<span class="sd">    applied, e.g.:</span>
+
+<span class="sd">    &gt;&gt;&gt; repr([1, 2, 3])</span>
+<span class="sd">    &#39;[1, 2, 3]&#39;</span>
+<span class="sd">    &gt;&gt;&gt; repr_([1, 2, 3])</span>
+<span class="sd">    &#39;[1, 2, 3]&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">pointer</span><span class="o">.</span><span class="n">Double</span><span class="p">,</span> <span class="n">pointer</span><span class="o">.</span><span class="n">PDouble</span><span class="p">)):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="p">((</span><span class="n">options</span><span class="o">.</span><span class="n">reprdigits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span>
+                     <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float16</span><span class="p">))):</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;{0:.</span><span class="si">{1}</span><span class="s1">f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">reprdigits</span><span class="p">)</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">string</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+            <span class="n">string</span> <span class="o">+=</span> <span class="s1">&#39;0&#39;</span>
+        <span class="k">return</span> <span class="n">string</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="round_"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.round_">[docs]</a><span class="k">def</span> <span class="nf">round_</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rjust</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Shortcut for `print(repr_(value), **kwargs)`.</span>
+
+<span class="sd">    See the documentation on function :func:`repr_` for any details.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">repr_</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="n">rjust</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Options"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.Options">[docs]</a><span class="k">class</span> <span class="nc">Options</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Singleton class for `global` options.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_printprogress</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbosedir</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reprcomments</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_usecython</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skipdoctests</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_refreshmodels</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reprdigits</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warntrim</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnsimulationstep</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkseries</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingcontrolfile</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingobsfile</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingsimfile</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_usedefaultvalues</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_getprintprogress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether information about the progress</span>
+<span class="sd">        of certain processes shall be printed to the standard output or not.</span>
+<span class="sd">        The default is `True`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_printprogress</span>
+
+    <span class="k">def</span> <span class="nf">_setprintprogress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_printprogress</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">printprogress</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getprintprogress</span><span class="p">,</span> <span class="n">_setprintprogress</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getdirverbose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicationg whether the listboxes for the member</span>
+<span class="sd">        selection of the classes of the HydPy framework should be complete</span>
+<span class="sd">        (True) or restrictive (False).  The latter is more viewable and hence</span>
+<span class="sd">        the default.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosedir</span>
+
+    <span class="k">def</span> <span class="nf">_setdirverbose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbosedir</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">dirverbose</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getdirverbose</span><span class="p">,</span> <span class="n">_setdirverbose</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getreprcomments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicationg whether comments shall be included</span>
+<span class="sd">        in string representations of some classes of the HydPy framework or</span>
+<span class="sd">        not.  The default is `True`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprcomments</span>
+
+    <span class="k">def</span> <span class="nf">_setreprcomments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reprcomments</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">reprcomments</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getreprcomments</span><span class="p">,</span> <span class="n">_setreprcomments</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getusecython</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether Cython models (True) or pure</span>
+<span class="sd">        Python models (False) shall be applied if possible.  Using Cython</span>
+<span class="sd">        models is more time efficient and thus the default.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_usecython</span>
+
+    <span class="k">def</span> <span class="nf">_setusecython</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_usecython</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">usecython</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getusecython</span><span class="p">,</span> <span class="n">_setusecython</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getskipdoctests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether documetation tests shall be</span>
+<span class="sd">        performed under certain situations.  Applying tests increases</span>
+<span class="sd">        reliabilty and is thus the default.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skipdoctests</span>
+
+    <span class="k">def</span> <span class="nf">_setskipdoctests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skipdoctests</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">skipdoctests</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getskipdoctests</span><span class="p">,</span> <span class="n">_setskipdoctests</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getreprdigits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Required precision of string representations of floating point</span>
+<span class="sd">        numbers, defined as the minimum number of digits to be reproduced</span>
+<span class="sd">        by the string representation (see function :func:`repr_`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reprdigits</span>
+
+    <span class="k">def</span> <span class="nf">_setreprdigits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reprdigits</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reprdigits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">reprdigits</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getreprdigits</span><span class="p">,</span> <span class="n">_setreprdigits</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getwarntrim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether a warning shall be raised</span>
+<span class="sd">        whenever certain values needed to be trimmed due to violating</span>
+<span class="sd">        certain boundaries. Such warnings increase savety and are thus</span>
+<span class="sd">        the default is `True`.  However, to cope with the limited precision</span>
+<span class="sd">        of floating point numbers only those violations beyond a small</span>
+<span class="sd">        tolerance value are reported (see :class:`Trimmer`).  Warnings</span>
+<span class="sd">        with identical information are reported only once.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warntrim</span>
+
+    <span class="k">def</span> <span class="nf">_setwarntrim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warntrim</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">warntrim</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getwarntrim</span><span class="p">,</span> <span class="n">_setwarntrim</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getwarnsimulationstep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether a warning shall be raised</span>
+<span class="sd">        when function :func:`~hydpy.core.magictools.simulationstep` is</span>
+<span class="sd">        called for the first time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warnsimulationstep</span>
+
+    <span class="k">def</span> <span class="nf">_setwarnsimulationstep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnsimulationstep</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">warnsimulationstep</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getwarnsimulationstep</span><span class="p">,</span>
+                                  <span class="n">_setwarnsimulationstep</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getcheckseries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether an error shall be raised</span>
+<span class="sd">        when e.g. an incomplete input time series, not spanning the whole</span>
+<span class="sd">        initialization time period, is loaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkseries</span>
+
+    <span class="k">def</span> <span class="nf">_setcheckseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkseries</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">checkseries</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getcheckseries</span><span class="p">,</span> <span class="n">_setcheckseries</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getwarnmissingcontrolfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether only a warning shall be raised</span>
+<span class="sd">        when a required control file is missing, or an exception.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingcontrolfile</span>
+
+    <span class="k">def</span> <span class="nf">_setwarnmissingcontrolfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingcontrolfile</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">warnmissingcontrolfile</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getwarnmissingcontrolfile</span><span class="p">,</span>
+                                      <span class="n">_setwarnmissingcontrolfile</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getwarnmissingobsfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether a warning shall be raised when a</span>
+<span class="sd">        requested observation sequence demanded by a node instance is missing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingobsfile</span>
+
+    <span class="k">def</span> <span class="nf">_setwarnmissingobsfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingobsfile</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">warnmissingobsfile</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getwarnmissingobsfile</span><span class="p">,</span>
+                                  <span class="n">_setwarnmissingobsfile</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getwarnmissingsimfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether a warning shall be raised when a</span>
+<span class="sd">        requested simulation sequence demanded a node instance is missing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingsimfile</span>
+
+    <span class="k">def</span> <span class="nf">_setwarnmissingsimfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warnmissingsimfile</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">warnmissingsimfile</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getwarnmissingsimfile</span><span class="p">,</span>
+                                  <span class="n">_setwarnmissingsimfile</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getusedefaultvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True/False flag indicating whether parameters values shall be</span>
+<span class="sd">        initialized with standard values or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_usedefaultvalues</span>
+
+    <span class="k">def</span> <span class="nf">_setusedefaultvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_usedefaultvalues</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">usedefaultvalues</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getusedefaultvalues</span><span class="p">,</span>
+                                <span class="n">_setusedefaultvalues</span><span class="p">)</span>
+
+    <span class="fm">__dir__</span> <span class="o">=</span> <span class="n">dir_</span></div>
+
+
+<div class="viewcode-block" id="trim"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.trim">[docs]</a><span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Trim the value(s) of  a :class:`ValueMath` instance.</span>
+
+<span class="sd">    One can pass the lower and/or the upper boundary as a function argument.</span>
+<span class="sd">    Otherwise, boundary values are taken from the class attribute `SPAN`</span>
+<span class="sd">    of the given :class:`ValueMath` instance, if available.</span>
+
+<span class="sd">    Note that method :func:`trim` works differently on :class:`ValueMath`</span>
+<span class="sd">    instances handling values of different types.  For floating point values,</span>
+<span class="sd">    an actual trimming is performed.  Additionally, a warning message is</span>
+<span class="sd">    raised if the trimming results in a change in value exceeding the</span>
+<span class="sd">    threshold value defined by function :func:`_tolerance`.  (This warning</span>
+<span class="sd">    message can be suppressed by setting the related option flag to False.)</span>
+<span class="sd">    For integer values, instead of a warning an exception is raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;SPAN&#39;</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="n">span</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="n">span</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">type_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;TYPE&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_</span> <span class="ow">is</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_trim_float_0d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_trim_float_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">type_</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_trim_int_0d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_trim_int_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s1">&#39;Method `trim` can only be applied on parameters handling &#39;</span>
+            <span class="s1">&#39;integer or floating point values, but value type of parameter &#39;</span>
+            <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` is `</span><span class="si">%s</span><span class="s1">`.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">classname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TYPE</span><span class="p">)))</span></div>
+
+
+<span class="k">def</span> <span class="nf">_trim_float_0d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lower</span><span class="p">):</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">upper</span><span class="p">):</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">if</span> <span class="bp">self</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">+</span><span class="n">_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">lower</span><span class="o">-</span><span class="n">_tolerance</span><span class="p">(</span><span class="n">lower</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">warntrim</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warntrim</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">lower</span>
+    <span class="k">elif</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">-</span><span class="n">_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">upper</span><span class="o">+</span><span class="n">_tolerance</span><span class="p">(</span><span class="n">upper</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">warntrim</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warntrim</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">upper</span>
+
+
+<span class="k">def</span> <span class="nf">_trim_float_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+    <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">lower</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lower</span><span class="p">))]</span> <span class="o">=</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+    <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">upper</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">upper</span><span class="p">))]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="bp">self</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span> <span class="o">=</span> <span class="n">lower</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">)</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="bp">self</span><span class="o">+</span><span class="n">_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">&lt;</span>
+                      <span class="p">(</span><span class="n">lower</span><span class="o">-</span><span class="n">_tolerance</span><span class="p">(</span><span class="n">lower</span><span class="p">)))</span> <span class="ow">or</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="bp">self</span><span class="o">-</span><span class="n">_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="o">&gt;</span>
+                          <span class="p">(</span><span class="n">upper</span><span class="o">+</span><span class="n">_tolerance</span><span class="p">(</span><span class="n">upper</span><span class="p">)))):</span>
+            <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">warntrim</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warntrim</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+
+
+<span class="k">def</span> <span class="nf">_trim_int_0d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="n">_INT_NAN</span>
+    <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="o">-</span><span class="n">_INT_NAN</span>
+    <span class="k">if</span> <span class="p">(</span><span class="bp">self</span> <span class="o">!=</span> <span class="n">_INT_NAN</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;The value `</span><span class="si">%d</span><span class="s1">` of parameter `</span><span class="si">%s</span><span class="s1">` of element `</span><span class="si">%s</span><span class="s1">` is not valid.  &#39;</span>
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">devicename</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">_trim_int_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="n">_INT_NAN</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="o">-</span><span class="n">_INT_NAN</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">idxs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">_INT_NAN</span><span class="p">)</span>
+    <span class="bp">self</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span> <span class="o">=</span> <span class="n">lower</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">)</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;At least one value of parameter `</span><span class="si">%s</span><span class="s1">` of element `</span><span class="si">%s</span><span class="s1">` is not &#39;</span>
+            <span class="s1">&#39;valid.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">devicename</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+    <span class="bp">self</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span> <span class="o">=</span> <span class="n">_INT_NAN</span>
+
+
+<span class="k">def</span> <span class="nf">_tolerance</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns some sort of &quot;numerical accuracy&quot; to be expected for the</span>
+<span class="sd">    given floating point value, see method :func:`trim`.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">values</span><span class="o">*</span><span class="mf">1e-15</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ValueMath"><a class="viewcode-back" href="../../../objecttools.html#hydpy.core.objecttools.ValueMath">[docs]</a><span class="k">class</span> <span class="nc">ValueMath</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for :class:`~hydpy.core.parametertools.Parameter` and</span>
+<span class="sd">    :class:`~hydpy.core.sequencetools.Sequence`.  Implements special</span>
+<span class="sd">    methods for arithmetic calculations, comparisons and type conversions.</span>
+
+<span class="sd">    The subclasses are required to provide the members `NDIM` (usually a</span>
+<span class="sd">    class attribute) and `value` (usually a property).  But for testing</span>
+<span class="sd">    purposes, one can simply add them as instance attributes.</span>
+
+<span class="sd">    A few examples for 0-dimensional objects:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core.objecttools import ValueMath</span>
+<span class="sd">    &gt;&gt;&gt; vm0 = ValueMath()</span>
+<span class="sd">    &gt;&gt;&gt; vm0.NDIM = 0</span>
+<span class="sd">    &gt;&gt;&gt; vm0.value = 2.</span>
+<span class="sd">    &gt;&gt;&gt; print(vm0 + vm0)</span>
+<span class="sd">    4.0</span>
+<span class="sd">    &gt;&gt;&gt; print(3. - vm0)</span>
+<span class="sd">    1.0</span>
+<span class="sd">    &gt;&gt;&gt; vm0 /= 2.</span>
+<span class="sd">    &gt;&gt;&gt; print(vm0.value)</span>
+<span class="sd">    1.0</span>
+<span class="sd">    &gt;&gt;&gt; print(vm0 &gt; vm0)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; print(vm0 != 1.5)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    Similar examples for 1-dimensional objects:</span>
+
+<span class="sd">    &gt;&gt;&gt; import numpy</span>
+<span class="sd">    &gt;&gt;&gt; vm1 = ValueMath()</span>
+<span class="sd">    &gt;&gt;&gt; vm1.NDIM = 1</span>
+<span class="sd">    &gt;&gt;&gt; vm1.value = numpy.array([1.,2.,3.])</span>
+<span class="sd">    &gt;&gt;&gt; print(vm1 + vm1)</span>
+<span class="sd">    [ 2.  4.  6.]</span>
+<span class="sd">    &gt;&gt;&gt; print(3. - vm1)</span>
+<span class="sd">    [ 2.  1.  0.]</span>
+<span class="sd">    &gt;&gt;&gt; vm1 /= 2.</span>
+<span class="sd">    &gt;&gt;&gt; print(vm1.value)</span>
+<span class="sd">    [ 0.5  1.   1.5]</span>
+<span class="sd">    &gt;&gt;&gt; print(vm1 &gt; vm1)</span>
+<span class="sd">    [False False False]</span>
+<span class="sd">    &gt;&gt;&gt; print(vm1 != 1.5)</span>
+<span class="sd">    [ True  True False]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Subclasses need to define...</span>
+    <span class="n">NDIM</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ... e.g. as class attribute (int)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ... e.g. as property (str)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># ... e.g. as property (float or ndarray of dtype float)</span>
+    <span class="c1"># ...and optionally...</span>
+    <span class="n">INIT</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="nf">_arithmetic_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verb</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">augmentexcmessage</span><span class="p">(</span><span class="s1">&#39;While trying to </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> instance `</span><span class="si">%s</span><span class="s1">` and </span><span class="si">%s</span><span class="s1"> `</span><span class="si">%s</span><span class="s1">`&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="n">verb</span><span class="p">,</span> <span class="n">classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                             <span class="n">classname</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="n">other</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;subtract&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;subtract&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__sub__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;multiply&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;divide&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;divide&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__truediv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__floordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;floor divide&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rfloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;floor divide&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ifloordiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__floordiv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;mod divide&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;mod divide&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__imod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mod__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;exponentiate&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;exponentiate&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ipow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__pow__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;compare (&lt;)&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;compare (&lt;=)&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;compare (==)&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;compare (!=)&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;compare (&gt;=)&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_conversion</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arithmetic_exception</span><span class="p">(</span><span class="s1">&#39;compare (&gt;)&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_typeconversion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">NDIM</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">type_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The </span><span class="si">%s</span><span class="s1"> instance `</span><span class="si">%s</span><span class="s1">` is </span><span class="si">%d</span><span class="s1">-dimensional and thus &#39;</span>
+                            <span class="s1">&#39;cannot be converted to a scalar </span><span class="si">%s</span><span class="s1"> value.&#39;</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NDIM</span><span class="p">,</span>
+                               <span class="n">classname</span><span class="p">(</span><span class="n">type_</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">__float__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typeconversion</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typeconversion</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__round__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndigits</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ndigits</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

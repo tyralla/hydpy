@@ -1,0 +1,198 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>modeltools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="objecttools" href="objecttools.html" />
+    <link rel="prev" title="magictools" href="magictools.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="objecttools.html" title="objecttools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="magictools.html" title="magictools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" accesskey="U">Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="modeltools">
+<span id="id1"></span><h1>modeltools<a class="headerlink" href="#modeltools" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.core.modeltools"></span><dl class="class">
+<dt id="hydpy.core.modeltools.MetaModelType">
+<em class="property">class </em><code class="descclassname">hydpy.core.modeltools.</code><code class="descname">MetaModelType</code><a class="reference internal" href="_modules/hydpy/core/modeltools.html#MetaModelType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.MetaModelType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#type" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">type</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.modeltools.MetaModelClass">
+<em class="property">class </em><code class="descclassname">hydpy.core.modeltools.</code><code class="descname">MetaModelClass</code><a class="headerlink" href="#hydpy.core.modeltools.MetaModelClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.modeltools.Model">
+<em class="property">class </em><code class="descclassname">hydpy.core.modeltools.</code><code class="descname">Model</code><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.modeltools.MetaModelClass" title="hydpy.core.modeltools.MetaModelClass"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.modeltools.MetaModelClass</span></code></a></p>
+<p>Base class for all hydrological models.</p>
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect the link sequences of the actual model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.doit">
+<code class="descname">doit</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.doit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.doit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.loaddata">
+<code class="descname">loaddata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.loaddata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.loaddata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.savedata">
+<code class="descname">savedata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.savedata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.savedata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.update_inlets">
+<code class="descname">update_inlets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.update_inlets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.update_inlets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maybe.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.update_outlets">
+<code class="descname">update_outlets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.update_outlets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.update_outlets" title="Permalink to this definition">¶</a></dt>
+<dd><p>In any case.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.update_receivers">
+<code class="descname">update_receivers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.update_receivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.update_receivers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.update_senders">
+<code class="descname">update_senders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.update_senders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.update_senders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.modeltools.Model.new2old">
+<code class="descname">new2old</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/modeltools.html#Model.new2old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.modeltools.Model.new2old" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign the new/final state values of the actual time step to the
+new/initial state values of the next time step.  Needs to be
+overwritten in Cython mode.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.modeltools.Model.idx_sim">
+<code class="descname">idx_sim</code><a class="headerlink" href="#hydpy.core.modeltools.Model.idx_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index of the actual simulation time step.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="magictools.html"
+                        title="previous chapter">magictools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="objecttools.html"
+                        title="next chapter">objecttools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modeltools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="objecttools.html" title="objecttools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="magictools.html" title="magictools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" >Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

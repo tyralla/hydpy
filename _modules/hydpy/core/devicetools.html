@@ -1,0 +1,656 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.core.devicetools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.core.devicetools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="c1"># ...from site-packages</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">connectiontools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.cythons</span> <span class="k">import</span> <span class="n">pointer</span>
+
+
+<div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_selection</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">_getname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Name of the actual device (node or element).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getname</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_checkname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Raises an :class:`~exceptions.ValueError` if the given name is not</span>
+<span class="sd">        a valid Python identifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exc</span> <span class="o">=</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For initializing `</span><span class="si">%s</span><span class="s1">` objects, `value` is a &#39;</span>
+                         <span class="s1">&#39;necessary function argument.  Principally, any &#39;</span>
+                         <span class="s1">&#39;object is allowed that supports the Python build-in &#39;</span>
+                         <span class="s1">&#39;function `str`.  But note that `str(value)` must &#39;</span>
+                         <span class="s1">&#39;return a valid Python identifier (that does &#39;</span>
+                         <span class="s1">&#39;not start with a number, that does not contain `-`, &#39;</span>
+                         <span class="s1">&#39;that is not a Python keyword like `for`...).  The &#39;</span>
+                         <span class="s1">&#39;given object returned the string `</span><span class="si">%s</span><span class="s1">`, which is not &#39;</span>
+                         <span class="s1">&#39;a valid Python identifier.&#39;</span>
+                         <span class="o">%</span> <span class="p">(</span><span class="n">objecttools</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">exec</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> = None&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">exc</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">__builtins__</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">exc</span>
+
+<div class="viewcode-block" id="Device.clearregistry"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Device.clearregistry">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">clearregistry</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.registerednames"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Device.registerednames">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">registerednames</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all names of :class:`Device` objects initialized so far.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">connectiontools</span><span class="o">.</span><span class="n">Connections</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Node"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node">[docs]</a><span class="k">class</span> <span class="nc">Node</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    readobs = False</span>
+<span class="sd">    readext = False</span>
+<span class="sd">    passsim = True</span>
+<span class="sd">    passobs = False</span>
+<span class="sd">    passext = False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_selection</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_predefinedvariable</span> <span class="o">=</span> <span class="s1">&#39;Q&#39;</span>
+    <span class="n">ROUTING_MODES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;newsim&#39;</span><span class="p">,</span> <span class="s1">&#39;obs&#39;</span><span class="p">,</span> <span class="s1">&#39;oldsim&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns an already existing :class:`Node` instance or, if such</span>
+<span class="sd">        an instance does not exist yet, a new newly created one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">Node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_checkname</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predefinedvariable</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span> <span class="o">=</span> <span class="n">variable</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="n">connectiontools</span><span class="o">.</span><span class="n">Connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exits</span> <span class="o">=</span> <span class="n">connectiontools</span><span class="o">.</span><span class="n">Connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span> <span class="o">=</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">NodeSequences</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">routingmode</span> <span class="o">=</span> <span class="s1">&#39;newsim&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_blackhole</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_selection</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">route</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">variable</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">variable</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The variable to be represented by a `Node &#39;</span>
+                             <span class="s1">&#39;instance cannot be changed.  The variable of &#39;</span>
+                             <span class="s1">&#39;node `</span><span class="si">%s</span><span class="s1">` is `</span><span class="si">%s</span><span class="s1">` instead of `</span><span class="si">%s</span><span class="s1">` or `None`.  &#39;</span>
+                             <span class="s1">&#39;Keep in mind, that `name` is the unique &#39;</span>
+                             <span class="s1">&#39;identifier of node objects.&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span> <span class="n">variable</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_getvariable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The variable handled by the respective node instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable</span>
+    <span class="n">variable</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getvariable</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Node.predefinevariable"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.predefinevariable">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">predefinevariable</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_predefinedvariable</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Node.registerednodes"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.registerednodes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">registerednodes</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all :class:`Node` objects initialized so far.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Nodes</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Node.gathernewnodes"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.gathernewnodes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">gathernewnodes</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gather all `new` :class:`Node` objects. :class:`Node` objects</span>
+<span class="sd">        are deemed to be new if their constructor has been called since the</span>
+<span class="sd">        last usage of this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">Nodes</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">nodes</span></div>
+
+    <span class="k">def</span> <span class="nf">_getroutingmode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_routingmode</span>
+
+    <span class="k">def</span> <span class="nf">_setroutingmode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROUTING_MODES</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_routingmode</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;newsim&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">use_ext</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;obs&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">use_ext</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">use_ext</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;oldsim&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">use_ext</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_blackhole</span> <span class="o">=</span> <span class="n">pointer</span><span class="o">.</span><span class="n">Double</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;When trying to set the routing mode of node </span><span class="si">%s</span><span class="s1">, &#39;</span>
+                             <span class="s1">&#39;the value `</span><span class="si">%s</span><span class="s1">` was given, but only the &#39;</span>
+                             <span class="s1">&#39;following values are allowed: </span><span class="si">%s</span><span class="s1">.&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span>
+                                 <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROUTING_MODES</span><span class="p">)))</span>
+
+    <span class="n">routingmode</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getroutingmode</span><span class="p">,</span> <span class="n">_setroutingmode</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Node.getdouble_via_exits"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.getdouble_via_exits">[docs]</a>    <span class="k">def</span> <span class="nf">getdouble_via_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">routingmode</span> <span class="o">!=</span> <span class="s1">&#39;obs&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fastaccess</span><span class="o">.</span><span class="n">sim</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fastaccess</span><span class="o">.</span><span class="n">obs</span></div>
+
+<div class="viewcode-block" id="Node.getdouble_via_entries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.getdouble_via_entries">[docs]</a>    <span class="k">def</span> <span class="nf">getdouble_via_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">routingmode</span> <span class="o">!=</span> <span class="s1">&#39;oldsim&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fastaccess</span><span class="o">.</span><span class="n">sim</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blackhole</span></div>
+
+<div class="viewcode-block" id="Node.reset"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fastaccess</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+    <span class="k">def</span> <span class="nf">_loaddata_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">fastaccess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fastaccess</span>
+        <span class="k">if</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_ramflag</span><span class="p">:</span>
+            <span class="n">fastaccess</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_array</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_diskflag</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">fastaccess</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_savedata_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">fastaccess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fastaccess</span>
+        <span class="k">if</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_ramflag</span><span class="p">:</span>
+            <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_array</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_diskflag</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">fastaccess</span><span class="o">.</span><span class="n">_sim_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_loaddata_obs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">fastaccess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fastaccess</span>
+        <span class="k">if</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_obs_ramflag</span><span class="p">:</span>
+            <span class="n">fastaccess</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_obs_array</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_obs_diskflag</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">fastaccess</span><span class="o">.</span><span class="n">_obs_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">fastaccess</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Node.prepare_allseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.prepare_allseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_allseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_simseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_obsseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Node.prepare_simseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.prepare_simseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_simseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_nodeseries</span><span class="p">(</span><span class="s1">&#39;sim&#39;</span><span class="p">,</span> <span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Node.prepare_obsseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.prepare_obsseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_obsseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_nodeseries</span><span class="p">(</span><span class="s1">&#39;obs&#39;</span><span class="p">,</span> <span class="n">ramflag</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_prepare_nodeseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seqname</span><span class="p">,</span> <span class="n">ramflag</span><span class="p">):</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="n">seqname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ramflag</span><span class="p">:</span>
+            <span class="n">seq</span><span class="o">.</span><span class="n">activate_ram</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seq</span><span class="o">.</span><span class="n">activate_disk</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Node.comparisonplot"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.comparisonplot">[docs]</a>    <span class="k">def</span> <span class="nf">comparisonplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">isinteractive</span><span class="p">():</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">series</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">variable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;Q&#39;</span><span class="p">:</span>
+            <span class="n">variable</span> <span class="o">=</span> <span class="sa">u</span><span class="s1">&#39;Q [m³/s]&#39;</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">isinteractive</span><span class="p">():</span>
+            <span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Node.assignrepr"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Node.assignrepr">[docs]</a>    <span class="k">def</span> <span class="nf">assignrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Node(&quot;</span><span class="si">%s</span><span class="s1">&quot;, variable=&quot;</span><span class="si">%s</span><span class="s1">&quot;)&#39;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="Element"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element">[docs]</a><span class="k">class</span> <span class="nc">Element</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+
+    <span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_selection</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">inlets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outlets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">receivers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">senders</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns an already existing :class:`Element` instance or, if such</span>
+<span class="sd">        an instance does not exist yet, a new newly created one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">Element</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_checkname</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inlets</span> <span class="o">=</span> <span class="n">connectiontools</span><span class="o">.</span><span class="n">Connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outlets</span> <span class="o">=</span> <span class="n">connectiontools</span><span class="o">.</span><span class="n">Connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">receivers</span> <span class="o">=</span> <span class="n">connectiontools</span><span class="o">.</span><span class="n">Connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">senders</span> <span class="o">=</span> <span class="n">connectiontools</span><span class="o">.</span> <span class="n">Connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_selection</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">inlets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outlets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">receivers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">senders</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds the given :class:`~connectiontools.Connections` instances to</span>
+<span class="sd">        the (old or new) :class:`Element` instance.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inlets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">inlet</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Nodes</span><span class="p">(</span><span class="n">inlets</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">inlet</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outlets</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For element `</span><span class="si">%s</span><span class="s1">`, the given inlet node &#39;</span>
+                                     <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` is already defined as an outlet &#39;</span>
+                                     <span class="s1">&#39;node, which is not allowed.&#39;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inlet</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inlets</span> <span class="o">+=</span> <span class="n">inlet</span>
+                <span class="n">inlet</span><span class="o">.</span><span class="n">exits</span> <span class="o">+=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">outlets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">outlet</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Nodes</span><span class="p">(</span><span class="n">outlets</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">outlet</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inlets</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For element `</span><span class="si">%s</span><span class="s1">`, the given outlet node &#39;</span>
+                                     <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` is already defined as an inlet &#39;</span>
+                                     <span class="s1">&#39;node, which is not allowed.&#39;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outlet</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outlets</span> <span class="o">+=</span> <span class="n">outlet</span>
+                <span class="n">outlet</span><span class="o">.</span><span class="n">entries</span> <span class="o">+=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">receivers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">receiver</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Nodes</span><span class="p">(</span><span class="n">receivers</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">receiver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">senders</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For element `</span><span class="si">%s</span><span class="s1">`, the given receiver &#39;</span>
+                                     <span class="s1">&#39;node `</span><span class="si">%s</span><span class="s1">` is already defined as an &#39;</span>
+                                     <span class="s1">&#39;sender node, which is not allowed.&#39;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">receivers</span> <span class="o">+=</span> <span class="n">receiver</span>
+                <span class="n">receiver</span><span class="o">.</span><span class="n">exits</span> <span class="o">+=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">senders</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">sender</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Nodes</span><span class="p">(</span><span class="n">senders</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">sender</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">receivers</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For element `</span><span class="si">%s</span><span class="s1">`, the given sender node &#39;</span>
+                                     <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` is already defined as an receiver, &#39;</span>
+                                     <span class="s1">&#39;node which is not allowed.&#39;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">senders</span> <span class="o">+=</span> <span class="n">sender</span>
+                <span class="n">sender</span><span class="o">.</span><span class="n">entries</span> <span class="o">+=</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="Element.registeredelements"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.registeredelements">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">registeredelements</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all :class:`Element` objects initialized so far.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Elements</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Element.gathernewelements"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.gathernewelements">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">gathernewelements</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gather all `new` :class:`Element` objects. :class:`Element` objects</span>
+<span class="sd">        are deemed to be new if their constructor has been called since the</span>
+<span class="sd">        last usage of this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="n">Elements</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">elements</span></div>
+
+    <span class="k">def</span> <span class="nf">_getvariables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">connections</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">connections</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">variables</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getvariables</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Element.initmodel"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.initmodel">[docs]</a>    <span class="k">def</span> <span class="nf">initmodel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">controlmanager</span><span class="o">.</span><span class="n">loadfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Element.connect"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span>
+                <span class="s1">&#39;While trying to build the connections of the model handled &#39;</span>
+                <span class="s1">&#39;by element `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Element.prepare_allseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.prepare_allseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_allseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_inputseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_fluxseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_stateseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Element.prepare_inputseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.prepare_inputseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_inputseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_series</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Element.prepare_fluxseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.prepare_fluxseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_fluxseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_series</span><span class="p">(</span><span class="s1">&#39;fluxes&#39;</span><span class="p">,</span> <span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Element.prepare_stateseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.prepare_stateseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_stateseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_series</span><span class="p">(</span><span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="n">ramflag</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_prepare_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_subseqs</span><span class="p">,</span> <span class="n">ramflag</span><span class="p">):</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span>
+        <span class="n">subseqs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">name_subseqs</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ramflag</span><span class="p">:</span>
+                <span class="n">subseqs</span><span class="o">.</span><span class="n">activate_ram</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">subseqs</span><span class="o">.</span><span class="n">activate_disk</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">,</span> <span class="n">selnames</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">selnames</span><span class="p">:</span>
+            <span class="n">seq</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">subseqs</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">)))</span>
+                <span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">series</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">pyplot</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">))</span>
+                <span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">series</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">isinteractive</span><span class="p">():</span>
+            <span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Element.inputplot"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.inputplot">[docs]</a>    <span class="k">def</span> <span class="nf">inputplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Element.fluxplot"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.fluxplot">[docs]</a>    <span class="k">def</span> <span class="nf">fluxplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">fluxes</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Element.stateplot"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.stateplot">[docs]</a>    <span class="k">def</span> <span class="nf">stateplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Element.assignrepr"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Element.assignrepr">[docs]</a>    <span class="k">def</span> <span class="nf">assignrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a :func:`repr` string with an prefixed assignement.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * prefix(:class:`str`): Usually something like &#39;x = &#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">blanks</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">+</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Element(&quot;</span><span class="si">%s</span><span class="s1">&quot;,&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">conname</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;inlets&#39;</span><span class="p">,</span> <span class="s1">&#39;outlets&#39;</span><span class="p">,</span> <span class="s1">&#39;receivers&#39;</span><span class="p">,</span> <span class="s1">&#39;senders&#39;</span><span class="p">):</span>
+            <span class="n">connections</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conname</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">connections</span><span class="p">:</span>
+                <span class="n">subprefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">=&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">blanks</span><span class="p">,</span> <span class="n">conname</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">connections</span><span class="o">.</span><span class="n">slaves</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="n">subprefix</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">Nodes</span><span class="p">(</span><span class="n">connections</span><span class="o">.</span><span class="n">slaves</span><span class="p">)</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="n">subprefix</span><span class="p">)</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Devices"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Devices">[docs]</a><span class="k">class</span> <span class="nc">Devices</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">_contentclass</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_extractvalues</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span>
+                <span class="s1">&#39;While trying to initialize a `</span><span class="si">%s</span><span class="s1">` object&#39;</span>
+                <span class="o">%</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_extractvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_contentclass</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contentclass</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">device</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_extractvalues</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getnames</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getdevices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="n">devices</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getdevices</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Devices.copy"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Devices.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a shallow copy of the actual :class:`Elements` instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contentclass</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">device</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="n">new</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+    <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">del</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+    <span class="k">def</span> <span class="nf">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">set</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Devices.assignrepr"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Devices.assignrepr">[docs]</a>    <span class="k">def</span> <span class="nf">assignrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">prefix</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(&#39;</span> <span class="o">%</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">blanks</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">assignrepr</span><span class="p">(</span><span class="n">blanks</span><span class="p">))</span>
+            <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span>
+        <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Nodes"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Nodes">[docs]</a><span class="k">class</span> <span class="nc">Nodes</span><span class="p">(</span><span class="n">Devices</span><span class="p">):</span>
+
+    <span class="n">_contentclass</span> <span class="o">=</span> <span class="n">Node</span>
+
+<div class="viewcode-block" id="Nodes.prepare_allseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Nodes.prepare_allseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_allseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_simseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_obsseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Nodes.prepare_simseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Nodes.prepare_simseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_simseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">prepare_simseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Nodes.prepare_obsseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Nodes.prepare_obsseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_obsseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">prepare_obsseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Elements"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Elements">[docs]</a><span class="k">class</span> <span class="nc">Elements</span><span class="p">(</span><span class="n">Devices</span><span class="p">):</span>
+
+    <span class="n">_contentclass</span> <span class="o">=</span> <span class="n">Element</span>
+
+<div class="viewcode-block" id="Elements.prepare_allseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Elements.prepare_allseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_allseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">prepare_allseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Elements.prepare_inputseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Elements.prepare_inputseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_inputseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">prepare_inputseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Elements.prepare_fluxseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Elements.prepare_fluxseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_fluxseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">prepare_fluxseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Elements.prepare_stateseries"><a class="viewcode-back" href="../../../devicetools.html#hydpy.core.devicetools.Elements.prepare_stateseries">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_stateseries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ramflag</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">prepare_stateseries</span><span class="p">(</span><span class="n">ramflag</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

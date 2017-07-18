@@ -1,0 +1,496 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>objecttools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="parametertools" href="parametertools.html" />
+    <link rel="prev" title="modeltools" href="modeltools.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parametertools.html" title="parametertools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modeltools.html" title="modeltools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" accesskey="U">Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="objecttools">
+<span id="id1"></span><h1>objecttools<a class="headerlink" href="#objecttools" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.core.objecttools"></span><dl class="class">
+<dt id="hydpy.core.objecttools.Options">
+<em class="property">class </em><code class="descclassname">hydpy.core.objecttools.</code><code class="descname">Options</code><a class="reference internal" href="_modules/hydpy/core/objecttools.html#Options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.Options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Singleton class for <cite>global</cite> options.</p>
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.checkseries">
+<code class="descname">checkseries</code><a class="headerlink" href="#hydpy.core.objecttools.Options.checkseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether an error shall be raised
+when e.g. an incomplete input time series, not spanning the whole
+initialization time period, is loaded.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.dirverbose">
+<code class="descname">dirverbose</code><a class="headerlink" href="#hydpy.core.objecttools.Options.dirverbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicationg whether the listboxes for the member
+selection of the classes of the HydPy framework should be complete
+(True) or restrictive (False).  The latter is more viewable and hence
+the default.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.printprogress">
+<code class="descname">printprogress</code><a class="headerlink" href="#hydpy.core.objecttools.Options.printprogress" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether information about the progress
+of certain processes shall be printed to the standard output or not.
+The default is <cite>True</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.reprcomments">
+<code class="descname">reprcomments</code><a class="headerlink" href="#hydpy.core.objecttools.Options.reprcomments" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicationg whether comments shall be included
+in string representations of some classes of the HydPy framework or
+not.  The default is <cite>True</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.reprdigits">
+<code class="descname">reprdigits</code><a class="headerlink" href="#hydpy.core.objecttools.Options.reprdigits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required precision of string representations of floating point
+numbers, defined as the minimum number of digits to be reproduced
+by the string representation (see function <a class="reference internal" href="#hydpy.core.objecttools.repr_" title="hydpy.core.objecttools.repr_"><code class="xref py py-func docutils literal"><span class="pre">repr_()</span></code></a>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.skipdoctests">
+<code class="descname">skipdoctests</code><a class="headerlink" href="#hydpy.core.objecttools.Options.skipdoctests" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether documetation tests shall be
+performed under certain situations.  Applying tests increases
+reliabilty and is thus the default.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.usecython">
+<code class="descname">usecython</code><a class="headerlink" href="#hydpy.core.objecttools.Options.usecython" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether Cython models (True) or pure
+Python models (False) shall be applied if possible.  Using Cython
+models is more time efficient and thus the default.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.usedefaultvalues">
+<code class="descname">usedefaultvalues</code><a class="headerlink" href="#hydpy.core.objecttools.Options.usedefaultvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether parameters values shall be
+initialized with standard values or not.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.warnmissingcontrolfile">
+<code class="descname">warnmissingcontrolfile</code><a class="headerlink" href="#hydpy.core.objecttools.Options.warnmissingcontrolfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether only a warning shall be raised
+when a required control file is missing, or an exception.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.warnmissingobsfile">
+<code class="descname">warnmissingobsfile</code><a class="headerlink" href="#hydpy.core.objecttools.Options.warnmissingobsfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether a warning shall be raised when a
+requested observation sequence demanded by a node instance is missing.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.warnmissingsimfile">
+<code class="descname">warnmissingsimfile</code><a class="headerlink" href="#hydpy.core.objecttools.Options.warnmissingsimfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether a warning shall be raised when a
+requested simulation sequence demanded a node instance is missing.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.warnsimulationstep">
+<code class="descname">warnsimulationstep</code><a class="headerlink" href="#hydpy.core.objecttools.Options.warnsimulationstep" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether a warning shall be raised
+when function <a class="reference internal" href="magictools.html#hydpy.core.magictools.simulationstep" title="hydpy.core.magictools.simulationstep"><code class="xref py py-func docutils literal"><span class="pre">simulationstep()</span></code></a> is
+called for the first time.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.Options.warntrim">
+<code class="descname">warntrim</code><a class="headerlink" href="#hydpy.core.objecttools.Options.warntrim" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False flag indicating whether a warning shall be raised
+whenever certain values needed to be trimmed due to violating
+certain boundaries. Such warnings increase savety and are thus
+the default is <cite>True</cite>.  However, to cope with the limited precision
+of floating point numbers only those violations beyond a small
+tolerance value are reported (see <code class="xref py py-class docutils literal"><span class="pre">Trimmer</span></code>).  Warnings
+with identical information are reported only once.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.objecttools.ValueMath">
+<em class="property">class </em><code class="descclassname">hydpy.core.objecttools.</code><code class="descname">ValueMath</code><a class="reference internal" href="_modules/hydpy/core/objecttools.html#ValueMath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.ValueMath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Base class for <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.Parameter" title="hydpy.core.parametertools.Parameter"><code class="xref py py-class docutils literal"><span class="pre">Parameter</span></code></a> and
+<a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.Sequence" title="hydpy.core.sequencetools.Sequence"><code class="xref py py-class docutils literal"><span class="pre">Sequence</span></code></a>.  Implements special
+methods for arithmetic calculations, comparisons and type conversions.</p>
+<p>The subclasses are required to provide the members <cite>NDIM</cite> (usually a
+class attribute) and <cite>value</cite> (usually a property).  But for testing
+purposes, one can simply add them as instance attributes.</p>
+<p>A few examples for 0-dimensional objects:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.objecttools</span> <span class="k">import</span> <span class="n">ValueMath</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm0</span> <span class="o">=</span> <span class="n">ValueMath</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm0</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm0</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm0</span> <span class="o">+</span> <span class="n">vm0</span><span class="p">)</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="mf">3.</span> <span class="o">-</span> <span class="n">vm0</span><span class="p">)</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm0</span> <span class="o">/=</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm0</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm0</span> <span class="o">&gt;</span> <span class="n">vm0</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm0</span> <span class="o">!=</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Similar examples for 1-dimensional objects:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm1</span> <span class="o">=</span> <span class="n">ValueMath</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm1</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm1</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.</span><span class="p">,</span><span class="mf">3.</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm1</span> <span class="o">+</span> <span class="n">vm1</span><span class="p">)</span>
+<span class="go">[ 2.  4.  6.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="mf">3.</span> <span class="o">-</span> <span class="n">vm1</span><span class="p">)</span>
+<span class="go">[ 2.  1.  0.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vm1</span> <span class="o">/=</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm1</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="go">[ 0.5  1.   1.5]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm1</span> <span class="o">&gt;</span> <span class="n">vm1</span><span class="p">)</span>
+<span class="go">[False False False]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vm1</span> <span class="o">!=</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="go">[ True  True False]</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.ValueMath.INIT">
+<code class="descname">INIT</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.core.objecttools.ValueMath.INIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.ValueMath.NDIM">
+<code class="descname">NDIM</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.core.objecttools.ValueMath.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.ValueMath.name">
+<code class="descname">name</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.core.objecttools.ValueMath.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.objecttools.ValueMath.value">
+<code class="descname">value</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.core.objecttools.ValueMath.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.augmentexcmessage">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">augmentexcmessage</code><span class="sig-paren">(</span><em>prefix=None</em>, <em>suffix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#augmentexcmessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.augmentexcmessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Augment an exception message with additional information while keeping
+the original traceback.</p>
+<p>You can prefix and/or suffix text.  If you prefix something (which happens
+much more often in the HydPy framework), the sub-clause ‘, the following
+error occured:’ is automatically included:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="mi">1</span> <span class="o">+</span> <span class="s1">&#39;1&#39;</span>
+<span class="gp">... </span><span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;While showing how prefixing works&#39;</span>
+<span class="gp">... </span>        <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;(This is a final remark.)&#39;</span>
+<span class="gp">... </span>        <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mi">76</span><span class="p">):</span>
+<span class="gp">... </span>            <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+<span class="go">While showing how prefixing works, the following error occured: unsupported</span>
+<span class="go">operand type(s) for +: &#39;int&#39; and &#39;str&#39; (This is a final remark.)</span>
+</pre></div>
+</div>
+<p>Note that the ancillary purpose of function <a class="reference internal" href="#hydpy.core.objecttools.augmentexcmessage" title="hydpy.core.objecttools.augmentexcmessage"><code class="xref py py-func docutils literal"><span class="pre">augmentexcmessage()</span></code></a> is
+to make re-raising exceptions compatible with both Python 2 and 3.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.classname">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">classname</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#classname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.classname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the class name of the given instance object or class.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.objecttools</span> <span class="k">import</span> <span class="n">classname</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">classname</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+<span class="go">float</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">classname</span><span class="p">(</span><span class="n">options</span><span class="p">))</span>
+<span class="go">Options</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.description">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">description</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the first “paragraph” of the docstring of the given object.</p>
+<p>Note that ugly things like multiple whitespaces and newline characters
+are removed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objecttools</span><span class="o">.</span><span class="n">description</span><span class="p">(</span><span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">)</span>
+<span class="go">&#39;Augment an exception message with additional information while keeping the original traceback.&#39;</span>
+</pre></div>
+</div>
+<p>In case the given object does not define a docstring, the following
+is returned:
+&gt;&gt;&gt; objecttools.description(type(‘Test’, (), {}))
+‘no description available’</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.devicename">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">devicename</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#devicename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.devicename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to return the name of the (indirect) master
+<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> or
+<a class="reference internal" href="devicetools.html#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a> instance,
+otherwise return <cite>?</cite>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.dir_">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">dir_</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#dir_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.dir_" title="Permalink to this definition">¶</a></dt>
+<dd><p>The prefered way for HydPy objects to respond to <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#dir" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">dir()</span></code></a>.</p>
+<p>Note thedepencence on the <cite>pub.options.dirverbose</cite>.  If this option is
+set <cite>True</cite>, all attributes and methods of the given instance and its
+class (including those inherited from the parent classes) are returned:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">dirverbose</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.objecttools</span> <span class="k">import</span> <span class="n">dir_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Test</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">only_public_attribute</span> <span class="o">=</span>  <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dir_</span><span class="p">(</span><span class="n">Test</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># Long list, try it yourself...</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>If the option is set to <cite>False</cite>, only the <cite>public</cite> attributes and methods
+(which do need begin with <cite>_</cite>) are returned:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">dirverbose</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">dir_</span><span class="p">(</span><span class="n">Test</span><span class="p">()))</span> <span class="c1"># Short list with one single entry...</span>
+<span class="go">[&#39;only_public_attribute&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.instancename">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">instancename</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#instancename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.instancename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the class name of the given instance object or class in lower
+case letters.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.objecttools</span> <span class="k">import</span> <span class="n">instancename</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">instancename</span><span class="p">(</span><span class="n">options</span><span class="p">))</span>
+<span class="go">options</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.modulename">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">modulename</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#modulename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.modulename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the module name of the given instance object.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.objecttools</span> <span class="k">import</span> <span class="n">modulename</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">modulename</span><span class="p">(</span><span class="n">options</span><span class="p">))</span>
+<span class="go">objecttools</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.repr_">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">repr_</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#repr_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.repr_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modifies <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a> for strings and floats, mainly for supporting
+clean float representations that are compatible with <a class="reference external" href="https://docs.python.org/2.7/library/doctest.html#module-doctest" title="(in Python v2.7)"><code class="xref py py-mod docutils literal"><span class="pre">doctest</span></code></a>.</p>
+<p>When value is a string, it is returned without any modification:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.objecttools</span> <span class="k">import</span> <span class="n">repr_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">&quot;&#39;test&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="go">&#39;test&#39;</span>
+</pre></div>
+</div>
+<p>When value is a float, the result depends on how the option
+<a class="reference internal" href="#hydpy.core.objecttools.Options.reprdigits" title="hydpy.core.objecttools.Options.reprdigits"><code class="xref py py-attr docutils literal"><span class="pre">reprdigits</span></code></a> is set. If it is <code class="xref py py-class docutils literal"><span class="pre">None</span></code>, <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a>
+defines the number of digits in the usual, system dependend manner:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.pub</span> <span class="k">import</span> <span class="n">options</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">reprdigits</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span> <span class="o">==</span> <span class="n">repr_</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Through setting <a class="reference internal" href="#hydpy.core.objecttools.Options.reprdigits" title="hydpy.core.objecttools.Options.reprdigits"><code class="xref py py-attr docutils literal"><span class="pre">reprdigits</span></code></a> to a positive integer value,
+one defines the maximum number of decimal places, which allows for
+doctesting across different systems and Python versions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">options</span><span class="o">.</span><span class="n">reprdigits</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span>
+<span class="go">&#39;0.333333&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="mf">2.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span>
+<span class="go">&#39;0.666667&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+<span class="go">&#39;0.5&#39;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#hydpy.core.objecttools.repr_" title="hydpy.core.objecttools.repr_"><code class="xref py py-func docutils literal"><span class="pre">repr_()</span></code></a> can also be applied on numpy’s float types:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">))</span>
+<span class="go">&#39;0.333333&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">))</span>
+<span class="go">&#39;0.333333&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">))</span>
+<span class="go">&#39;0.333333&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float16</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">))</span>
+<span class="go">&#39;0.333252&#39;</span>
+</pre></div>
+</div>
+<p>Note that the deviation from the <cite>true</cite> result in the last example is due
+to the low precision of <code class="xref py py-class docutils literal"><span class="pre">float16</span></code>.</p>
+<p>On all types not mentioned above, the usual <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a> function is
+applied, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">repr</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">&#39;[1, 2, 3]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repr_</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="go">&#39;[1, 2, 3]&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.round_">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">round_</code><span class="sig-paren">(</span><em>value</em>, <em>rjust=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#round_"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.round_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for <cite>print(repr_(value), **kwargs)</cite>.</p>
+<p>See the documentation on function <a class="reference internal" href="#hydpy.core.objecttools.repr_" title="hydpy.core.objecttools.repr_"><code class="xref py py-func docutils literal"><span class="pre">repr_()</span></code></a> for any details.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.core.objecttools.trim">
+<code class="descclassname">hydpy.core.objecttools.</code><code class="descname">trim</code><span class="sig-paren">(</span><em>self</em>, <em>lower=None</em>, <em>upper=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/objecttools.html#trim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.objecttools.trim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trim the value(s) of  a <a class="reference internal" href="#hydpy.core.objecttools.ValueMath" title="hydpy.core.objecttools.ValueMath"><code class="xref py py-class docutils literal"><span class="pre">ValueMath</span></code></a> instance.</p>
+<p>One can pass the lower and/or the upper boundary as a function argument.
+Otherwise, boundary values are taken from the class attribute <cite>SPAN</cite>
+of the given <a class="reference internal" href="#hydpy.core.objecttools.ValueMath" title="hydpy.core.objecttools.ValueMath"><code class="xref py py-class docutils literal"><span class="pre">ValueMath</span></code></a> instance, if available.</p>
+<p>Note that method <a class="reference internal" href="#hydpy.core.objecttools.trim" title="hydpy.core.objecttools.trim"><code class="xref py py-func docutils literal"><span class="pre">trim()</span></code></a> works differently on <a class="reference internal" href="#hydpy.core.objecttools.ValueMath" title="hydpy.core.objecttools.ValueMath"><code class="xref py py-class docutils literal"><span class="pre">ValueMath</span></code></a>
+instances handling values of different types.  For floating point values,
+an actual trimming is performed.  Additionally, a warning message is
+raised if the trimming results in a change in value exceeding the
+threshold value defined by function <code class="xref py py-func docutils literal"><span class="pre">_tolerance()</span></code>.  (This warning
+message can be suppressed by setting the related option flag to False.)
+For integer values, instead of a warning an exception is raised.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="modeltools.html"
+                        title="previous chapter">modeltools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="parametertools.html"
+                        title="next chapter">parametertools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/objecttools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="parametertools.html" title="parametertools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modeltools.html" title="modeltools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" >Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

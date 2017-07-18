@@ -1,0 +1,167 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HydPy-H (HBV) &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HydPy-H-Land" href="HydPy-H-Land.html" />
+    <link rel="prev" title="Model Collection" href="modelcollection.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Land.html" title="HydPy-H-Land"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modelcollection.html" title="Model Collection"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" accesskey="U">Model Collection</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hydpy-h-hbv">
+<span id="hydpy-h"></span><h1>HydPy-H (HBV)<a class="headerlink" href="#hydpy-h-hbv" title="Permalink to this headline">¶</a></h1>
+<p>HydPy implements a very close emulation of the central routines of
+the famous HBV96 model, introduced by <a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S0022169497000413">Lindstroem et al. (1997)</a>.
+As discussed in <a class="reference external" href="https://www.deutsche-digitale-bibliothek.de/binary/5SSCDNE4JTDF7B2SY5NSQ34ZI2UV2V4R/full/1.pdf">Tyralla and Schumann (2013)</a>, the results of
+version 1 application models of HydPy-H and the IHMS-HBV96
+implementation of the Swedish Meteorological and Hydrological Institute
+agree very well for the majority of the tested river basins <a class="footnote-reference" href="#f1" id="id1">[1]</a> .
+This documentation focusses on technical aspects of HydPy-H and tries
+to be as precise as possible regarding the implementation of the
+process equations.  The background of the scientifical development of
+the HBV96 model is more thoroughly covered in <a class="reference external" href="http://www.sciencedirect.com/science/article/pii/S0022169497000413">Lindstroem et al. (1997)</a>.</p>
+<p>HydPy-H is divided into three base models, which can be used to compile
+different application models:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="HydPy-H-Land.html">HydPy-H-Land</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HydPy-H-Stream.html">HydPy-H-Stream</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HydPy-H-Branch.html">HydPy-H-Branch</a></li>
+</ul>
+</div>
+<p>So far the following application models are compiled:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="hland_v1.html">hland_v1 (HBV96 version of HydPy-H-Land)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hstream_v1.html">hstream_v1 (HBV96 version of HydPy-H-Stream)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hbranch_v1.html">hbranch_v1 (HBV96 version of HydPy-H-Branch)</a></li>
+</ul>
+</div>
+<p>All these application models are stand-alone models, which can be
+combined freely with all other models implemented in HydPy.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Unfortunately, the report <a class="reference external" href="https://www.deutsche-digitale-bibliothek.de/binary/5SSCDNE4JTDF7B2SY5NSQ34ZI2UV2V4R/full/1.pdf">Tyralla and Schumann (2013)</a>
+is only available in German so far.  But inspecting pictures 2.2 to 2.11
+should be instructive nonetheless. The simulated runoff values are
+virtuelly identical for catchments in high and low mountain ranges as
+well as in lowland areas (pictures 2.2 to 2.5).  The same is true for
+all internal states, beginning with the interception storage (picture 2.6)
+and ending with the lower groundwater storage (picture 2.11).  Table 2.5
+evaluates the aggreement between the results of HydPy-H and the IHMS-HBV96
+implementation of the SMHI for the whole Rhine river basin, using the
+Nash-Sutcliffe efficiency.  Relevant differences occur only within the
+Main river basin.  These differences result from implausible evaporation
+values calculated by the IHMS software.  If these is due to a bug of the
+IHMS software or due to an incorrect configuration of the HBV forecasting
+model of the German Federal Institute for Hydrology could not be clarified
+so far.</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="modelcollection.html"
+                        title="previous chapter">Model Collection</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="HydPy-H-Land.html"
+                        title="next chapter">HydPy-H-Land</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/HydPy-H.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Land.html" title="HydPy-H-Land"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modelcollection.html" title="Model Collection"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,196 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lland.lland_fluxes &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lland.lland_fluxes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+
+
+<div class="viewcode-block" id="NKor"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.NKor">[docs]</a><span class="k">class</span> <span class="nc">NKor</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Korrigierter Niederschlag (corrected precipitation) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="TKor"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.TKor">[docs]</a><span class="k">class</span> <span class="nc">TKor</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Korrigierte Lufttemperatur (corrected air temperature) [°C].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ET0"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.ET0">[docs]</a><span class="k">class</span> <span class="nc">ET0</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Grasreferenzverdunstung (reference evapotranspiration) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="EvPo"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.EvPo">[docs]</a><span class="k">class</span> <span class="nc">EvPo</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Potenzielle Evaporation/Evapotranspiration (potential</span>
+<span class="sd">    evaporation/evapotranspiration) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NBes"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.NBes">[docs]</a><span class="k">class</span> <span class="nc">NBes</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gesamter Bestandsniederschlag (total stand precipitation) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SBes"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.SBes">[docs]</a><span class="k">class</span> <span class="nc">SBes</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Schneeanteil Bestandsniederschlag (frozen stand precipitation) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="EvI"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.EvI">[docs]</a><span class="k">class</span> <span class="nc">EvI</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tatsächliche Interzeptionsverdunstung (actual evaporation of</span>
+<span class="sd">    intercepted water) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="EvB"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.EvB">[docs]</a><span class="k">class</span> <span class="nc">EvB</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tatsächliche Bodenverdunstung (actual evaporation of</span>
+<span class="sd">    soil water) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="WGTF"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.WGTF">[docs]</a><span class="k">class</span> <span class="nc">WGTF</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Potenzielle Schneeschmelze (maximum amount of frozen water that could</span>
+<span class="sd">    be melted) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Schm"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.Schm">[docs]</a><span class="k">class</span> <span class="nc">Schm</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tatsächliche Schneeschmelze (actual amount of water melting within the</span>
+<span class="sd">    snow cover) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="WaDa"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.WaDa">[docs]</a><span class="k">class</span> <span class="nc">WaDa</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wasserdargebot (water reaching the soil routine) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="QDB"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QDB">[docs]</a><span class="k">class</span> <span class="nc">QDB</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Direktabfluss-Abgabe aus dem Bodenspeicher (direct runoff release</span>
+<span class="sd">    from the soil storage) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="QIB1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QIB1">[docs]</a><span class="k">class</span> <span class="nc">QIB1</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Erste Komponente der Interflow-Abgabe aus dem Bodenspeicher (first</span>
+<span class="sd">    component of the interflow release from the soil storage) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="QIB2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QIB2">[docs]</a><span class="k">class</span> <span class="nc">QIB2</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zweite Komponente der Interflow-Abgabe aus dem Bodenspeicher (second</span>
+<span class="sd">    component of the interflow release from the soil storage) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="QBB"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QBB">[docs]</a><span class="k">class</span> <span class="nc">QBB</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Basisabfluss-Abgabe aus dem Bodenspeicher (base flow release</span>
+<span class="sd">    from the soil storage) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="QDGZ"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QDGZ">[docs]</a><span class="k">class</span> <span class="nc">QDGZ</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gesamtzufluss in beide Direktabfluss-Gebietsspeicher (total inflow</span>
+<span class="sd">    into both storage compartments for direct runoff) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Q"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.Q">[docs]</a><span class="k">class</span> <span class="nc">Q</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gesamtabfluss des Teilgebiets (runoff at the catchment outlet) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="FluxSequences"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.FluxSequences">[docs]</a><span class="k">class</span> <span class="nc">FluxSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flux sequences of the HydPy-L-Land model.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">NKor</span><span class="p">,</span> <span class="n">TKor</span><span class="p">,</span> <span class="n">ET0</span><span class="p">,</span> <span class="n">EvPo</span><span class="p">,</span> <span class="n">SBes</span><span class="p">,</span> <span class="n">NBes</span><span class="p">,</span> <span class="n">EvI</span><span class="p">,</span> <span class="n">EvB</span><span class="p">,</span>
+                   <span class="n">WGTF</span><span class="p">,</span> <span class="n">Schm</span><span class="p">,</span> <span class="n">WaDa</span><span class="p">,</span> <span class="n">QDB</span><span class="p">,</span> <span class="n">QIB1</span><span class="p">,</span> <span class="n">QIB2</span><span class="p">,</span> <span class="n">QBB</span><span class="p">,</span> <span class="n">QDGZ</span><span class="p">,</span> <span class="n">Q</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

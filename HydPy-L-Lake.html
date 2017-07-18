@@ -1,0 +1,1500 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HydPy-L-Lake &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lland_v1 (LARSIM-Xinanjiang-Turc-Wendling version of HydPy-L-Land)" href="lland_v1.html" />
+    <link rel="prev" title="HydPy-L-Stream" href="HydPy-L-Stream.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lland_v1.html" title="lland_v1 (LARSIM-Xinanjiang-Turc-Wendling version of HydPy-L-Land)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-L-Stream.html" title="HydPy-L-Stream"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-L.html" accesskey="U">HydPy-L (LARSIM)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hydpy-l-lake">
+<span id="id1"></span><h1>HydPy-L-Lake<a class="headerlink" href="#hydpy-l-lake" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.models.llake"></span><p>The L-Lake model defines the methods and classes required for
+performing lake and dam retention processes as implemented in
+LARSIM.</p>
+<div class="section" id="model-features">
+<h2>Model features<a class="headerlink" href="#model-features" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_model.Model">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">Model</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modeltools.html#hydpy.core.modeltools.Model" title="hydpy.core.modeltools.Model"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.modeltools.Model</span></code></a></p>
+<p>Base model for HydPy-L-Lake.</p>
+<dl class="docutils">
+<dt>The following “run methods” are called each simulation step run in the given sequence:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.update_inlets_v1" title="hydpy.models.llake.llake_model.update_inlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_inlets_v1()</span></code></a> <cite>Update the inlet link sequence.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.solve_dv_dt_v1" title="hydpy.models.llake.llake_model.solve_dv_dt_v1"><code class="xref py py-func docutils literal"><span class="pre">solve_dv_dt_v1()</span></code></a> <cite>Solve the differential equation of HydPy-L.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.interp_w_v1" title="hydpy.models.llake.llake_model.interp_w_v1"><code class="xref py py-func docutils literal"><span class="pre">interp_w_v1()</span></code></a> <cite>Calculate the actual water stage based on linear interpolation.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.corr_dw_v1" title="hydpy.models.llake.llake_model.corr_dw_v1"><code class="xref py py-func docutils literal"><span class="pre">corr_dw_v1()</span></code></a> <cite>Adjust the water stage drop to the highest value allowed and correct the associated fluxes.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.modify_qa_v1" title="hydpy.models.llake.llake_model.modify_qa_v1"><code class="xref py py-func docutils literal"><span class="pre">modify_qa_v1()</span></code></a> <cite>Add water to or remove water from the calculated lake outflow.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.update_outlets_v1" title="hydpy.models.llake.llake_model.update_outlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_outlets_v1()</span></code></a> <cite>Update the outlet link sequence.</cite></li>
+</ul>
+</dd>
+<dt>The following “additional methods” are called by at least one “run method”:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.interp_v_v1" title="hydpy.models.llake.llake_model.interp_v_v1"><code class="xref py py-func docutils literal"><span class="pre">interp_v_v1()</span></code></a> <cite>Calculate the actual water volume based on linear interpolation.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.calc_vq_v1" title="hydpy.models.llake.llake_model.calc_vq_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_vq_v1()</span></code></a> <cite>Calculate the auxiliary term.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.interp_qa_v1" title="hydpy.models.llake.llake_model.interp_qa_v1"><code class="xref py py-func docutils literal"><span class="pre">interp_qa_v1()</span></code></a> <cite>Calculate the lake outflow based on linear interpolation.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_model.calc_v_qa_v1" title="hydpy.models.llake.llake_model.calc_v_qa_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_v_qa_v1()</span></code></a> <cite>Update the stored water volume based on the equation of continuity.</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_model"></span><dl class="function">
+<dt id="hydpy.models.llake.llake_model.solve_dv_dt_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">solve_dv_dt_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#solve_dv_dt_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.solve_dv_dt_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the differential equation of HydPy-L.</p>
+<p>At the moment, HydPy-L only implements a simple numerical solution of
+its underlying ordinary differential equation.  To increase the accuracy
+(or sometimes even to prevent instability) of this approximation, one
+can set the value of parameter
+<a class="reference internal" href="#hydpy.models.llake.llake_control.MaxDT" title="hydpy.models.llake.llake_control.MaxDT"><code class="xref py py-class docutils literal"><span class="pre">MaxDT</span></code></a> to a value smaller than
+the actual simulation step size.  Method <a class="reference internal" href="#hydpy.models.llake.llake_model.solve_dv_dt_v1" title="hydpy.models.llake.llake_model.solve_dv_dt_v1"><code class="xref py py-func docutils literal"><span class="pre">solve_dv_dt_v1()</span></code></a> then
+applies the methods related to the numerical approximation multiple times
+and aggregates the results.</p>
+<p>Note that the order of convergence is onle only.  It is hard to tell how
+short the internal simulation step needs to be to ensure a certain degree
+of accuracy.  In most cases one hour or very often even one day should be
+sufficient to gain acceptable results.  However, this strongly depends on
+the given water stage-volume-discharge relationship.  Hence it seems
+advisable to always define a few test waves and apply the llake model with
+different <a class="reference internal" href="#hydpy.models.llake.llake_control.MaxDT" title="hydpy.models.llake.llake_control.MaxDT"><code class="xref py py-class docutils literal"><span class="pre">MaxDT</span></code></a> values.
+Afterwards, select a <a class="reference internal" href="#hydpy.models.llake.llake_control.MaxDT" title="hydpy.models.llake.llake_control.MaxDT"><code class="xref py py-class docutils literal"><span class="pre">MaxDT</span></code></a>
+value  lower than one which results in acceptable approximations for
+all test waves.  The computation time of the llake mode per substep is
+rather small, so always include a savety factor.</p>
+<p>Of course, an adaptive step size determination would be much more
+convenient…</p>
+<dl class="docutils">
+<dt>Required derived parameter:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_derived.NmbSubsteps" title="hydpy.models.llake.llake_derived.NmbSubsteps"><code class="xref py py-class docutils literal"><span class="pre">NmbSubsteps</span></code></a></dd>
+<dt>Used aide sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_aides.V" title="hydpy.models.llake.llake_aides.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_aides.QA" title="hydpy.models.llake.llake_aides.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a></dd>
+<dt>Updated state sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_states.V" title="hydpy.models.llake.llake_states.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a></dd>
+<dt>Calculated flux sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QA" title="hydpy.models.llake.llake_fluxes.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a></dd>
+</dl>
+<p>Note that method <a class="reference internal" href="#hydpy.models.llake.llake_model.solve_dv_dt_v1" title="hydpy.models.llake.llake_model.solve_dv_dt_v1"><code class="xref py py-func docutils literal"><span class="pre">solve_dv_dt_v1()</span></code></a> calls the versions of <cite>calc_vq</cite>,
+<cite>interp_qa</cite> and <cite>calc_v_qa</cite> selected by the respective application model.
+Hence, also their parameter and sequence specifications need to be
+considered.</p>
+<dl class="docutils">
+<dt>Basic equation:</dt>
+<dd><span class="math">\(\frac{dV}{dt}= QZ - QA(V)\)</span></dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.calc_vq_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">calc_vq_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#calc_vq_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.calc_vq_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the auxiliary term.</p>
+<dl class="docutils">
+<dt>Required derived parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_derived.Seconds" title="hydpy.models.llake.llake_derived.Seconds"><code class="xref py py-class docutils literal"><span class="pre">Seconds</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_derived.NmbSubsteps" title="hydpy.models.llake.llake_derived.NmbSubsteps"><code class="xref py py-class docutils literal"><span class="pre">NmbSubsteps</span></code></a></dd>
+<dt>Required flux sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QZ" title="hydpy.models.llake.llake_fluxes.QZ"><code class="xref py py-class docutils literal"><span class="pre">QZ</span></code></a></dd>
+<dt>Required aide sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_aides.V" title="hydpy.models.llake.llake_aides.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a></dd>
+<dt>Calculated aide sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_aides.VQ" title="hydpy.models.llake.llake_aides.VQ"><code class="xref py py-class docutils literal"><span class="pre">VQ</span></code></a></dd>
+<dt>Basic equation:</dt>
+<dd><span class="math">\(VQ = 2 \cdot V + \frac{Seconds}{NmbSubsteps} \cdot QZ\)</span></dd>
+</dl>
+<p>Example:</p>
+<blockquote>
+<div><p>The following example shows that the auxiliary term <cite>vq</cite> does not
+depend on the (outer) simulation step size but on the (inner)
+calculation step size defined by parameter <cite>maxdt</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;6h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">seconds</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qz</span> <span class="o">=</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">1e5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_vq_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">vq</span>
+<span class="go">vq(243200.0)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.interp_qa_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">interp_qa_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#interp_qa_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.interp_qa_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the lake outflow based on linear interpolation.</p>
+<dl class="docutils">
+<dt>Required control parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_control.Q" title="hydpy.models.llake.llake_control.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a></dd>
+<dt>Required derived parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_derived.TOY" title="hydpy.models.llake.llake_derived.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_derived.VQ" title="hydpy.models.llake.llake_derived.VQ"><code class="xref py py-class docutils literal"><span class="pre">VQ</span></code></a></dd>
+<dt>Required aide sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_aides.VQ" title="hydpy.models.llake.llake_aides.VQ"><code class="xref py py-class docutils literal"><span class="pre">VQ</span></code></a></dd>
+<dt>Calculated aide sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_aides.QA" title="hydpy.models.llake.llake_aides.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a></dd>
+</dl>
+<p>Examples:</p>
+<blockquote>
+<div><p>In preparation for the following examples, define a short simulation
+time period with a simulation step size of 12 hours and initialize
+the required model object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Timegrids</span><span class="p">,</span> <span class="n">Timegrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;2000.01.01&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;2000.01.04&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;12h&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Next, for the sake of brevity, define a test function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="o">*</span><span class="n">vqs</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">vq</span> <span class="ow">in</span> <span class="n">vqs</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">aides</span><span class="o">.</span><span class="n">vq</span><span class="p">(</span><span class="n">vq</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">model</span><span class="o">.</span><span class="n">interp_qa_v1</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">aides</span><span class="o">.</span><span class="n">vq</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">aides</span><span class="o">.</span><span class="n">qa</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The following three relationships between the auxiliary term <cite>vq</cite> and
+the tabulated discharge <cite>q</cite> are taken as examples.  Each one is valid
+for one of the first three days in January and is defined via five
+nodes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">toy</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">vq</span><span class="p">(</span><span class="n">_1_1_6</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
+<span class="gp">... </span>           <span class="n">_1_2_6</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
+<span class="gp">... </span>           <span class="n">_1_3_6</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="p">(</span><span class="n">_1_1_6</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+<span class="gp">... </span>  <span class="n">_1_2_6</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">,</span> <span class="mf">9.</span><span class="p">],</span>
+<span class="gp">... </span>  <span class="n">_1_3_6</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In the first example, discharge does not depend on the actual value
+of the auxiliary term and is always zero:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;2000.01.01&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">4.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">7.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">10.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span>
+<span class="go">vq(0.0) qa(0.0)</span>
+<span class="go">vq(0.75) qa(0.0)</span>
+<span class="go">vq(1.0) qa(0.0)</span>
+<span class="go">vq(1.333333) qa(0.0)</span>
+<span class="go">vq(2.0) qa(0.0)</span>
+<span class="go">vq(2.333333) qa(0.0)</span>
+<span class="go">vq(3.0) qa(0.0)</span>
+<span class="go">vq(3.333333) qa(0.0)</span>
+</pre></div>
+</div>
+<p>The seconds example demonstrates that relationships are allowed to
+contain jumps, which is the case for the (<cite>vq</cite>,`q`) pairs (2,6) and
+(2,7).  Also it demonstrates that when the highest <cite>vq</cite> value is
+exceeded linear extrapolation based on the two highest (<cite>vq</cite>,`q`)
+pairs is performed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;2000.01.02&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">4.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">7.</span><span class="o">/</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">10.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span>
+<span class="go">vq(0.0) qa(0.0)</span>
+<span class="go">vq(0.75) qa(1.5)</span>
+<span class="go">vq(1.0) qa(2.0)</span>
+<span class="go">vq(1.333333) qa(3.0)</span>
+<span class="go">vq(2.0) qa(5.0)</span>
+<span class="go">vq(2.333333) qa(7.0)</span>
+<span class="go">vq(3.0) qa(9.0)</span>
+<span class="go">vq(3.333333) qa(10.0)</span>
+</pre></div>
+</div>
+<p>The third example shows that the relationships do not need to be
+arranged monotonously increasing.  Particualarly for the extrapolation
+range, this could result in negative values of <cite>qa</cite>, which is avoided
+by setting it to zero in such cases:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;2000.01.03&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mf">10.</span><span class="p">)</span>
+<span class="go">vq(0.5) qa(1.0)</span>
+<span class="go">vq(1.5) qa(1.5)</span>
+<span class="go">vq(2.5) qa(2.0)</span>
+<span class="go">vq(3.5) qa(2.5)</span>
+<span class="go">vq(4.5) qa(1.5)</span>
+<span class="go">vq(10.0) qa(0.0)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.calc_v_qa_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">calc_v_qa_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#calc_v_qa_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.calc_v_qa_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the stored water volume based on the equation of continuity.</p>
+<p>Note that for too high outflow values, which would result in overdraining
+the lake, the outflow is trimmed.</p>
+<dl class="docutils">
+<dt>Required derived parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_derived.Seconds" title="hydpy.models.llake.llake_derived.Seconds"><code class="xref py py-class docutils literal"><span class="pre">Seconds</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_derived.NmbSubsteps" title="hydpy.models.llake.llake_derived.NmbSubsteps"><code class="xref py py-class docutils literal"><span class="pre">NmbSubsteps</span></code></a></dd>
+<dt>Required flux sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QZ" title="hydpy.models.llake.llake_fluxes.QZ"><code class="xref py py-class docutils literal"><span class="pre">QZ</span></code></a></dd>
+<dt>Updated aide sequences:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_aides.QA" title="hydpy.models.llake.llake_aides.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_aides.V" title="hydpy.models.llake.llake_aides.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a></dd>
+<dt>Basic Equation:</dt>
+<dd><span class="math">\(\frac{dV}{dt}= QZ - QA\)</span></dd>
+</dl>
+<p>Examples:</p>
+<blockquote>
+<div><p>Prepare a lake model with an initial storage of 100.000 m³ and an
+inflow of 2 m³/s and a (potential) outflow of 6 m³/s:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;6h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">seconds</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mf">1e5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qz</span> <span class="o">=</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">qa</span> <span class="o">=</span> <span class="mf">6.</span>
+</pre></div>
+</div>
+<p>Through calling method <cite>calc_v_qa_v1</cite> three times with the same inflow
+and outflow values, the storage is emptied after the second step and
+outflow is equal to inflow after the third step:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_v_qa_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">v</span>
+<span class="go">v(13600.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(6.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_v_qa_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">v</span>
+<span class="go">v(0.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(2.62963)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_v_qa_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">v</span>
+<span class="go">v(0.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aides</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(2.0)</span>
+</pre></div>
+</div>
+<p>Note that the results of method <a class="reference internal" href="#hydpy.models.llake.llake_model.calc_v_qa_v1" title="hydpy.models.llake.llake_model.calc_v_qa_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_v_qa_v1()</span></code></a> are not based
+depend on the (outer) simulation step size but on the (inner)
+calculation step size defined by parameter <cite>maxdt</cite>.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.interp_w_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">interp_w_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#interp_w_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.interp_w_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the actual water stage based on linear interpolation.</p>
+<dl class="docutils">
+<dt>Required control parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_control.V" title="hydpy.models.llake.llake_control.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_control.W" title="hydpy.models.llake.llake_control.W"><code class="xref py py-class docutils literal"><span class="pre">W</span></code></a></dd>
+<dt>Required state sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_states.V" title="hydpy.models.llake.llake_states.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a></dd>
+<dt>Calculated state sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_states.W" title="hydpy.models.llake.llake_states.W"><code class="xref py py-class docutils literal"><span class="pre">W</span></code></a></dd>
+</dl>
+<p>Examples:</p>
+<blockquote>
+<div><p>Prepare a model object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the sake of brevity, define a test function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="o">*</span><span class="n">vs</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vs</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">states</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="n">v</span>
+<span class="gp">... </span>        <span class="n">model</span><span class="o">.</span><span class="n">interp_w_v1</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">v</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">w</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Define a simple <cite>w</cite>-<cite>v</cite> relationship consisting of three nodes and
+calculate the water stages for different volumes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Perform the interpolation for a few test points:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">)</span>
+<span class="go">v(0.0) w(-1.0)</span>
+<span class="go">v(0.5) w(-0.5)</span>
+<span class="go">v(2.0) w(1.0)</span>
+<span class="go">v(3.0) w(1.5)</span>
+<span class="go">v(4.0) w(2.0)</span>
+<span class="go">v(5.0) w(2.5)</span>
+</pre></div>
+</div>
+<p>The reference water stage of the relationship can be selected
+arbitrarily.  Even negative water stages are returned, as is
+demonstrated by the first two calculations.  For volumes outside
+the range of the (<cite>v</cite>,`w`) pairs, the outer two highest pairs are
+used for linear extrapolation.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.interp_v_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">interp_v_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#interp_v_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.interp_v_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the actual water volume based on linear interpolation.</p>
+<dl class="docutils">
+<dt>Required control parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_control.V" title="hydpy.models.llake.llake_control.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_control.W" title="hydpy.models.llake.llake_control.W"><code class="xref py py-class docutils literal"><span class="pre">W</span></code></a></dd>
+<dt>Required state sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_states.W" title="hydpy.models.llake.llake_states.W"><code class="xref py py-class docutils literal"><span class="pre">W</span></code></a></dd>
+<dt>Calculated state sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_states.V" title="hydpy.models.llake.llake_states.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a></dd>
+</dl>
+<p>Examples:</p>
+<blockquote>
+<div><p>Prepare a model object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the sake of brevity, define a test function:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="o">*</span><span class="n">ws</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">ws</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">states</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="n">w</span>
+<span class="gp">... </span>        <span class="n">model</span><span class="o">.</span><span class="n">interp_v_v1</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">w</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">v</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Define a simple <cite>v</cite>-<cite>w</cite> relationship consisting of three nodes and
+calculate the water stages for different volumes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">4.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Perform the interpolation for a few test points:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+<span class="go">w(-1.0) v(0.0)</span>
+<span class="go">w(-0.5) v(0.5)</span>
+<span class="go">w(1.0) v(2.0)</span>
+<span class="go">w(1.5) v(3.0)</span>
+<span class="go">w(2.0) v(4.0)</span>
+<span class="go">w(2.5) v(5.0)</span>
+</pre></div>
+</div>
+<p>The reference water stage of the relationship can be selected
+arbitrarily, hence even the negative water contained in the given
+example is allowed.  For volumes outside the range of the (<cite>w</cite>,`v`)
+pairs, the outer two highest pairs are used for linear extrapolation.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.corr_dw_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">corr_dw_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#corr_dw_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.corr_dw_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust the water stage drop to the highest value allowed and correct
+the associated fluxes.</p>
+<p>Note that method <a class="reference internal" href="#hydpy.models.llake.llake_model.corr_dw_v1" title="hydpy.models.llake.llake_model.corr_dw_v1"><code class="xref py py-func docutils literal"><span class="pre">corr_dw_v1()</span></code></a> calls the method <cite>interp_v</cite> of the
+respective application model.  Hence the requirements of the actual
+<cite>interp_v</cite> need to be considered additionally.</p>
+<dl class="docutils">
+<dt>Required control parameter:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_control.MaxDW" title="hydpy.models.llake.llake_control.MaxDW"><code class="xref py py-class docutils literal"><span class="pre">MaxDW</span></code></a></dd>
+<dt>Required derived parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_derived.TOY" title="hydpy.models.llake.llake_derived.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_derived.Seconds" title="hydpy.models.llake.llake_derived.Seconds"><code class="xref py py-class docutils literal"><span class="pre">Seconds</span></code></a></dd>
+<dt>Required flux sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QZ" title="hydpy.models.llake.llake_fluxes.QZ"><code class="xref py py-class docutils literal"><span class="pre">QZ</span></code></a></dd>
+<dt>Updated flux sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QA" title="hydpy.models.llake.llake_fluxes.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a></dd>
+<dt>Updated state sequences:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_states.W" title="hydpy.models.llake.llake_states.W"><code class="xref py py-class docutils literal"><span class="pre">W</span></code></a>
+<a class="reference internal" href="#hydpy.models.llake.llake_states.V" title="hydpy.models.llake.llake_states.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a></dd>
+<dt>Basic Restriction:</dt>
+<dd><span class="math">\(W_{old} - W_{new} \leq MaxDW\)</span></dd>
+</dl>
+<p>Examples:</p>
+<blockquote>
+<div><p>In preparation for the following examples, define a short simulation
+time period with a simulation step size of 12 hours and initialize
+the required model object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Timegrids</span><span class="p">,</span> <span class="n">Timegrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;2000.01.01&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;2000.01.04&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;12h&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">toy</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">seconds</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Select the first half of the second day of January as the simulation
+step relevant for the following examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;2000.01.02&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The following tests are based on method <a class="reference internal" href="#hydpy.models.llake.llake_model.interp_v_v1" title="hydpy.models.llake.llake_model.interp_v_v1"><code class="xref py py-func docutils literal"><span class="pre">interp_v_v1()</span></code></a> for the
+interpolation of the stored water volume based on the corrected
+water stage:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">interp_v</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">interp_v_v1</span>
+</pre></div>
+</div>
+<p>For the sake of simplicity, the underlying <cite>w</cite>-<cite>v</cite> relationship is
+assumed to be linear:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The maximum drop in water stage for the first half of the second
+day of January is set to 0.4 m/d.  Note that, due to the difference
+between the parameter step size and the simulation step size, the
+actual value used for calculation is 0.2 m/12h:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdw</span><span class="p">(</span><span class="n">_1_1_18</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">_1_2_6</span><span class="o">=.</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">_1_2_18</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdw</span>
+<span class="go">maxdw(toy_1_1_18_0_0=0.1,</span>
+<span class="go">      toy_1_2_6_0_0=0.4,</span>
+<span class="go">      toy_1_2_18_0_0=0.1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.objecttools</span> <span class="k">import</span> <span class="n">round_</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_</span><span class="p">(</span><span class="n">maxdw</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="go">0.2</span>
+</pre></div>
+</div>
+<p>Define old and new water stages and volumes in agreement with the
+given linear relationship:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">old</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">old</span> <span class="o">=</span> <span class="mf">1e6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="o">.</span><span class="mi">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="mf">9e5</span>
+</pre></div>
+</div>
+<p>Also define an inflow and an outflow value.  Note the that the latter
+is set to zero, which is inconsistent with the actual water stage drop
+defined above, but done for didactic reasons:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qz</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span> <span class="o">=</span> <span class="mf">0.</span>
+</pre></div>
+</div>
+<p>Calling the <a class="reference internal" href="#hydpy.models.llake.llake_model.corr_dw_v1" title="hydpy.models.llake.llake_model.corr_dw_v1"><code class="xref py py-func docutils literal"><span class="pre">corr_dw_v1()</span></code></a> method does not change the values of
+either of following sequences, as the actual drop (0.1 m/12h) is
+smaller than the allowed drop (0.2 m/12h):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">corr_dw_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">w</span>
+<span class="go">w(0.9)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">v</span>
+<span class="go">v(900000.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(0.0)</span>
+</pre></div>
+</div>
+<p>Note that the values given above are not recalculated, which can
+clearly be seen for the lake outflow, which is still zero.</p>
+<p>Through setting the new value of the water stage to 0.6 m, the actual
+drop (0.4 m/12h) exceeds the allowed drop (0.2 m/12h). Hence the
+water stage is trimmed and the other values are recalculated:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="o">.</span><span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">corr_dw_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">w</span>
+<span class="go">w(0.8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">v</span>
+<span class="go">v(800000.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(5.62963)</span>
+</pre></div>
+</div>
+<p>Through setting the maximum water stage drop to zero, method
+<a class="reference internal" href="#hydpy.models.llake.llake_model.corr_dw_v1" title="hydpy.models.llake.llake_model.corr_dw_v1"><code class="xref py py-func docutils literal"><span class="pre">corr_dw_v1()</span></code></a> is effectively disabled.  Regardless of the
+actual change in water stage, no trimming or recalculating is
+performed:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdw</span><span class="o">.</span><span class="n">toy_01_02_06</span> <span class="o">=</span> <span class="mf">0.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="o">.</span><span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">corr_dw_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">w</span>
+<span class="go">w(0.6)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">v</span>
+<span class="go">v(800000.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(5.62963)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.modify_qa_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">modify_qa_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#modify_qa_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.modify_qa_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add water to or remove water from the calculated lake outflow.</p>
+<dl class="docutils">
+<dt>Required control parameter:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_control.Verzw" title="hydpy.models.llake.llake_control.Verzw"><code class="xref py py-class docutils literal"><span class="pre">Verzw</span></code></a></dd>
+<dt>Required derived parameter:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_derived.TOY" title="hydpy.models.llake.llake_derived.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a></dd>
+<dt>Updated flux sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QA" title="hydpy.models.llake.llake_fluxes.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a></dd>
+<dt>Basic Equation:</dt>
+<dd><span class="math">\(QA = QA* - Verzw\)</span></dd>
+<dt>Examples:</dt>
+<dd><p class="first">In preparation for the following examples, define a short simulation
+time period with a simulation step size of 12 hours and initialize
+the required model object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Timegrids</span><span class="p">,</span> <span class="n">Timegrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;2000.01.01&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;2000.01.04&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;12h&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">toy</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Select the first half of the second day of January as the simulation
+step relevant for the following examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">init</span><span class="p">[</span><span class="s1">&#39;2000.01.02&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Assume that, in accordance with previous calculations, the original
+outflow value is 3 m³/s:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span> <span class="o">=</span> <span class="mf">3.</span>
+</pre></div>
+</div>
+<p>Prepare the shape of parameter <cite>verzw</cite> (usually, this is done
+automatically when calling parameter <cite>n</cite>):
+&gt;&gt;&gt; verzw.shape = (None,)</p>
+<p>Set the value of the abstraction on the first half of the second
+day of January to 2 m³/s:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verzw</span><span class="p">(</span><span class="n">_1_1_18</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">_1_2_6</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
+<span class="gp">... </span>      <span class="n">_1_2_18</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the first example <cite>verzw</cite> is simply subtracted from <cite>qa</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">modify_qa_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(1.0)</span>
+</pre></div>
+</div>
+<p>In the second example <cite>verzw</cite> exceeds <cite>qa</cite>, resulting in a zero
+outflow value:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">modify_qa_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(0.0)</span>
+</pre></div>
+</div>
+<p>The last example demonstrates, that “negative abstractions” are
+allowed, resulting in an increase in simulated outflow:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verzw</span><span class="o">.</span><span class="n">toy_1_2_6</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">modify_qa_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fluxes</span><span class="o">.</span><span class="n">qa</span>
+<span class="go">qa(2.0)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.update_inlets_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">update_inlets_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#update_inlets_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.update_inlets_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the inlet link sequence.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.llake.llake_model.update_outlets_v1">
+<code class="descclassname">hydpy.models.llake.llake_model.</code><code class="descname">update_outlets_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_model.html#update_outlets_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_model.update_outlets_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the outlet link sequence.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="parameter-features">
+<h2>Parameter features<a class="headerlink" href="#parameter-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="control-parameters">
+<h3>Control parameters<a class="headerlink" href="#control-parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_control.ControlParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">ControlParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#ControlParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.ControlParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Control parameters of HydPy-L-Lake, directly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a> <cite>Anzahl Interpolationsstützstellen (number of nodes for the interpolation between water state, volume and discharge) [-].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_control.W" title="hydpy.models.llake.llake_control.W"><code class="xref py py-class docutils literal"><span class="pre">W</span></code></a> <cite>Wasserstand (water stage) [m].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_control.V" title="hydpy.models.llake.llake_control.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a> <cite>Wasservolumen bei vorgegebenem Wasserstand (water volume for a given water stage) [m³].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_control.Q" title="hydpy.models.llake.llake_control.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Üblicher Seeausfluss bei vorgegebenem Wasserstand (sea outlet discharge for a given water stage) [m³/s].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_control.MaxDT" title="hydpy.models.llake.llake_control.MaxDT"><code class="xref py py-class docutils literal"><span class="pre">MaxDT</span></code></a> <cite>Maximale interne Rechenschrittweite (maximum of the internal step size) [T].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_control.MaxDW" title="hydpy.models.llake.llake_control.MaxDW"><code class="xref py py-class docutils literal"><span class="pre">MaxDW</span></code></a> <cite>Maximale Absenkgeschwindigkeit (maximum drop in water level) [m/T].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_control.Verzw" title="hydpy.models.llake.llake_control.Verzw"><code class="xref py py-class docutils literal"><span class="pre">Verzw</span></code></a> <cite>Zu- oder Abschlag des Seeausflusses (addition to or abstraction from the seas outlet discharge) [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_control"></span><dl class="class">
+<dt id="hydpy.models.llake.llake_control.N">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">N</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#N"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.N" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Anzahl Interpolationsstützstellen (number of nodes for the
+interpolation between water state, volume and discharge) [-].</p>
+<p>Parameter <a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a> determines the length of all 1- and 2-dimensional
+parameters of HydPy-L-Lake.  This requires that the value of
+the respective <a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a> instance is set before any of the values
+of these 1- and 2-dimensional parameters are set.  Changing the
+value of the <a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a> instance necessitates setting their values
+again.</p>
+<p>Examples:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For “simple” 1-dimensional parameters, the shape depends on the
+value of <a class="reference internal" href="#hydpy.models.llake.llake_control.N" title="hydpy.models.llake.llake_control.N"><code class="xref py py-class docutils literal"><span class="pre">N</span></code></a> only:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">w</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5,)</span>
+</pre></div>
+</div>
+<p>For time varying parameters (derived from
+<a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SeasonalParameter" title="hydpy.core.parametertools.SeasonalParameter"><code class="xref py py-class docutils literal"><span class="pre">SeasonalParameter</span></code></a>), it also depends
+on the defined number simulation steps per leap year:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">verzw</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(732,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(732, 5)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.N.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_control.N.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.N.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (2, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_control.N.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.N.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_control.N.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.N.TYPE">
+<code class="descname">TYPE</code><em class="property"> = int</em><a class="headerlink" href="#hydpy.models.llake.llake_control.N.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_control.W">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">W</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#W"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.W" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.MultiParameter" title="hydpy.core.parametertools.MultiParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.MultiParameter</span></code></a></p>
+<p>Wasserstand (water stage) [m].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.W.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.models.llake.llake_control.W.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.W.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (None, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_control.W.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.W.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_control.W.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.W.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_control.W.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_control.V">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">V</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#V"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.MultiParameter" title="hydpy.core.parametertools.MultiParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.MultiParameter</span></code></a></p>
+<p>Wasservolumen bei vorgegebenem Wasserstand (water volume for a
+given water stage) [m³].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.V.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.models.llake.llake_control.V.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.V.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_control.V.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.V.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_control.V.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.V.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_control.V.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_control.Q">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">Q</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SeasonalParameter" title="hydpy.core.parametertools.SeasonalParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SeasonalParameter</span></code></a></p>
+<p>Üblicher Seeausfluss bei vorgegebenem Wasserstand (sea outlet discharge
+for a given water stage) [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Q.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 2</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Q.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Q.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Q.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Q.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Q.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Q.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Q.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_control.MaxDT">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">MaxDT</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#MaxDT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Maximale interne Rechenschrittweite (maximum of the internal step size)
+[T].</p>
+<p>Examples:</p>
+<blockquote>
+<div><p>Initialize a llake model and set different time step length for
+parameterstep, simulationstep and maxdt:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;1h&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Internally, the value of maxdt is stored in seconds, but in string
+representations it is shown as a <a class="reference internal" href="timetools.html#hydpy.core.timetools.Period" title="hydpy.core.timetools.Period"><code class="xref py py-class docutils literal"><span class="pre">Period</span></code></a>
+string:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="o">.</span><span class="n">value</span>
+<span class="go">3600.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span>
+<span class="go">maxdt(&#39;1h&#39;)</span>
+</pre></div>
+</div>
+<p>Note that maxdt only defines the maximum internal step size, not the
+one actually used.  Hence, maxdt is e.g. allowed to be larger than the
+actual simulation step size:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span>
+<span class="go">maxdt(&#39;2d&#39;)</span>
+</pre></div>
+</div>
+<p>It is allowed the set the number of seconds directly or modify it
+by mathematical operations:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">60.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span>
+<span class="go">maxdt(&#39;1m&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span> <span class="o">*=</span> <span class="mf">120.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span>
+<span class="go">maxdt(&#39;2h&#39;)</span>
+</pre></div>
+</div>
+<p>However, for the more secure way of calling the object trying to
+pass an argument which cannot be converted to a Period instance
+unambiguously results in an exception:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="mf">60.</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">While trying the set the value of parameter `maxdt` of the lake model handled by element `?`, the following error occured: The supplied argument must be either an instance of `datetime.timedelta` or `str`.  The given arguments type is float. (An example: set `max dt` to 3600 seconds by writing `maxdt(&quot;1h&quot;))</span>
+</pre></div>
+</div>
+</div></blockquote>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDT.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDT.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDT.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDT.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDT.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDT.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDT.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDT.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_control.MaxDW">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">MaxDW</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#MaxDW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SeasonalParameter" title="hydpy.core.parametertools.SeasonalParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SeasonalParameter</span></code></a></p>
+<p>Maximale Absenkgeschwindigkeit (maximum drop in water level) [m/T].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDW.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDW.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDW.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDW.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDW.TIME">
+<code class="descname">TIME</code><em class="property"> = True</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDW.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.MaxDW.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_control.MaxDW.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_control.Verzw">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_control.</code><code class="descname">Verzw</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_control.html#Verzw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_control.Verzw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SeasonalParameter" title="hydpy.core.parametertools.SeasonalParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SeasonalParameter</span></code></a></p>
+<p>Zu- oder Abschlag des Seeausflusses (addition to or abstraction from
+the seas outlet discharge) [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Verzw.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Verzw.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Verzw.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (None, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Verzw.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Verzw.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Verzw.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_control.Verzw.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_control.Verzw.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="derived-parameters">
+<h3>Derived parameters<a class="headerlink" href="#derived-parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_derived.DerivedParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_derived.</code><code class="descname">DerivedParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#DerivedParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.DerivedParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Derived parameters of HydPy-L-Lake, indirectly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_derived.TOY" title="hydpy.models.llake.llake_derived.TOY"><code class="xref py py-class docutils literal"><span class="pre">TOY</span></code></a> <cite>References the “global” time of the year index array [-].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_derived.Seconds" title="hydpy.models.llake.llake_derived.Seconds"><code class="xref py py-class docutils literal"><span class="pre">Seconds</span></code></a> <cite>Length of the actual simulation step size in seconds [s].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_derived.NmbSubsteps" title="hydpy.models.llake.llake_derived.NmbSubsteps"><code class="xref py py-class docutils literal"><span class="pre">NmbSubsteps</span></code></a> <cite>Number of the internal simulation steps [-].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_derived.VQ" title="hydpy.models.llake.llake_derived.VQ"><code class="xref py py-class docutils literal"><span class="pre">VQ</span></code></a> <cite>Hilfsterm (auxiliary term): math:VdtQ = 2 cdot + dt cdot Q</cite> [m³].`</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_derived"></span><dl class="class">
+<dt id="hydpy.models.llake.llake_derived.TOY">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_derived.</code><code class="descname">TOY</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#TOY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.TOY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.IndexParameter" title="hydpy.core.parametertools.IndexParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.IndexParameter</span></code></a></p>
+<p>References the “global” time of the year index array [-].</p>
+<dl class="method">
+<dt id="hydpy.models.llake.llake_derived.TOY.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#TOY.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.TOY.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.TOY.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.TOY.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.TOY.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.TOY.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.TOY.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.TOY.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.TOY.TYPE">
+<code class="descname">TYPE</code><em class="property"> = int</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.TOY.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_derived.Seconds">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_derived.</code><code class="descname">Seconds</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#Seconds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.Seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Length of the actual simulation step size in seconds [s].</p>
+<dl class="method">
+<dt id="hydpy.models.llake.llake_derived.Seconds.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#Seconds.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.Seconds.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.Seconds.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.Seconds.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.Seconds.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.Seconds.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.Seconds.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.Seconds.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.Seconds.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.Seconds.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_derived.NmbSubsteps">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_derived.</code><code class="descname">NmbSubsteps</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#NmbSubsteps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.NmbSubsteps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Number of the internal simulation steps [-].</p>
+<p>Examples:</p>
+<blockquote>
+<div><p>Initialize a llake model and assume a simulation step size of 12 hours:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If the maximum internal step size is also set to 12 hours, there is
+only one internal calculation step per outer simulation step:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span>
+<span class="go">nmbsubsteps(1)</span>
+</pre></div>
+</div>
+<p>Assigning smaller values to <cite>maxdt</cite> increases <cite>nmbstepsize</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;1h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span>
+<span class="go">nmbsubsteps(12)</span>
+</pre></div>
+</div>
+<p>In case the simulationstep is not a whole multiple of <cite>dwmax</cite>,
+the value of <cite>nmbsubsteps</cite> is rounded up:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;59m&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span>
+<span class="go">nmbsubsteps(13)</span>
+</pre></div>
+</div>
+<p>Even for <cite>maxdt</cite> values exceeding the simulationstep, the value
+of <cite>numbsubsteps</cite> does not become smaller than one:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span>
+<span class="go">nmbsubsteps(1)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<dl class="method">
+<dt id="hydpy.models.llake.llake_derived.NmbSubsteps.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#NmbSubsteps.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.NmbSubsteps.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.NmbSubsteps.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.NmbSubsteps.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.NmbSubsteps.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (1, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.NmbSubsteps.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.NmbSubsteps.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.NmbSubsteps.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.NmbSubsteps.TYPE">
+<code class="descname">TYPE</code><em class="property"> = int</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.NmbSubsteps.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_derived.VQ">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_derived.</code><code class="descname">VQ</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#VQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.VQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SeasonalParameter" title="hydpy.core.parametertools.SeasonalParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SeasonalParameter</span></code></a></p>
+<p>Hilfsterm (auxiliary term): math:VdtQ = 2 cdot + dt cdot Q` [m³].</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.llake</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1e5</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="p">(</span><span class="n">_1</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span> <span class="n">_7</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maxdt</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">seconds</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsubsteps</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">vq</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">vq</span>
+<span class="go">vq(toy_1_1_0_0_0=[0.0, 243200.0, 2086400.0],</span>
+<span class="go">   toy_7_1_0_0_0=[0.0, 286400.0, 2216000.0])</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="hydpy.models.llake.llake_derived.VQ.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_derived.html#VQ.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_derived.VQ.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.VQ.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 2</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.VQ.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.VQ.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.VQ.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.VQ.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.VQ.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_derived.VQ.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.llake.llake_derived.VQ.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="sequence-features">
+<h2>Sequence features<a class="headerlink" href="#sequence-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="flux-sequences">
+<h3>Flux sequences<a class="headerlink" href="#flux-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_fluxes.FluxSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_fluxes.</code><code class="descname">FluxSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_fluxes.html#FluxSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_fluxes.FluxSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.FluxSequences" title="hydpy.core.sequencetools.FluxSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.FluxSequences</span></code></a></p>
+<p>Flux sequences of HydPy-L-Lake.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QZ" title="hydpy.models.llake.llake_fluxes.QZ"><code class="xref py py-class docutils literal"><span class="pre">QZ</span></code></a> <cite>Seezufluss (inflow into the lake) [m³/s].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_fluxes.QA" title="hydpy.models.llake.llake_fluxes.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a> <cite>Seeausfluss (outflow from the lake) [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_fluxes"></span><dl class="class">
+<dt id="hydpy.models.llake.llake_fluxes.QZ">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_fluxes.</code><code class="descname">QZ</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_fluxes.html#QZ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_fluxes.QZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.FluxSequence" title="hydpy.core.sequencetools.FluxSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.FluxSequence</span></code></a></p>
+<p>Seezufluss (inflow into the lake) [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_fluxes.QZ.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_fluxes.QZ.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_fluxes.QZ.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_fluxes.QZ.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_fluxes.QA">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_fluxes.</code><code class="descname">QA</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_fluxes.html#QA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_fluxes.QA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.FluxSequence" title="hydpy.core.sequencetools.FluxSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.FluxSequence</span></code></a></p>
+<p>Seeausfluss (outflow from the lake) [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_fluxes.QA.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_fluxes.QA.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_fluxes.QA.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_fluxes.QA.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="state-sequences">
+<h3>State sequences<a class="headerlink" href="#state-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_states.StateSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_states.</code><code class="descname">StateSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_states.html#StateSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_states.StateSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequences" title="hydpy.core.sequencetools.StateSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequences</span></code></a></p>
+<p>State sequences of HydPy-L-Lake.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_states.V" title="hydpy.models.llake.llake_states.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a> <cite>Wasservolumen (water volume) [m³].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_states.W" title="hydpy.models.llake.llake_states.W"><code class="xref py py-class docutils literal"><span class="pre">W</span></code></a> <cite>Wasserstand (water stage) [m].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_states"></span><dl class="class">
+<dt id="hydpy.models.llake.llake_states.V">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_states.</code><code class="descname">V</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_states.html#V"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_states.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequence" title="hydpy.core.sequencetools.StateSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequence</span></code></a></p>
+<p>Wasservolumen (water volume) [m³].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_states.V.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_states.V.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_states.V.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_states.V.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_states.V.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_states.V.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_states.W">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_states.</code><code class="descname">W</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_states.html#W"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_states.W" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequence" title="hydpy.core.sequencetools.StateSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequence</span></code></a></p>
+<p>Wasserstand (water stage) [m].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_states.W.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_states.W.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_states.W.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_states.W.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_states.W.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (None, None)</em><a class="headerlink" href="#hydpy.models.llake.llake_states.W.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="inlet-sequences">
+<h3>Inlet sequences<a class="headerlink" href="#inlet-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_inlets.InletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_inlets.</code><code class="descname">InletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_inlets.html#InletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_inlets.InletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Upstream link sequences of HydPy-L-Lake.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_inlets.Q" title="hydpy.models.llake.llake_inlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Abfluss (runoff) [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_inlets"></span><dl class="class">
+<dt id="hydpy.models.llake.llake_inlets.Q">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_inlets.</code><code class="descname">Q</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_inlets.html#Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_inlets.Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequence" title="hydpy.core.sequencetools.LinkSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequence</span></code></a></p>
+<p>Abfluss (runoff) [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_inlets.Q.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.models.llake.llake_inlets.Q.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_inlets.Q.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_inlets.Q.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="outlet-sequences">
+<h3>Outlet sequences<a class="headerlink" href="#outlet-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_outlets.OutletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_outlets.</code><code class="descname">OutletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_outlets.html#OutletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_outlets.OutletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Downstream link sequences of HydPy-L-Lake.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_outlets.Q" title="hydpy.models.llake.llake_outlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Abfluss (runoff) [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_outlets"></span><dl class="class">
+<dt id="hydpy.models.llake.llake_outlets.Q">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_outlets.</code><code class="descname">Q</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_outlets.html#Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_outlets.Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequence" title="hydpy.core.sequencetools.LinkSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequence</span></code></a></p>
+<p>Abfluss (runoff) [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_outlets.Q.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_outlets.Q.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_outlets.Q.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_outlets.Q.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="aide-sequences">
+<h3>Aide sequences<a class="headerlink" href="#aide-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.llake.llake_aides.AideSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_aides.</code><code class="descname">AideSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/llake/llake_aides.html#AideSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_aides.AideSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.AideSequences" title="hydpy.core.sequencetools.AideSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.AideSequences</span></code></a></p>
+<p>Aide sequences of HydPy-L-Lake.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.llake.llake_aides.QA" title="hydpy.models.llake.llake_aides.QA"><code class="xref py py-class docutils literal"><span class="pre">QA</span></code></a> <cite>Seeausfluss (outflow from the lake) [m³/s].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_aides.VQ" title="hydpy.models.llake.llake_aides.VQ"><code class="xref py py-class docutils literal"><span class="pre">VQ</span></code></a> <cite>Hilfsterm (auxiliary term) [m³].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.llake.llake_aides.V" title="hydpy.models.llake.llake_aides.V"><code class="xref py py-class docutils literal"><span class="pre">V</span></code></a> <cite>Wasservolumen (water volume) [m³].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.llake.llake_aides"></span><dl class="class">
+<dt id="hydpy.models.llake.llake_aides.QA">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_aides.</code><code class="descname">QA</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_aides.html#QA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_aides.QA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.AideSequence" title="hydpy.core.sequencetools.AideSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.AideSequence</span></code></a></p>
+<p>Seeausfluss (outflow from the lake) [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_aides.QA.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_aides.QA.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_aides.QA.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_aides.QA.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_aides.VQ">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_aides.</code><code class="descname">VQ</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_aides.html#VQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_aides.VQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.AideSequence" title="hydpy.core.sequencetools.AideSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.AideSequence</span></code></a></p>
+<p>Hilfsterm (auxiliary term) [m³].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_aides.VQ.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_aides.VQ.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_aides.VQ.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_aides.VQ.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.llake.llake_aides.V">
+<em class="property">class </em><code class="descclassname">hydpy.models.llake.llake_aides.</code><code class="descname">V</code><a class="reference internal" href="_modules/hydpy/models/llake/llake_aides.html#V"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.llake.llake_aides.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.AideSequence" title="hydpy.core.sequencetools.AideSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.AideSequence</span></code></a></p>
+<p>Wasservolumen (water volume) [m³].</p>
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_aides.V.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.llake.llake_aides.V.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.llake.llake_aides.V.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.llake.llake_aides.V.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HydPy-L-Lake</a><ul>
+<li><a class="reference internal" href="#model-features">Model features</a></li>
+<li><a class="reference internal" href="#parameter-features">Parameter features</a><ul>
+<li><a class="reference internal" href="#control-parameters">Control parameters</a></li>
+<li><a class="reference internal" href="#derived-parameters">Derived parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sequence-features">Sequence features</a><ul>
+<li><a class="reference internal" href="#flux-sequences">Flux sequences</a></li>
+<li><a class="reference internal" href="#state-sequences">State sequences</a></li>
+<li><a class="reference internal" href="#inlet-sequences">Inlet sequences</a></li>
+<li><a class="reference internal" href="#outlet-sequences">Outlet sequences</a></li>
+<li><a class="reference internal" href="#aide-sequences">Aide sequences</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="HydPy-L-Stream.html"
+                        title="previous chapter">HydPy-L-Stream</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="lland_v1.html"
+                        title="next chapter">lland_v1 (LARSIM-Xinanjiang-Turc-Wendling version of HydPy-L-Land)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/HydPy-L-Lake.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lland_v1.html" title="lland_v1 (LARSIM-Xinanjiang-Turc-Wendling version of HydPy-L-Land)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-L-Stream.html" title="HydPy-L-Stream"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-L.html" >HydPy-L (LARSIM)</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

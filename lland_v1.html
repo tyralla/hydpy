@@ -1,0 +1,472 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>lland_v1 (LARSIM-Xinanjiang-Turc-Wendling version of HydPy-L-Land) &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lstream_v1 (LARSIM-Manning version of HydPy-L-Stream)" href="lstream_v1.html" />
+    <link rel="prev" title="HydPy-L-Lake" href="HydPy-L-Lake.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lstream_v1.html" title="lstream_v1 (LARSIM-Manning version of HydPy-L-Stream)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-L-Lake.html" title="HydPy-L-Lake"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-L.html" accesskey="U">HydPy-L (LARSIM)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-hydpy.models.lland_v1">
+<span id="lland-v1-larsim-xinanjiang-turc-wendling-version-of-hydpy-l-land"></span><span id="lland-v1"></span><h1>lland_v1 (LARSIM-Xinanjiang-Turc-Wendling version of HydPy-L-Land)<a class="headerlink" href="#module-hydpy.models.lland_v1" title="Permalink to this headline">¶</a></h1>
+<p>Version 1 of the L-Land model is designed to aggree with the LARSIM-ME
+configuration of the LARSIM model used by the German Federal Institute
+of Hydrology (BfG), but offers more flexibility in some regards (e.g. in
+parameterization).  It can briefly be summarized as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Simple routines for adjusting the meteorological input data.</li>
+<li>Reference evapotranspiration after Turc-Wendling.</li>
+<li>An enhanced degree-day-method for calculating snow melt.</li>
+<li>A simple snow retention routine.</li>
+<li>Landuse and month specific potential evapotranspiration.</li>
+<li>Acual soil evapotranspiration after ATV-DVWK- 504 (2002).</li>
+<li>Soil routine based on the Xinanjiang model.</li>
+<li>One base flow, two interflow and two direct flow components.</li>
+<li>Seperate linear storages for modelling runoff concentration.</li>
+<li>Additional evaporation from water areas.</li>
+</ul>
+</div></blockquote>
+<p>The following picture shows the general structure of L-Land Version 1.  Note
+that, besides water areas and sealed surface areas, all land use types rely
+on the same process equations:</p>
+<img alt="_images/HydPy-L-Land_Version-1.png" src="_images/HydPy-L-Land_Version-1.png" />
+<p>As all models implemented in HydPy, base model L-Land can principally be
+applied on arbitrary simulation step sizes.  But for the L-Land version 1
+application model one has to be aware, that the Turc-Wendling equation
+for calculating reference evaporation is designed for daily values only.</p>
+<p>Integration tests:</p>
+<blockquote>
+<div><p>The integration tests are performed in January (to allow for realistic
+snow examples), spanning over a period of five days:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span><span class="p">,</span> <span class="n">Timegrid</span><span class="p">,</span> <span class="n">Timegrids</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;01.01.2000&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;06.01.2000&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;1d&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Prepare the model instance and built the connections to element <cite>land</cite>
+and node <cite>outlet</cite>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.lland_v1</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">Element</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlet</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="s1">&#39;outlet&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">land</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="s1">&#39;land&#39;</span><span class="p">,</span> <span class="n">outlets</span><span class="o">=</span><span class="n">outlet</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">land</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>All tests shall be performed using single hydrological response unit with
+a size of one square kilometre an a altitude of 100 meter:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nhru</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ft</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fhru</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hnn</span><span class="p">(</span><span class="mf">100.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Initialize a test function object, which prepares and runs the tests
+and prints their results for the given sequences:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.testtools</span> <span class="k">import</span> <span class="n">Test</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">Test</span><span class="p">(</span><span class="n">land</span><span class="p">,</span> <span class="n">inits</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;inzp&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;wats&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;waes&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;bowa&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qdgz1&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qdgz2&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qigz1&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qigz2&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qbgz&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qdga1&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qdga2&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qiga1&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qiga2&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="s1">&#39;qbga&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="o">.</span><span class="n">dateformat</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">.%m.&#39;</span>
+</pre></div>
+</div>
+<p>Set the input values for the complete simulation period:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span><span class="o">.</span><span class="n">nied</span><span class="o">.</span><span class="n">series</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">0.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span><span class="o">.</span><span class="n">teml</span><span class="o">.</span><span class="n">series</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span><span class="o">.</span><span class="n">glob</span><span class="o">.</span><span class="n">series</span> <span class="o">=</span> <span class="mf">100.</span>
+</pre></div>
+</div>
+<p>Define the control parameter values (select only arable land, sealed
+soil and water area as landuse classes, as all other land use classes
+are functionally identical with arable land):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lnk</span><span class="p">(</span><span class="n">ACKER</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kg</span><span class="p">(</span><span class="mf">1.2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kt</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ke</span><span class="p">(</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kf</span><span class="p">(</span><span class="o">.</span><span class="mi">6</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fln</span><span class="o">.</span><span class="n">acker_jan</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fln</span><span class="o">.</span><span class="n">vers_jan</span> <span class="o">=</span> <span class="o">.</span><span class="mi">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fln</span><span class="o">.</span><span class="n">wasser_jan</span> <span class="o">=</span> <span class="mf">1.3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hinz</span><span class="p">(</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lai</span><span class="o">.</span><span class="n">acker_jan</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">treft</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trefn</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tgr</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tsp</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gtf</span><span class="p">(</span><span class="mf">5.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rschmelz</span><span class="p">(</span><span class="mf">334.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cpwasser</span><span class="p">(</span><span class="mf">4.1868</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pwmax</span><span class="p">(</span><span class="mf">1.4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grasref_r</span><span class="p">(</span><span class="mf">5.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nfk</span><span class="p">(</span><span class="mf">200.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">relwz</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">relwb</span><span class="p">(</span><span class="o">.</span><span class="mi">05</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span><span class="p">(</span><span class="o">.</span><span class="mi">01</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fbeta</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dmax</span><span class="p">(</span><span class="mf">5.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dmin</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bsf</span><span class="p">(</span><span class="o">.</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a2</span><span class="p">(</span><span class="n">inf</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tind</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eqb</span><span class="p">(</span><span class="mf">100.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eqi1</span><span class="p">(</span><span class="mf">50.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eqi2</span><span class="p">(</span><span class="mf">10.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eqd1</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eqd2</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Check the correctness of the results:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">test</span><span class="p">()</span>
+<span class="go">|   date | nied | teml |  glob | nkor | tkor |      et0 |     evpo | nbes | sbes | evi |      evb |     wgtf |     schm |     wada |      qdb | qib1 | qib2 | qbb |     qdgz |        q | inzp |     wats |     waes |     bowa |    qdgz1 | qdgz2 | qigz1 | qigz2 | qbgz |    qdga1 | qdga2 | qiga1 | qiga2 | qbga |   outlet |</span>
+<span class="go">--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+<span class="go">| 01.01. |  0.0 | -2.0 | 100.0 |  0.0 | -3.0 | 0.779561 | 0.779561 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |      0.0 |      0.0 |      0.0 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |  0.0 |      0.0 |      0.0 |      0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |</span>
+<span class="go">| 02.01. |  5.0 | -1.0 | 100.0 |  6.0 | -2.0 | 0.813809 | 0.813809 |  5.8 |  5.8 | 0.2 |      0.0 |      0.0 |      0.0 |      0.0 |      0.0 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |  0.0 |      5.8 |      5.8 |      0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |</span>
+<span class="go">| 03.01. |  5.0 |  0.0 | 100.0 |  6.0 | -1.0 | 0.847495 | 0.847495 |  5.8 |  5.8 | 0.2 |      0.0 |      0.0 |      0.0 |      0.0 |      0.0 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |  0.0 |     11.6 |     11.6 |      0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |</span>
+<span class="go">| 04.01. |  5.0 |  1.0 | 100.0 |  6.0 |  0.0 | 0.880634 | 0.880634 |  5.8 |  0.0 | 0.2 |      0.0 |      0.0 |      0.0 |     1.16 | 0.000962 |  0.0 |  0.0 | 0.0 | 0.000962 | 0.000205 |  0.0 |     11.6 |    16.24 | 1.159038 | 0.000962 |   0.0 |   0.0 |   0.0 |  0.0 | 0.000205 |   0.0 |   0.0 |   0.0 |  0.0 | 0.000002 |</span>
+<span class="go">| 05.01. |  0.0 |  2.0 | 100.0 |  0.0 |  1.0 | 0.913238 | 0.913238 |  0.0 |  0.0 | 0.0 | 0.013321 | 5.012535 | 5.012535 | 7.017549 | 0.047086 |  0.0 |  0.0 | 0.0 | 0.047086 |  0.01033 |  0.0 | 6.587465 | 9.222451 |  8.11618 | 0.047086 |   0.0 |   0.0 |   0.0 |  0.0 |  0.01033 |   0.0 |   0.0 |   0.0 |  0.0 |  0.00012 |</span>
+</pre></div>
+</div>
+</div></blockquote>
+<dl class="class">
+<dt id="hydpy.models.lland_v1.Model">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">Model</code><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modeltools.html#hydpy.core.modeltools.Model" title="hydpy.core.modeltools.Model"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.modeltools.Model</span></code></a></p>
+<p>LARSIM-Land version of HydPy-L-Land (lland_v1).</p>
+<dl class="docutils">
+<dt>The following “run methods” are called each simulation step run in the given sequence:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_nkor_v1" title="hydpy.models.lland.lland_model.calc_nkor_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_nkor_v1()</span></code></a> <cite>Adjust the given precipitation values.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_tkor_v1" title="hydpy.models.lland.lland_model.calc_tkor_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_tkor_v1()</span></code></a> <cite>Adjust the given air temperature values.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_et0_v1" title="hydpy.models.lland.lland_model.calc_et0_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_et0_v1()</span></code></a> <cite>Calculate reference evapotranspiration after Turc-Wendling.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_evpo_v1" title="hydpy.models.lland.lland_model.calc_evpo_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_evpo_v1()</span></code></a> <cite>Calculate land use and month specific values of potential evapotranspiration.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_nbes_inzp_v1" title="hydpy.models.lland.lland_model.calc_nbes_inzp_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_nbes_inzp_v1()</span></code></a> <cite>Calculate throughfall and update the interception storage accordingly.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_evi_inzp_v1" title="hydpy.models.lland.lland_model.calc_evi_inzp_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_evi_inzp_v1()</span></code></a> <cite>Calculate interception evaporation and update the interception storage accordingly.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_sbes_v1" title="hydpy.models.lland.lland_model.calc_sbes_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_sbes_v1()</span></code></a> <cite>Calculate the frozen part of stand precipitation.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_wgtf_v1" title="hydpy.models.lland.lland_model.calc_wgtf_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_wgtf_v1()</span></code></a> <cite>Calculate the potential snow melt.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_schm_wats_v1" title="hydpy.models.lland.lland_model.calc_schm_wats_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_schm_wats_v1()</span></code></a> <cite>Calculate the actual amount of water melting within the snow cover.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_wada_waes_v1" title="hydpy.models.lland.lland_model.calc_wada_waes_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_wada_waes_v1()</span></code></a> <cite>Calculate the actual water release from the snow cover.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_evb_v1" title="hydpy.models.lland.lland_model.calc_evb_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_evb_v1()</span></code></a> <cite>Calculate the actual water release from the snow cover.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qbb_v1" title="hydpy.models.lland.lland_model.calc_qbb_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qbb_v1()</span></code></a> <cite>Calculate the amount of base flow released from the soil.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qib1_v1" title="hydpy.models.lland.lland_model.calc_qib1_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qib1_v1()</span></code></a> <cite>Calculate the first inflow component released from the soil.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qib2_v1" title="hydpy.models.lland.lland_model.calc_qib2_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qib2_v1()</span></code></a> <cite>Calculate the first inflow component released from the soil.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdb_v1" title="hydpy.models.lland.lland_model.calc_qdb_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qdb_v1()</span></code></a> <cite>Calculate direct runoff released from the soil.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_bowa_v1" title="hydpy.models.lland.lland_model.calc_bowa_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_bowa_v1()</span></code></a> <cite>Update soil moisture and correct fluxes if necessary.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qbgz_v1" title="hydpy.models.lland.lland_model.calc_qbgz_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qbgz_v1()</span></code></a> <cite>Aggregate the amount of base flow released by all HRUs.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qigz1_v1" title="hydpy.models.lland.lland_model.calc_qigz1_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qigz1_v1()</span></code></a> <cite>Aggregate the amount of the first interflow component released by all HRUs.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qigz2_v1" title="hydpy.models.lland.lland_model.calc_qigz2_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qigz2_v1()</span></code></a> <cite>Aggregate the amount of the second interflow component released by all HRUs.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdgz_v1" title="hydpy.models.lland.lland_model.calc_qdgz_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qdgz_v1()</span></code></a> <cite>Aggregate the amount of total direct flow released by all HRUs.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdgz1_qdgz2_v1" title="hydpy.models.lland.lland_model.calc_qdgz1_qdgz2_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qdgz1_qdgz2_v1()</span></code></a> <cite>Seperate total direct flow into a small and a fast component.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qbga_v1" title="hydpy.models.lland.lland_model.calc_qbga_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qbga_v1()</span></code></a> <cite>Perform the runoff concentration calculation for base flow.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qiga1_v1" title="hydpy.models.lland.lland_model.calc_qiga1_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qiga1_v1()</span></code></a> <cite>Perform the runoff concentration calculation for the first interflow component.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qiga2_v1" title="hydpy.models.lland.lland_model.calc_qiga2_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qiga2_v1()</span></code></a> <cite>Perform the runoff concentration calculation for the second interflow component.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdga1_v1" title="hydpy.models.lland.lland_model.calc_qdga1_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qdga1_v1()</span></code></a> <cite>Perform the runoff concentration calculation for “slow” direct runoff.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_qdga2_v1" title="hydpy.models.lland.lland_model.calc_qdga2_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qdga2_v1()</span></code></a> <cite>Perform the runoff concentration calculation for “fast” direct runoff.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.calc_q_v1" title="hydpy.models.lland.lland_model.calc_q_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_q_v1()</span></code></a> <cite>Calculate the final runoff.</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_model.update_outlets_v1" title="hydpy.models.lland.lland_model.update_outlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_outlets_v1()</span></code></a> <cite>Update the outlet link sequence.</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.lland_v1.ControlParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">ControlParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#ControlParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.ControlParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Control parameters of lland_v1, directly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.FT" title="hydpy.models.lland.lland_control.FT"><code class="xref py py-class docutils literal"><span class="pre">FT</span></code></a> <cite>Teileinzugsgebietsfläche (subbasin area) [km²].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.NHRU" title="hydpy.models.lland.lland_control.NHRU"><code class="xref py py-class docutils literal"><span class="pre">NHRU</span></code></a> <cite>Anzahl der Hydrotope (number of hydrological response units) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.Lnk" title="hydpy.models.lland.lland_control.Lnk"><code class="xref py py-class docutils literal"><span class="pre">Lnk</span></code></a> <cite>Landnutzungsklasse (land use class) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.FHRU" title="hydpy.models.lland.lland_control.FHRU"><code class="xref py py-class docutils literal"><span class="pre">FHRU</span></code></a> <cite>Flächenanteile der Hydrotope (area percentages of the respective HRUs) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.HNN" title="hydpy.models.lland.lland_control.HNN"><code class="xref py py-class docutils literal"><span class="pre">HNN</span></code></a> <cite>Höhe über Normal-Null (height above sea level) [m].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.KG" title="hydpy.models.lland.lland_control.KG"><code class="xref py py-class docutils literal"><span class="pre">KG</span></code></a> <cite>Niederschlagskorrekturfaktor (adjustment factor for precipitation) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.KT" title="hydpy.models.lland.lland_control.KT"><code class="xref py py-class docutils literal"><span class="pre">KT</span></code></a> <cite>Temperaturkorrektursummand (adjustment summand for air temperature) [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.KE" title="hydpy.models.lland.lland_control.KE"><code class="xref py py-class docutils literal"><span class="pre">KE</span></code></a> <cite>Grasreferenzverdunstungskorrekturfaktor (adjustment factor for reference evapotranspiration) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.KF" title="hydpy.models.lland.lland_control.KF"><code class="xref py py-class docutils literal"><span class="pre">KF</span></code></a> <cite>Küstenfaktor (“coast factor” of Turc-Wendling’s evaporation equation [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.FLn" title="hydpy.models.lland.lland_control.FLn"><code class="xref py py-class docutils literal"><span class="pre">FLn</span></code></a> <cite>Landnutzungsabhängiger Verdunstungsfaktor (factor for adjusting reference evapotranspiration to different land use classes) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.HInz" title="hydpy.models.lland.lland_control.HInz"><code class="xref py py-class docutils literal"><span class="pre">HInz</span></code></a> <cite>Interzeptionskapazität bezogen auf die Blattoberfläche (interception capacity normalized to the leaf surface area) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.LAI" title="hydpy.models.lland.lland_control.LAI"><code class="xref py py-class docutils literal"><span class="pre">LAI</span></code></a> <cite>Blattflächenindex (leaf area index) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.TRefT" title="hydpy.models.lland.lland_control.TRefT"><code class="xref py py-class docutils literal"><span class="pre">TRefT</span></code></a> <cite>Lufttemperaturgrenzwert des grundlegenden Grad-Tag-Verfahrens (air temperature threshold of the degree-day method) [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.TRefN" title="hydpy.models.lland.lland_control.TRefN"><code class="xref py py-class docutils literal"><span class="pre">TRefN</span></code></a> <cite>Niederschlagstemperaturgrenzwert des erweiterten Grad-Tag-Verfahrens (precipitation temperature threshold of the degree-day method) [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.TGr" title="hydpy.models.lland.lland_control.TGr"><code class="xref py py-class docutils literal"><span class="pre">TGr</span></code></a> <cite>Temperaturgrenzwert flüssiger/fester Niederschlag (threshold temperature liquid/frozen precipitation) [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.TSp" title="hydpy.models.lland.lland_control.TSp"><code class="xref py py-class docutils literal"><span class="pre">TSp</span></code></a> <cite>Temperaturspanne flüssiger/fester Niederschlag (temperature range with mixed precipitation) [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.GTF" title="hydpy.models.lland.lland_control.GTF"><code class="xref py py-class docutils literal"><span class="pre">GTF</span></code></a> <cite>Grad-Tag-Faktor (factor of the degree-day method) [mm/°C/T].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.RSchmelz" title="hydpy.models.lland.lland_control.RSchmelz"><code class="xref py py-class docutils literal"><span class="pre">RSchmelz</span></code></a> <cite>Spezifische Schmelzwärme von Wasser (specific melt heat of water) [J/g].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.CPWasser" title="hydpy.models.lland.lland_control.CPWasser"><code class="xref py py-class docutils literal"><span class="pre">CPWasser</span></code></a> <cite>Spezifische Wärmekapazität von Wasser (specific heat capacity of water) [J/g].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.PWMax" title="hydpy.models.lland.lland_control.PWMax"><code class="xref py py-class docutils literal"><span class="pre">PWMax</span></code></a> <cite>Maximalverhältnis Gesamt- zu Trockenschnee (maximum ratio of the total and the frozen water equivalent stored in the snow cover) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.GrasRef_R" title="hydpy.models.lland.lland_control.GrasRef_R"><code class="xref py py-class docutils literal"><span class="pre">GrasRef_R</span></code></a> <cite>Bodenfeuchte-Verdunstung-Parameter (soil moisture dependend evaporation factor) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.NFk" title="hydpy.models.lland.lland_control.NFk"><code class="xref py py-class docutils literal"><span class="pre">NFk</span></code></a> <cite>Nutzbare Feldkapazität (usable field capacity) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.RelWZ" title="hydpy.models.lland.lland_control.RelWZ"><code class="xref py py-class docutils literal"><span class="pre">RelWZ</span></code></a> <cite>Relative Mindestbodenfeuchte für die Interflowentstehung (threshold value of relative soil moisture for interflow generation) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.RelWB" title="hydpy.models.lland.lland_control.RelWB"><code class="xref py py-class docutils literal"><span class="pre">RelWB</span></code></a> <cite>Relative Mindestbodenfeuchte für die Basisabflussentstehung (threshold value of relative soil moisture for base flow generation) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.Beta" title="hydpy.models.lland.lland_control.Beta"><code class="xref py py-class docutils literal"><span class="pre">Beta</span></code></a> <cite>Drainageindex des tiefen Bodenspeichers (storage coefficient for releasing base flow from the lower soil compartment) [1/T].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.FBeta" title="hydpy.models.lland.lland_control.FBeta"><code class="xref py py-class docutils literal"><span class="pre">FBeta</span></code></a> <cite>Faktor zur Erhöhung der Perkolation im Grobporenbereich (factor for increasing percolation under wet conditions) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.DMax" title="hydpy.models.lland.lland_control.DMax"><code class="xref py py-class docutils literal"><span class="pre">DMax</span></code></a> <cite>Drainageindex des oberen Bodenspeichers (additional flux rate for releasing interflow from the upper soil compartment) [mm/T].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.DMin" title="hydpy.models.lland.lland_control.DMin"><code class="xref py py-class docutils literal"><span class="pre">DMin</span></code></a> <cite>Drainageindex des mittleren Bodenspeichers (flux rate for releasing interflow from the middle soil compartment) [mm/T].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.BSf" title="hydpy.models.lland.lland_control.BSf"><code class="xref py py-class docutils literal"><span class="pre">BSf</span></code></a> <cite>Bodenfeuchte-Sättigungsfläche-Parameter (shape parameter for the relation between the avarage soil moisture and the relative saturated area of a subbasin) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.A1" title="hydpy.models.lland.lland_control.A1"><code class="xref py py-class docutils literal"><span class="pre">A1</span></code></a> <cite>Parameter für die kontinuierliche Aufteilung der Direktabflusskomponenten (threshold value for the continuous seperation of direct runoff in a slow and a fast component) [mm/d]</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.A2" title="hydpy.models.lland.lland_control.A2"><code class="xref py py-class docutils literal"><span class="pre">A2</span></code></a> <cite>Parameter für die diskontinuierliche Aufteilung der Direktabflusskomponenten (threshold value for the discontinuous seperation of direct runoff in a slow and a fast component) [mm/d]</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.TInd" title="hydpy.models.lland.lland_control.TInd"><code class="xref py py-class docutils literal"><span class="pre">TInd</span></code></a> <cite>Fließzeitindex (factor related to the time of concentration) [T].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.EQB" title="hydpy.models.lland.lland_control.EQB"><code class="xref py py-class docutils literal"><span class="pre">EQB</span></code></a> <cite>Kalibrierfaktor für die Basisabflusskonzentration (factor for adjusting the concentration time of baseflow). [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.EQI1" title="hydpy.models.lland.lland_control.EQI1"><code class="xref py py-class docutils literal"><span class="pre">EQI1</span></code></a> <cite>Kalibrierfaktor für die “untere” Zwischenabflusskonzentration (factor for adjusting the concentration time of the first interflow component) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.EQI2" title="hydpy.models.lland.lland_control.EQI2"><code class="xref py py-class docutils literal"><span class="pre">EQI2</span></code></a> <cite>Kalibrierfaktor für die “obere” Zwischenabflusskonzentration (factor for adjusting the concentration time of the second interflow component) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.EQD1" title="hydpy.models.lland.lland_control.EQD1"><code class="xref py py-class docutils literal"><span class="pre">EQD1</span></code></a> <cite>Kalibrierfaktor für die langsamere Direktabflusskonzentration (factor for adjusting the concentration time of the slower component of direct runoff). [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_control.EQD2" title="hydpy.models.lland.lland_control.EQD2"><code class="xref py py-class docutils literal"><span class="pre">EQD2</span></code></a> <cite>Kalibrierfaktor für die schnellere Direktabflusskonzentration (factor for adjusting the concentration time of the faster component of direct runoff). [-].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.lland_v1.DerivedParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">DerivedParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#DerivedParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.DerivedParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Derived parameters of lland_v1, indirectly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.MOY" title="hydpy.models.lland.lland_derived.MOY"><code class="xref py py-class docutils literal"><span class="pre">MOY</span></code></a> <cite>References the “global” month of the year index array [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.KInz" title="hydpy.models.lland.lland_derived.KInz"><code class="xref py py-class docutils literal"><span class="pre">KInz</span></code></a> <cite>Interzeptionskapazität bezogen auf die Bodenoberfläche (interception capacity normalized to the soil surface area) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.WB" title="hydpy.models.lland.lland_derived.WB"><code class="xref py py-class docutils literal"><span class="pre">WB</span></code></a> <cite>Absolute Mindestbodenfeuchte für die Basisabflussentstehung (threshold value of absolute soil moisture for base flow generation) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.WZ" title="hydpy.models.lland.lland_derived.WZ"><code class="xref py py-class docutils literal"><span class="pre">WZ</span></code></a> <cite>Absolute Mindestbodenfeuchte für die Interflowentstehung (threshold value of absolute soil moisture for interflow generation) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.KB" title="hydpy.models.lland.lland_derived.KB"><code class="xref py py-class docutils literal"><span class="pre">KB</span></code></a> <cite>Konzentrationszeit des Basisabflusses (concentration time of baseflow) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.KI1" title="hydpy.models.lland.lland_derived.KI1"><code class="xref py py-class docutils literal"><span class="pre">KI1</span></code></a> <cite>Konzentrationszeit des “unteren” Zwischenabflusses (concentration time of the first interflow component) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.KI2" title="hydpy.models.lland.lland_derived.KI2"><code class="xref py py-class docutils literal"><span class="pre">KI2</span></code></a> <cite>Konzentrationszeit des “oberen” Zwischenabflusses” (concentration time of the second interflow component) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.KD1" title="hydpy.models.lland.lland_derived.KD1"><code class="xref py py-class docutils literal"><span class="pre">KD1</span></code></a> <cite>Konzentrationszeit des “langsamen” Direktabflusses (concentration time of the slower component of direct runoff) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.KD2" title="hydpy.models.lland.lland_derived.KD2"><code class="xref py py-class docutils literal"><span class="pre">KD2</span></code></a> <cite>Konzentrationszeit des “schnellen” Direktabflusses (concentration time of the faster component of direct runoff) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_derived.QFactor" title="hydpy.models.lland.lland_derived.QFactor"><code class="xref py py-class docutils literal"><span class="pre">QFactor</span></code></a> <cite>Factor for converting mm/stepsize to m³/s.</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.lland_v1.InputSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">InputSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#InputSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.InputSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.InputSequences" title="hydpy.core.sequencetools.InputSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.InputSequences</span></code></a></p>
+<p>Input sequences of lland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_inputs.Nied" title="hydpy.models.lland.lland_inputs.Nied"><code class="xref py py-class docutils literal"><span class="pre">Nied</span></code></a> <cite>Niederschlag (precipitation) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_inputs.TemL" title="hydpy.models.lland.lland_inputs.TemL"><code class="xref py py-class docutils literal"><span class="pre">TemL</span></code></a> <cite>Lufttemperatur (air temperature) [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_inputs.Glob" title="hydpy.models.lland.lland_inputs.Glob"><code class="xref py py-class docutils literal"><span class="pre">Glob</span></code></a> <cite>Globalstrahlung (global radiation) [W/m²].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.lland_v1.FluxSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">FluxSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#FluxSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.FluxSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.FluxSequences" title="hydpy.core.sequencetools.FluxSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.FluxSequences</span></code></a></p>
+<p>Flux sequences of lland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.NKor" title="hydpy.models.lland.lland_fluxes.NKor"><code class="xref py py-class docutils literal"><span class="pre">NKor</span></code></a> <cite>Korrigierter Niederschlag (corrected precipitation) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.TKor" title="hydpy.models.lland.lland_fluxes.TKor"><code class="xref py py-class docutils literal"><span class="pre">TKor</span></code></a> <cite>Korrigierte Lufttemperatur (corrected air temperature) [°C].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.ET0" title="hydpy.models.lland.lland_fluxes.ET0"><code class="xref py py-class docutils literal"><span class="pre">ET0</span></code></a> <cite>Grasreferenzverdunstung (reference evapotranspiration) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.EvPo" title="hydpy.models.lland.lland_fluxes.EvPo"><code class="xref py py-class docutils literal"><span class="pre">EvPo</span></code></a> <cite>Potenzielle Evaporation/Evapotranspiration (potential evaporation/evapotranspiration) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.NBes" title="hydpy.models.lland.lland_fluxes.NBes"><code class="xref py py-class docutils literal"><span class="pre">NBes</span></code></a> <cite>Gesamter Bestandsniederschlag (total stand precipitation) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.SBes" title="hydpy.models.lland.lland_fluxes.SBes"><code class="xref py py-class docutils literal"><span class="pre">SBes</span></code></a> <cite>Schneeanteil Bestandsniederschlag (frozen stand precipitation) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.EvI" title="hydpy.models.lland.lland_fluxes.EvI"><code class="xref py py-class docutils literal"><span class="pre">EvI</span></code></a> <cite>Tatsächliche Interzeptionsverdunstung (actual evaporation of intercepted water) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.EvB" title="hydpy.models.lland.lland_fluxes.EvB"><code class="xref py py-class docutils literal"><span class="pre">EvB</span></code></a> <cite>Tatsächliche Bodenverdunstung (actual evaporation of soil water) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.WGTF" title="hydpy.models.lland.lland_fluxes.WGTF"><code class="xref py py-class docutils literal"><span class="pre">WGTF</span></code></a> <cite>Potenzielle Schneeschmelze (maximum amount of frozen water that could be melted) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.Schm" title="hydpy.models.lland.lland_fluxes.Schm"><code class="xref py py-class docutils literal"><span class="pre">Schm</span></code></a> <cite>Tatsächliche Schneeschmelze (actual amount of water melting within the snow cover) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.WaDa" title="hydpy.models.lland.lland_fluxes.WaDa"><code class="xref py py-class docutils literal"><span class="pre">WaDa</span></code></a> <cite>Wasserdargebot (water reaching the soil routine) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QDB" title="hydpy.models.lland.lland_fluxes.QDB"><code class="xref py py-class docutils literal"><span class="pre">QDB</span></code></a> <cite>Direktabfluss-Abgabe aus dem Bodenspeicher (direct runoff release from the soil storage) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QIB1" title="hydpy.models.lland.lland_fluxes.QIB1"><code class="xref py py-class docutils literal"><span class="pre">QIB1</span></code></a> <cite>Erste Komponente der Interflow-Abgabe aus dem Bodenspeicher (first component of the interflow release from the soil storage) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QIB2" title="hydpy.models.lland.lland_fluxes.QIB2"><code class="xref py py-class docutils literal"><span class="pre">QIB2</span></code></a> <cite>Zweite Komponente der Interflow-Abgabe aus dem Bodenspeicher (second component of the interflow release from the soil storage) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QBB" title="hydpy.models.lland.lland_fluxes.QBB"><code class="xref py py-class docutils literal"><span class="pre">QBB</span></code></a> <cite>Basisabfluss-Abgabe aus dem Bodenspeicher (base flow release from the soil storage) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.QDGZ" title="hydpy.models.lland.lland_fluxes.QDGZ"><code class="xref py py-class docutils literal"><span class="pre">QDGZ</span></code></a> <cite>Gesamtzufluss in beide Direktabfluss-Gebietsspeicher (total inflow into both storage compartments for direct runoff) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_fluxes.Q" title="hydpy.models.lland.lland_fluxes.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Gesamtabfluss des Teilgebiets (runoff at the catchment outlet) [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.lland_v1.StateSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">StateSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#StateSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.StateSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequences" title="hydpy.core.sequencetools.StateSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequences</span></code></a></p>
+<p>State sequences of lland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.Inzp" title="hydpy.models.lland.lland_states.Inzp"><code class="xref py py-class docutils literal"><span class="pre">Inzp</span></code></a> <cite>Interzeptionsspeicherung (interception storage) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.WATS" title="hydpy.models.lland.lland_states.WATS"><code class="xref py py-class docutils literal"><span class="pre">WATS</span></code></a> <cite>Wasseräquivalent Trockenschnee (frozen water equivalent of the snow cover) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.WAeS" title="hydpy.models.lland.lland_states.WAeS"><code class="xref py py-class docutils literal"><span class="pre">WAeS</span></code></a> <cite>Wasseräquivalent Gesamtschnee (total water equivalent of the snow cover) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.BoWa" title="hydpy.models.lland.lland_states.BoWa"><code class="xref py py-class docutils literal"><span class="pre">BoWa</span></code></a> <cite>Bodenwasserspeicherung (soil water storage) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGZ1" title="hydpy.models.lland.lland_states.QDGZ1"><code class="xref py py-class docutils literal"><span class="pre">QDGZ1</span></code></a> <cite>Zufluss in den trägeren Direktabfluss-Gebietsspeicher (inflow into the less responsive storage compartment for direct runoff) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGZ2" title="hydpy.models.lland.lland_states.QDGZ2"><code class="xref py py-class docutils literal"><span class="pre">QDGZ2</span></code></a> <cite>Zufluss in den dynamischeren Direktabfluss-Gebietsspeicher (inflow into the more responsive storage compartment for direct runoff) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGZ1" title="hydpy.models.lland.lland_states.QIGZ1"><code class="xref py py-class docutils literal"><span class="pre">QIGZ1</span></code></a> <cite>“Zufluss in den ersten Zwischenabfluss-Gebietsspeicher (inflow into the first storage compartment for interflow) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGZ2" title="hydpy.models.lland.lland_states.QIGZ2"><code class="xref py py-class docutils literal"><span class="pre">QIGZ2</span></code></a> <cite>Zufluss in den zweiten Zwischenabfluss-Gebietsspeicher (inflow into the second storage compartment for interflow) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QBGZ" title="hydpy.models.lland.lland_states.QBGZ"><code class="xref py py-class docutils literal"><span class="pre">QBGZ</span></code></a> <cite>Zufluss in den Basisabfluss-Gebietsspeicher (inflow into the storage compartment for base flow) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGA1" title="hydpy.models.lland.lland_states.QDGA1"><code class="xref py py-class docutils literal"><span class="pre">QDGA1</span></code></a> <cite>Abfluss aus dem trägeren Direktabfluss-Gebietsspeicher (outflow from the less responsive storage compartment for direct runoff) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGA2" title="hydpy.models.lland.lland_states.QDGA2"><code class="xref py py-class docutils literal"><span class="pre">QDGA2</span></code></a> <cite>Abfluss aus dem dynamischeren Direktabfluss-Gebietsspeicher (outflow from the more responsive storage compartment for direct runoff) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGA1" title="hydpy.models.lland.lland_states.QIGA1"><code class="xref py py-class docutils literal"><span class="pre">QIGA1</span></code></a> <cite>Abfluss aus dem “unteren” Zwischenabfluss-Gebietsspeicher (outflow from the storage compartment for the first interflow component) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGA2" title="hydpy.models.lland.lland_states.QIGA2"><code class="xref py py-class docutils literal"><span class="pre">QIGA2</span></code></a> <cite>Abfluss aus dem “oberen” Zwischenabfluss-Gebietsspeicher (outflow from the storage compartment for the second interflow component) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_states.QBGA" title="hydpy.models.lland.lland_states.QBGA"><code class="xref py py-class docutils literal"><span class="pre">QBGA</span></code></a> <cite>Abfluss aus dem Basisabfluss-Gebietsspeicher (outflow from the storage compartment for base flow) [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.lland_v1.AideSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">AideSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#AideSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.AideSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.AideSequences" title="hydpy.core.sequencetools.AideSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.AideSequences</span></code></a></p>
+<p>Aide sequences of lland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_aides.Temp" title="hydpy.models.lland.lland_aides.Temp"><code class="xref py py-class docutils literal"><span class="pre">Temp</span></code></a> <cite>Temporary variable used in different methods [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_aides.SfA" title="hydpy.models.lland.lland_aides.SfA"><code class="xref py py-class docutils literal"><span class="pre">SfA</span></code></a> <cite>Sättigungsflächen-Aktivität (activity of the saturated surface) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_aides.Exz" title="hydpy.models.lland.lland_aides.Exz"><code class="xref py py-class docutils literal"><span class="pre">Exz</span></code></a> <cite>Bodenfeuchteüberschuss (excess of soil water) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_aides.BVl" title="hydpy.models.lland.lland_aides.BVl"><code class="xref py py-class docutils literal"><span class="pre">BVl</span></code></a> <cite>Berechneter Bodenwasserverlust (calculated amount of water that should be released from the soil) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_aides.MVl" title="hydpy.models.lland.lland_aides.MVl"><code class="xref py py-class docutils literal"><span class="pre">MVl</span></code></a> <cite>Möglicher Bodenwasserverlust (maximum amount of water released that can be released from the soil) [mm].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_aides.RVl" title="hydpy.models.lland.lland_aides.RVl"><code class="xref py py-class docutils literal"><span class="pre">RVl</span></code></a> <cite>Relation von MVl und BVl (ratio of MVl and BVl) [-].</cite></li>
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_aides.EPW" title="hydpy.models.lland.lland_aides.EPW"><code class="xref py py-class docutils literal"><span class="pre">EPW</span></code></a> <cite>Potenzielle Evaporation/Evapotranspiration von Wasserflächen (potential evaporation/evapotranspiration combined from all water areas) [mm].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.lland_v1.OutletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.lland_v1.</code><code class="descname">OutletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/lland_v1.html#OutletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.lland_v1.OutletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Downstream link sequences of lland_v1.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="HydPy-L-Land.html#hydpy.models.lland.lland_outlets.Q" title="hydpy.models.lland.lland_outlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Runoff [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="HydPy-L-Lake.html"
+                        title="previous chapter">HydPy-L-Lake</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="lstream_v1.html"
+                        title="next chapter">lstream_v1 (LARSIM-Manning version of HydPy-L-Stream)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/lland_v1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="lstream_v1.html" title="lstream_v1 (LARSIM-Manning version of HydPy-L-Stream)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-L-Lake.html" title="HydPy-L-Lake"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-L.html" >HydPy-L (LARSIM)</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

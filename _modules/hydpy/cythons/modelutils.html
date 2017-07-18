@@ -1,0 +1,854 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.cythons.modelutils &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.cythons.modelutils</h1><div class="highlight"><pre>
+<span></span>
+<span class="sd">&quot;&quot;&quot; This module provides utilities to build and apply cython models.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">distutils.core</span>
+<span class="kn">import</span> <span class="nn">distutils.extension</span>
+<span class="kn">import</span> <span class="nn">Cython.Build</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="c1"># ...third party modules</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">cythons</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">magictools</span>
+
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;windows&#39;</span><span class="p">:</span>
+    <span class="n">dllextension</span> <span class="o">=</span> <span class="s1">&#39;.pyd&#39;</span>
+    <span class="sd">&quot;&quot;&quot;The dll file extension on the respective system.&quot;&quot;&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">dllextension</span> <span class="o">=</span> <span class="s1">&#39;.so&#39;</span>
+
+<span class="n">TYPE2STR</span> <span class="o">=</span> <span class="p">{</span><span class="nb">bool</span><span class="p">:</span> <span class="s1">&#39;bint&#39;</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">:</span> <span class="s1">&#39;numpy.&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;_t&#39;</span><span class="p">,</span>
+            <span class="nb">float</span><span class="p">:</span> <span class="s1">&#39;double&#39;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">:</span> <span class="s1">&#39;void&#39;</span><span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;Maps Python types to Cython compatible type declarations.</span>
+
+<span class="sd">The Cython type belonging to Python&#39;s :class:`int` is selected to be in</span>
+<span class="sd">agreement with numpy&#39;s default integer type on the respective platform/system.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">NDIM2STR</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;[:]&#39;</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;[:,:]&#39;</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;[:,:,:]&#39;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="Lines"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.Lines">[docs]</a><span class="k">class</span> <span class="nc">Lines</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handles lines to be written into a `.pyx` file.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Lines.add"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.Lines.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Appends the given text line with prefixed spaces in accordance with</span>
+<span class="sd">        the given number of indentation levels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">*</span><span class="mi">4</span><span class="o">*</span><span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">line</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></div>
+
+
+<div class="viewcode-block" id="Cythonizer"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.Cythonizer">[docs]</a><span class="k">class</span> <span class="nc">Cythonizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handles the writing, compiling and initialization of cython models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pymodule</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_globals</span><span class="p">[</span><span class="s1">&#39;__name__&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Cythonizer.complete"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.Cythonizer.complete">[docs]</a>    <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outdated</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">skipdoctests</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usecython</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tester</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">skipdoctests</span><span class="p">:</span>
+                <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usecython</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tester</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Cythonizer.doit"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.Cythonizer.doit">[docs]</a>    <span class="k">def</span> <span class="nf">doit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">magictools</span><span class="o">.</span><span class="n">PrintStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Translate module/package </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyname</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">magictools</span><span class="o">.</span><span class="n">PrintStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="mi">33</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pyxwriter</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">magictools</span><span class="o">.</span><span class="n">PrintStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Compile module </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyname</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">magictools</span><span class="o">.</span><span class="n">PrintStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">compile_</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">movedll</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pyname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Name of the compiled module.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pymodule</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;__init__&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pymodule</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pymodule</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cyname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Name of the compiled module.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;c_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyname</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cydirpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path of the directory containing the compiled modules.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cythons</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cymodule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The compiled module.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;hydpy.cythons.&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">cyname</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cyfilepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path of the compiled module.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cydirpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyname</span><span class="o">+</span><span class="s1">&#39;.pyx&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">buildpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path for temporarily build files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cydirpath</span><span class="p">,</span> <span class="s1">&#39;_build&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pyxwriter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the pyx file.&quot;&quot;&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Parameters&#39;</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parametertools</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Sequences&#39;</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">sequences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sequences</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">sequences</span> <span class="o">=</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">Sequences</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">PyxWriter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyfilepath</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pysourcefiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;All source files of the actual models Python classes and their</span>
+<span class="sd">        respective base classes.&quot;&quot;&quot;</span>
+        <span class="n">sourcefiles</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">child</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">parents</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmro</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sourcefile</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfile</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">sourcefiles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Lines</span><span class="p">(</span><span class="o">*</span><span class="n">sourcefiles</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outdated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;True if at least one of the :attr:`~Cythonizer.pysourcefiles`</span>
+<span class="sd">        is newer than the compiled file under :attr:`~Cythonizer.cyfilepath`,</span>
+<span class="sd">        otherwise False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cyfilepath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">cydate</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cyfilepath</span><span class="p">)</span><span class="o">.</span><span class="n">st_mtime</span>
+        <span class="k">for</span> <span class="n">pysourcefile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pysourcefiles</span><span class="p">:</span>
+            <span class="n">pydate</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">pysourcefile</span><span class="p">)</span><span class="o">.</span><span class="n">st_mtime</span>
+            <span class="k">if</span> <span class="n">pydate</span> <span class="o">&gt;</span> <span class="n">cydate</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="Cythonizer.compile_"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.Cythonizer.compile_">[docs]</a>    <span class="k">def</span> <span class="nf">compile_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translate cython code to C code and compile it.&quot;&quot;&quot;</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">=</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;build_ext&#39;</span><span class="p">,</span> <span class="s1">&#39;--build-lib=&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">buildpath</span><span class="p">]</span>
+        <span class="n">exc_modules</span> <span class="o">=</span> <span class="n">Cython</span><span class="o">.</span><span class="n">Build</span><span class="o">.</span><span class="n">cythonize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cyfilepath</span><span class="p">)</span>
+        <span class="n">distutils</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">ext_modules</span><span class="o">=</span><span class="n">exc_modules</span><span class="p">,</span>
+                             <span class="n">include_dirs</span><span class="o">=</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">get_include</span><span class="p">()])</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">=</span> <span class="n">argv</span></div>
+
+<div class="viewcode-block" id="Cythonizer.movedll"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.Cythonizer.movedll">[docs]</a>    <span class="k">def</span> <span class="nf">movedll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Try to find the resulting dll file and to move it into the</span>
+<span class="sd">        `cythons` package.</span>
+
+<span class="sd">        Things to be aware of:</span>
+<span class="sd">          * The file extension either `pyd` (Window) or `so` (Linux).</span>
+<span class="sd">          * The folder containing the dll file is system dependend, but is</span>
+<span class="sd">            always a subfolder of the `cythons` package.</span>
+<span class="sd">          * Under Linux, the filename might contain system information, e.g.</span>
+<span class="sd">            ...cpython-36m-x86_64-linux-gnu.so.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dirinfos</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buildpath</span><span class="p">)</span>
+        <span class="nb">next</span><span class="p">(</span><span class="n">dirinfos</span><span class="p">)</span>
+        <span class="n">system_dependend_filename</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">dirinfo</span> <span class="ow">in</span> <span class="n">dirinfos</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">dirinfo</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cyname</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">dllextension</span><span class="p">)):</span>
+                    <span class="n">system_dependend_filename</span> <span class="o">=</span> <span class="n">filename</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">system_dependend_filename</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                             <span class="n">system_dependend_filename</span><span class="p">),</span>
+                                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cydirpath</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">cyname</span><span class="o">+</span><span class="n">dllextension</span><span class="p">))</span>
+                    <span class="k">break</span>
+                <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+                    <span class="n">prefix</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;After trying to cythonize module </span><span class="si">%s</span><span class="s1">, when &#39;</span>
+                              <span class="s1">&#39;trying to move the final cython module </span><span class="si">%s</span><span class="s1"> &#39;</span>
+                              <span class="s1">&#39;from directory </span><span class="si">%s</span><span class="s1"> to directory </span><span class="si">%s</span><span class="s1">&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyname</span><span class="p">,</span> <span class="n">system_dependend_filename</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">buildpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cydirpath</span><span class="p">))</span>
+                    <span class="n">suffix</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;A likely error cause is that the cython module &#39;</span>
+                              <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does already exist in this directory and is &#39;</span>
+                              <span class="s1">&#39;currently blocked by another Python process.  &#39;</span>
+                              <span class="s1">&#39;Maybe it helps to close all Python processes &#39;</span>
+                              <span class="s1">&#39;and restart the cyhonization afterwards.&#39;</span>
+                              <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyname</span><span class="o">+</span><span class="n">dllextension</span><span class="p">)</span>
+                    <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;After trying to cythonize module </span><span class="si">%s</span><span class="s1">, the resulting &#39;</span>
+                          <span class="s1">&#39;file </span><span class="si">%s</span><span class="s1"> could neither be found in directory </span><span class="si">%s</span><span class="s1"> nor &#39;</span>
+                          <span class="s1">&#39;its subdirectories.  The distul report should tell &#39;</span>
+                          <span class="s1">&#39;whether the file has been stored somewhere else,&#39;</span>
+                          <span class="s1">&#39;is named somehow else, or could not be build at &#39;</span>
+                          <span class="s1">&#39;all.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildpath</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PyxWriter"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter">[docs]</a><span class="k">class</span> <span class="nc">PyxWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Writes a new pyx file into framework.models.cython when initialized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cythonizer</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">pyxpath</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cythonizer</span> <span class="o">=</span> <span class="n">cythonizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyxpath</span> <span class="o">=</span> <span class="n">pyxpath</span>
+
+<div class="viewcode-block" id="PyxWriter.write"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyxpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pxf</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;* cython options&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cythonoptions</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;* C imports&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cimports</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;* constants (if defined)&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constants</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;* parameter classes&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;* sequence classes&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;* model class&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;        </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;- model attributes&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modeldeclarations</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;        </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;- standard functions&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelstandardfunctions</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;        </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;- additional functions&#39;</span><span class="p">)</span>
+            <span class="n">pxf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modeluserfunctions</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cythonoptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cython option lines.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Lines</span><span class="p">(</span><span class="s1">&#39;#!python&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;#cython: boundscheck=False&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;#cython: wraparound=False&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;#cython: initializedcheck=False&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cimports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Import command lines.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Lines</span><span class="p">(</span><span class="s1">&#39;import numpy&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;cimport numpy&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from libc.math cimport exp, fabs&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from libc.stdio cimport *&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from libc.stdlib cimport *&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;import cython&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from cpython.mem cimport PyMem_Malloc&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from cpython.mem cimport PyMem_Realloc&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from cpython.mem cimport PyMem_Free&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from hydpy.cythons cimport pointer&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;from hydpy.cythons import pointer&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constants</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constants declaration lines.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cythonizer</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">member</span><span class="p">))</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="ow">in</span> <span class="n">TYPE2STR</span><span class="p">)):</span>
+                <span class="n">ndim</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">member</span><span class="p">)</span><span class="o">.</span><span class="n">ndim</span>
+                <span class="n">ctype</span> <span class="o">=</span> <span class="n">TYPE2STR</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">member</span><span class="p">)]</span> <span class="o">+</span> <span class="n">NDIM2STR</span><span class="p">[</span><span class="n">ndim</span><span class="p">]</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;cdef public </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="s1">&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">member</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parameter declaration lines.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">subpars</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;        - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name1</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;@cython.final&#39;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;cdef class </span><span class="si">%s</span><span class="s1">(object):&#39;</span>
+                         <span class="o">%</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="n">subpars</span><span class="p">))</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subpars</span><span class="p">:</span>
+                <span class="n">ctype</span> <span class="o">=</span> <span class="n">TYPE2STR</span><span class="p">[</span><span class="n">par</span><span class="o">.</span><span class="n">TYPE</span><span class="p">]</span> <span class="o">+</span> <span class="n">NDIM2STR</span><span class="p">[</span><span class="n">par</span><span class="o">.</span><span class="n">NDIM</span><span class="p">]</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">name2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sequence declaration lines.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;        - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name1</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;@cython.final&#39;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;cdef class </span><span class="si">%s</span><span class="s1">(object):&#39;</span>
+                         <span class="o">%</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+                <span class="n">ctype</span> <span class="o">=</span> <span class="s1">&#39;double&#39;</span> <span class="o">+</span> <span class="n">NDIM2STR</span><span class="p">[</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subseqs</span><span class="p">,</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">LinkSequences</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef double *</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name2</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef double **</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name2</span><span class="p">)</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public int len_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name2</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">name2</span><span class="p">))</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public int _</span><span class="si">%s</span><span class="s1">_ndim&#39;</span> <span class="o">%</span> <span class="n">name2</span><span class="p">)</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public int _</span><span class="si">%s</span><span class="s1">_length&#39;</span> <span class="o">%</span> <span class="n">name2</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">):</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public int _</span><span class="si">%s</span><span class="s1">_length_</span><span class="si">%d</span><span class="s1">&#39;</span>
+                                 <span class="o">%</span> <span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subseqs</span><span class="p">,</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">IOSubSequences</span><span class="p">):</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iosequence</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subseqs</span><span class="p">,</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">InputSequences</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loaddata</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subseqs</span><span class="p">,</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">IOSubSequences</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">openfiles</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">closefiles</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subseqs</span><span class="p">,</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">InputSequence</span><span class="p">):</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">savedata</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subseqs</span><span class="p">,</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">LinkSequences</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setpointer</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+<div class="viewcode-block" id="PyxWriter.iosequence"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.iosequence">[docs]</a>    <span class="k">def</span> <span class="nf">iosequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Special declaration lines for the given</span>
+<span class="sd">        :class:`~hydpy.core.sequencetools.IOSequence` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public bint _</span><span class="si">%s</span><span class="s1">_diskflag&#39;</span> <span class="o">%</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public str _</span><span class="si">%s</span><span class="s1">_path&#39;</span> <span class="o">%</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef FILE *_</span><span class="si">%s</span><span class="s1">_file&#39;</span> <span class="o">%</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public bint _</span><span class="si">%s</span><span class="s1">_ramflag&#39;</span> <span class="o">%</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="s1">&#39;double&#39;</span> <span class="o">+</span> <span class="n">NDIM2STR</span><span class="p">[</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public </span><span class="si">%s</span><span class="s1"> _</span><span class="si">%s</span><span class="s1">_array&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.openfiles"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.openfiles">[docs]</a>    <span class="k">def</span> <span class="nf">openfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open file statements.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . openfiles&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef openfiles(self, int idx):&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;if self._</span><span class="si">%s</span><span class="s1">_diskflag:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;self._</span><span class="si">%s</span><span class="s1">_file = fopen(str(self._</span><span class="si">%s</span><span class="s1">_path).encode(), &#39;</span>
+                         <span class="s1">&#39;&quot;rb+&quot;)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fseek(self._</span><span class="si">%s</span><span class="s1">_file, idx*8, SEEK_SET)&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fseek(self._</span><span class="si">%s</span><span class="s1">_file, idx*self._</span><span class="si">%s</span><span class="s1">_length*8, &#39;</span>
+                             <span class="s1">&#39;SEEK_SET)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.closefiles"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.closefiles">[docs]</a>    <span class="k">def</span> <span class="nf">closefiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close file statements.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . closefiles&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline closefiles(self):&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">subseqs</span><span class="p">):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;if self._</span><span class="si">%s</span><span class="s1">_diskflag:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fclose(self._</span><span class="si">%s</span><span class="s1">_file)&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.loaddata"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.loaddata">[docs]</a>    <span class="k">def</span> <span class="nf">loaddata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load data statements.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . loaddata&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline loaddata(self, int idx):&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;cdef int jdx0, jdx1, jdx2, jdx3, jdx4, jdx5&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;if self._</span><span class="si">%s</span><span class="s1">_diskflag:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fread(&amp;self.</span><span class="si">%s</span><span class="s1">, 8, 1, self._</span><span class="si">%s</span><span class="s1">_file)&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fread(&amp;self.</span><span class="si">%s</span><span class="s1">[0], 8, self._</span><span class="si">%s</span><span class="s1">_length, &#39;</span>
+                             <span class="s1">&#39;self._</span><span class="si">%s</span><span class="s1">_file)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="p">((</span><span class="n">name</span><span class="p">,))))</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;elif self._</span><span class="si">%s</span><span class="s1">_ramflag:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1"> = self._</span><span class="si">%s</span><span class="s1">_array[idx]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">indexing</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">):</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;for jdx</span><span class="si">%d</span><span class="s1"> in range(self._</span><span class="si">%s</span><span class="s1">_length_</span><span class="si">%d</span><span class="s1">):&#39;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
+                    <span class="n">indexing</span> <span class="o">+=</span> <span class="s1">&#39;jdx</span><span class="si">%d</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="n">idx</span>
+                <span class="n">indexing</span> <span class="o">=</span> <span class="n">indexing</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">] = self._</span><span class="si">%s</span><span class="s1">_array[idx,</span><span class="si">%s</span><span class="s1">]&#39;</span>
+                                      <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">indexing</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.savedata"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.savedata">[docs]</a>    <span class="k">def</span> <span class="nf">savedata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save data statements.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . savedata&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline savedata(self, int idx):&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;cdef int jdx0, jdx1, jdx2, jdx3, jdx4, jdx5&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;if self._</span><span class="si">%s</span><span class="s1">_diskflag:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fwrite(&amp;self.</span><span class="si">%s</span><span class="s1">, 8, 1, self._</span><span class="si">%s</span><span class="s1">_file)&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;fwrite(&amp;self.</span><span class="si">%s</span><span class="s1">[0], 8, self._</span><span class="si">%s</span><span class="s1">_length, &#39;</span>
+                             <span class="s1">&#39;self._</span><span class="si">%s</span><span class="s1">_file)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;elif self._</span><span class="si">%s</span><span class="s1">_ramflag:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;self._</span><span class="si">%s</span><span class="s1">_array[idx] = self.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">indexing</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">):</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;for jdx</span><span class="si">%d</span><span class="s1"> in range(self._</span><span class="si">%s</span><span class="s1">_length_</span><span class="si">%d</span><span class="s1">):&#39;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
+                    <span class="n">indexing</span> <span class="o">+=</span> <span class="s1">&#39;jdx</span><span class="si">%d</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="n">idx</span>
+                <span class="n">indexing</span> <span class="o">=</span> <span class="n">indexing</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">,</span> <span class="s1">&#39;self._</span><span class="si">%s</span><span class="s1">_array[idx,</span><span class="si">%s</span><span class="s1">] = self.</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+                                      <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">indexing</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.setpointer"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.setpointer">[docs]</a>    <span class="k">def</span> <span class="nf">setpointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setpointer functions for link sequences.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setpointer0d</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+            <span class="k">break</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alloc</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dealloc</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setpointer1d</span><span class="p">(</span><span class="n">subseqs</span><span class="p">))</span>
+            <span class="k">break</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.setpointer0d"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.setpointer0d">[docs]</a>    <span class="k">def</span> <span class="nf">setpointer0d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setpointer function for 0-dimensional link sequences.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . setpointer0d&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline setpointer0d&#39;</span>
+                     <span class="s1">&#39;(self, str name, pointer.PDouble value):&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;if name == &quot;</span><span class="si">%s</span><span class="s1">&quot;:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1"> = value.p_value&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.alloc"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.alloc">[docs]</a>    <span class="k">def</span> <span class="nf">alloc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allocate memory for 1-dimensional link sequences.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . setlength&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline alloc(self, name, int length):&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;if name == &quot;</span><span class="si">%s</span><span class="s1">&quot;:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;self._</span><span class="si">%s</span><span class="s1">_length_0 = length&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1"> = &lt;double**&gt; &#39;</span>
+                         <span class="s1">&#39;PyMem_Malloc(length * sizeof(double*))&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.dealloc"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.dealloc">[docs]</a>    <span class="k">def</span> <span class="nf">dealloc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deallocate memory for 1-dimensional link sequences.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . dealloc&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline dealloc(self):&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;PyMem_Free(self.</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="PyxWriter.setpointer1d"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.PyxWriter.setpointer1d">[docs]</a>    <span class="k">def</span> <span class="nf">setpointer1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setpointer function for 1-dimensional link sequences.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . setpointer1d&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline setpointer1d&#39;</span>
+                     <span class="s1">&#39;(self, str name, pointer.PDouble value, int idx):&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;if name == &quot;</span><span class="si">%s</span><span class="s1">&quot;:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1">[idx] = value.p_value&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modeldeclarations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Attribute declarations of the model class.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;@cython.final&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;cdef class Model(object):&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public int idx_sim&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">things</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">):</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">in</span> <span class="n">things</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span>
+                             <span class="o">%</span> <span class="p">(</span><span class="n">objecttools</span><span class="o">.</span><span class="n">classname</span><span class="p">(</span><span class="n">thing</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public StateSequences old_states&#39;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cdef public StateSequences new_states&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modelstandardfunctions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Standard functions of the model class.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doit</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iofunctions</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new2old</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;run&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">tpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">tpl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listofmodeluserfunctions</span><span class="p">]:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">doit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do (most of) it function of the model class.&quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;                . doit&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline void doit(self, int idx):&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.idx_sim = idx&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.loaddata()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;inlets&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.update_inlets()&#39;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.run()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;outlets&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.update_outlets()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.new2old()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;senders&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.update_senders()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;fluxes&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.savedata()&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">iofunctions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Input/output functions of the model class.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;openfiles&#39;</span><span class="p">,</span> <span class="s1">&#39;closefiles&#39;</span><span class="p">,</span> <span class="s1">&#39;loaddata&#39;</span><span class="p">,</span> <span class="s1">&#39;savedata&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">func</span> <span class="o">==</span> <span class="s1">&#39;loaddata&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">func</span> <span class="o">==</span> <span class="s1">&#39;savedata&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">((</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;fluxes&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                 <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))):</span>
+                <span class="k">continue</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">func</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline void </span><span class="si">%s</span><span class="s1">(self):&#39;</span> <span class="o">%</span> <span class="n">func</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">func</span> <span class="o">==</span> <span class="s1">&#39;loaddata&#39;</span><span class="p">:</span>
+                    <span class="n">applyfuncs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,)</span>
+                <span class="k">elif</span> <span class="n">func</span> <span class="o">==</span> <span class="s1">&#39;savedata&#39;</span><span class="p">:</span>
+                    <span class="n">applyfuncs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;fluxes&#39;</span><span class="p">,</span> <span class="s1">&#39;states&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">applyfuncs</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;fluxes&#39;</span><span class="p">,</span> <span class="s1">&#39;states&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">applyfuncs</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">func</span> <span class="o">==</span> <span class="s1">&#39;closefiles&#39;</span><span class="p">:</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">()&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">(self.idx_sim)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">new2old</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;                . new2old&#39;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline void new2old(self):&#39;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;cdef int jdx0, jdx1, jdx2, jdx3, jdx4, jdx5&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.old_states.</span><span class="si">%s</span><span class="s1"> = self.new_states.</span><span class="si">%s</span><span class="s1">&#39;</span>
+                                 <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">indexing</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">):</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                            <span class="mi">2</span><span class="o">+</span><span class="n">idx</span><span class="p">,</span>
+                            <span class="s1">&#39;for jdx</span><span class="si">%d</span><span class="s1"> in range(self.states._</span><span class="si">%s</span><span class="s1">_length_</span><span class="si">%d</span><span class="s1">):&#39;</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
+                        <span class="n">indexing</span> <span class="o">+=</span> <span class="s1">&#39;jdx</span><span class="si">%d</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="n">idx</span>
+                    <span class="n">indexing</span> <span class="o">=</span> <span class="n">indexing</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                        <span class="mi">2</span><span class="o">+</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span><span class="p">,</span>
+                        <span class="s1">&#39;self.old_states.</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">] = self.new_states.</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">indexing</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpdef inline void run(self):&#39;</span><span class="p">)</span>
+        <span class="n">anything</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_RUNMETHODS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;update_&#39;</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1">()&#39;</span> <span class="o">%</span> <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="n">anything</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">anything</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">listofmodeluserfunctions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;User functions of the model class.&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="s1">&#39;new2old&#39;</span><span class="p">))</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="s1">&#39;fastaccess&#39;</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">member</span><span class="p">))):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">member</span><span class="p">))</span>
+        <span class="n">run</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;run&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">run</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="n">run</span><span class="p">))</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="s1">&#39;fastaccess&#39;</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">member</span><span class="p">))):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">member</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modeluserfunctions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">Lines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listofmodeluserfunctions</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;            . </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">funcconverter</span> <span class="o">=</span> <span class="n">FuncConverter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">funcconverter</span><span class="o">.</span><span class="n">pyxlines</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+
+<div class="viewcode-block" id="FuncConverter"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.FuncConverter">[docs]</a><span class="k">class</span> <span class="nc">FuncConverter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">funcname</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">funcname</span> <span class="o">=</span> <span class="n">funcname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">argnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">locnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">vn</span> <span class="k">for</span> <span class="n">vn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varnames</span> <span class="k">if</span> <span class="n">vn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">argnames</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sourcelines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Lines</span><span class="p">(</span><span class="o">*</span><span class="n">inspect</span><span class="o">.</span><span class="n">getsourcelines</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">collectornames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">things</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">):</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">in</span> <span class="n">things</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varnames</span><span class="p">:</span>
+                    <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;old&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varnames</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;old_states&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;new&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varnames</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;new_states&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">names</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">collectorshortcuts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">name</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collectornames</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">untypedvarnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">varnames</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectorshortcuts</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;self&#39;</span><span class="p">])]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">untypedarguments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">defline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanlines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">untypedvarnames</span>
+                <span class="k">if</span> <span class="p">((</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">defline</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="p">(</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">defline</span><span class="p">))]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">untypedinternalvarnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">untypedvarnames</span> <span class="k">if</span>
+                <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">untypedarguments</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cleanlines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cleaned code lines.</span>
+
+<span class="sd">        Implemented cleanups:</span>
+<span class="sd">          * eventually remove method version</span>
+<span class="sd">          * remove docstrings</span>
+<span class="sd">          * remove comments</span>
+<span class="sd">          * remove empty lines</span>
+<span class="sd">          * replace `modelutils` with nothing</span>
+<span class="sd">          * remove complete lines containing `fastaccess`</span>
+<span class="sd">          * replace shortcuts with complete references</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">)</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&quot;&quot;&#39;</span><span class="p">)[::</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;modelutils.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">shortcut</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collectornames</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">collectorshortcuts</span><span class="p">):</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">shortcut</span><span class="p">,</span> <span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;def </span><span class="si">%s</span><span class="s1">(self):&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">funcname</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="s1">&#39;fastaccess&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l</span><span class="p">]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">Lines</span><span class="p">(</span><span class="o">*</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pyxlines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cython code lines.</span>
+
+<span class="sd">        Assumptions:</span>
+<span class="sd">          * Function shall be a method</span>
+<span class="sd">          * Method shall be inlined</span>
+<span class="sd">          * Method returns nothing</span>
+<span class="sd">          * Method arguments are of type `int` (except self)</span>
+<span class="sd">          * Local variables are of type `int`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;    &#39;</span><span class="o">+</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanlines</span><span class="p">]</span>
+        <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;def &#39;</span><span class="p">,</span> <span class="s1">&#39;cpdef inline void &#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">untypedarguments</span><span class="p">:</span>
+            <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;, int </span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;, </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;, int </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">untypedinternalvarnames</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;        cdef int &#39;</span> <span class="o">+</span>
+                            <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">untypedinternalvarnames</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Lines</span><span class="p">(</span><span class="o">*</span><span class="n">lines</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="exp"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.exp">[docs]</a><span class="k">def</span> <span class="nf">exp</span><span class="p">(</span><span class="n">double</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cython wrapper for numpys exp function applied on a single float.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">double</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fabs"><a class="viewcode-back" href="../../../modelutils.html#hydpy.cythons.modelutils.fabs">[docs]</a><span class="k">def</span> <span class="nf">fabs</span><span class="p">(</span><span class="n">double</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cython wrapper for maths fabs function applied on a single float.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">double</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

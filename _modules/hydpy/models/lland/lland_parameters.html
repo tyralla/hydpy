@@ -1,0 +1,171 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lland.lland_parameters &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lland.lland_parameters</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+<span class="c1"># ...model specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_constants</span>
+
+
+<div class="viewcode-block" id="MultiParameter"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_parameters.MultiParameter">[docs]</a><span class="k">class</span> <span class="nc">MultiParameter</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">ZipParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of the HydPy-L-Land model</span>
+<span class="sd">    (potentially) handling multiple values.</span>
+
+<span class="sd">    Class :class:`MultiParameter` of HydPy-L-Land basically works like</span>
+<span class="sd">    Class :class:`~hydpy.models.lland.lland_parameters.MultiParameter` of</span>
+<span class="sd">    HydPy-H-Land, except that keyword arguments specific to HydPy-L-Land</span>
+<span class="sd">    are applied (acker, nadelw, wasser..., see module</span>
+<span class="sd">    :mod:`~hydpy.models.lland.lland_constants`) and except that parameter</span>
+<span class="sd">    :class:`~hydpy.models.lland.lland_control.NHRU` determines the number of</span>
+<span class="sd">    entries:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lland.lland_parameters import MultiParameter</span>
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">    &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; mp = MultiParameter()</span>
+<span class="sd">    &gt;&gt;&gt; mp.subpars = control</span>
+<span class="sd">    &gt;&gt;&gt; mp.shape</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    RuntimeError: Shape information for parameter `multiparameter` can only be retrieved after it has been defined.  You can do this manually, but usually it is done automatically by defining the value of parameter `nhru` first in each parameter control file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">MODEL_CONSTANTS</span> <span class="o">=</span> <span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">refparameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alias for the associated instance of</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_control.LNK`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">pars</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">lnk</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shapeparameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alias for the associated instance of</span>
+<span class="sd">        :class:`~hydpy.models.lland.lland_control.NHRU`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">pars</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">nhru</span></div>
+
+
+<div class="viewcode-block" id="MultiParameterLand"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_parameters.MultiParameterLand">[docs]</a><span class="k">class</span> <span class="nc">MultiParameterLand</span><span class="p">(</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of HydPy-L-Land (potentially)</span>
+<span class="sd">    handling multiple values relevant for non water HRUs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                            <span class="ow">in</span> <span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;WASSER&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MultiParameterSoil"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_parameters.MultiParameterSoil">[docs]</a><span class="k">class</span> <span class="nc">MultiParameterSoil</span><span class="p">(</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for handling parameters of HydPy-L-Land (potentially)</span>
+<span class="sd">    handling multiple values relevant for non water HRUs without sealed</span>
+<span class="sd">    surfaces.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">REQUIRED_VALUES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                            <span class="ow">in</span> <span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;WASSER&#39;</span><span class="p">,</span> <span class="s1">&#39;VERS&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="LanduseMonthParameter"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_parameters.LanduseMonthParameter">[docs]</a><span class="k">class</span> <span class="nc">LanduseMonthParameter</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">KeywordParameter2D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for parameters which values depend both an the actual</span>
+<span class="sd">    land use class and the actual month.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">COLNAMES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;jan&#39;</span><span class="p">,</span> <span class="s1">&#39;feb&#39;</span><span class="p">,</span> <span class="s1">&#39;mar&#39;</span><span class="p">,</span> <span class="s1">&#39;apr&#39;</span><span class="p">,</span> <span class="s1">&#39;mai&#39;</span><span class="p">,</span> <span class="s1">&#39;jun&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;jul&#39;</span><span class="p">,</span> <span class="s1">&#39;aug&#39;</span><span class="p">,</span> <span class="s1">&#39;sep&#39;</span><span class="p">,</span> <span class="s1">&#39;oct&#39;</span><span class="p">,</span> <span class="s1">&#39;nov&#39;</span><span class="p">,</span> <span class="s1">&#39;dec&#39;</span><span class="p">)</span>
+    <span class="n">ROWNAMES</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                     <span class="ow">in</span> <span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="ow">in</span>
+                         <span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span></div>
+
+
+<div class="viewcode-block" id="Parameters"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_parameters.Parameters">[docs]</a><span class="k">class</span> <span class="nc">Parameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">Parameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;All parameters of the HydPy-L-Land model.&quot;&quot;&quot;</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

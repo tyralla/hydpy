@@ -1,0 +1,1046 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.core.filetools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.core.filetools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">timetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">devicetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">selectiontools</span>
+
+
+<div class="viewcode-block" id="MainManager"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.MainManager">[docs]</a><span class="k">class</span> <span class="nc">MainManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">networkfile</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controlfiles</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequencefiles</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialvaluefiles</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameterfiles</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkpath</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loadinfo</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">applyinfo</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clearinfo</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_getpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">projectname</span><span class="o">+</span><span class="s1">&#39;.py&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getpath</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MainManager.checkpath"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.MainManager.checkpath">[docs]</a>    <span class="k">def</span> <span class="nf">checkpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The required project main file `</span><span class="si">%s</span><span class="s1">` does not exist.&#39;</span>
+                          <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainManager.loadinfo"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.MainManager.loadinfo">[docs]</a>    <span class="k">def</span> <span class="nf">loadinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load general information from the project&#39;s main file.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">file_</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;exec&#39;</span><span class="p">)</span>
+                <span class="n">exec</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="p">{},</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;While trying to load the general project settings &#39;</span>
+                      <span class="s1">&#39;from `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MainManager.clearinfo"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.MainManager.clearinfo">[docs]</a>    <span class="k">def</span> <span class="nf">clearinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="MainManager.applyinfo"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.MainManager.applyinfo">[docs]</a>    <span class="k">def</span> <span class="nf">applyinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timegrids2pub</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">getmanagers</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MainManager.timegrids2pub"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.MainManager.timegrids2pub">[docs]</a>    <span class="k">def</span> <span class="nf">timegrids2pub</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">timetools</span><span class="o">.</span><span class="n">Timegrids</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;The main project file `</span><span class="si">%s</span><span class="s1">` must define exactly &#39;</span>
+                              <span class="s1">&#39;1 `Timegrids` object; </span><span class="si">%d</span><span class="s1"> objects are defined &#39;</span>
+                              <span class="s1">&#39;instead.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MainManager.getmanagers"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.MainManager.getmanagers">[docs]</a>    <span class="k">def</span> <span class="nf">getmanagers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">FileClass</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NetworkManager</span><span class="p">,</span> <span class="n">ControlManager</span><span class="p">,</span>
+                          <span class="n">SequenceManager</span><span class="p">,</span> <span class="n">ConditionManager</span><span class="p">):</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">FileClass</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;The main project file `</span><span class="si">%s</span><span class="s1">` must not define &#39;</span>
+                                  <span class="s1">&#39;more then one `</span><span class="si">%s</span><span class="s1">` objects but </span><span class="si">%d</span><span class="s1"> objects &#39;</span>
+                                  <span class="s1">&#39;are defined.&#39;</span>
+                                  <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">FileClass</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                     <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)))</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">FileClass</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">selection</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">FileClass</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">FileClass</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NetworkManager"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.NetworkManager">[docs]</a><span class="k">class</span> <span class="nc">NetworkManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manager for network files.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;network&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">projectname</span>
+
+    <span class="k">def</span> <span class="nf">_getbasepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path pointing to all network directories.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span><span class="p">)</span>
+
+    <span class="n">basepath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getbasepath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Directory containing the network files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subdirectory</span>
+
+    <span class="k">def</span> <span class="nf">_setdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subdirectory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">subdirectory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;A directory `</span><span class="si">%s</span><span class="s1">` within the network base path &#39;</span>
+                          <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` does not exist.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="n">subdirectory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subdirectory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">subdirectory</span><span class="p">)</span>
+
+    <span class="n">directory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getdirectory</span><span class="p">,</span> <span class="n">_setdirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getdirpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Complete path of the directory containing the network files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
+
+    <span class="n">dirpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getdirpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getfilenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Names of the network files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">))]</span>
+
+    <span class="n">filenames</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getfilenames</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getfilepaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Complete paths of the defined networks files.&quot;&quot;&quot;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">fn</span><span class="p">)</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">]</span>
+
+    <span class="n">filepaths</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getfilepaths</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NetworkManager.load"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.NetworkManager.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load nodes and elements from all network files and return them in</span>
+<span class="sd">        a :class:`~hydpy.selectiontools.Selections` instance.  Each single</span>
+<span class="sd">        network file defines a seperate</span>
+<span class="sd">        :class:`~hydpy.selectiontools.Selection` instance.  Additionally, all</span>
+<span class="sd">        elements and nodes are bundled in a selection named `complete`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selections</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filenames</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepaths</span><span class="p">):</span>
+            <span class="c1"># Ensure both `Node` and `Element`start with a `fresh` memory.</span>
+            <span class="n">devicetools</span><span class="o">.</span><span class="n">Node</span><span class="o">.</span><span class="n">gathernewnodes</span><span class="p">()</span>
+            <span class="n">devicetools</span><span class="o">.</span><span class="n">Element</span><span class="o">.</span><span class="n">gathernewelements</span><span class="p">()</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+                    <span class="n">code</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">file_</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">path</span><span class="p">,</span> <span class="s1">&#39;exec&#39;</span><span class="p">)</span>
+                    <span class="n">exec</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="p">{},</span> <span class="n">info</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;While trying to load the network file `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">path</span>
+                <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">selections</span> <span class="o">+=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selection</span><span class="p">(</span>
+                                           <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                                           <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Node&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gathernewnodes</span><span class="p">(),</span>
+                                           <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Element&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gathernewelements</span><span class="p">())</span>
+
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;The class `</span><span class="si">%s</span><span class="s1">` cannot be loaded from the network &#39;</span>
+                         <span class="s1">&#39;file `</span><span class="si">%s</span><span class="s1">`.  Please refer to the HydPy documentation &#39;</span>
+                         <span class="s1">&#39;on how to prepare network files properly.&#39;</span>
+                         <span class="o">%</span> <span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">filename</span><span class="p">))</span>
+        <span class="n">selections</span> <span class="o">+=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selection</span><span class="p">(</span>
+                                          <span class="s1">&#39;complete&#39;</span><span class="p">,</span>
+                                          <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Node&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">registerednodes</span><span class="p">(),</span>
+                                          <span class="n">info</span><span class="p">[</span><span class="s1">&#39;Element&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">registeredelements</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">selections</span></div>
+
+<div class="viewcode-block" id="NetworkManager.save"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.NetworkManager.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selections</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save the nodes and elements from each</span>
+<span class="sd">        :class:`~hydpy.selectiontools.Selection` object contained within the</span>
+<span class="sd">        given :class:`~hydpy.selectiontools.Selections` instance to a seperate</span>
+<span class="sd">        network file of the same name.  Set `overwrite` to `True`, if you</span>
+<span class="sd">        want to overwrite already existing network files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">selections</span> <span class="o">=</span> <span class="n">selectiontools</span><span class="o">.</span><span class="n">Selections</span><span class="p">(</span><span class="n">selections</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;complete&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">name</span><span class="o">+</span><span class="s1">&#39;.py&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The path `</span><span class="si">%s</span><span class="s1">` does already exist, selection &#39;</span>
+                              <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` cannot be saved.  Please select another &#39;</span>
+                              <span class="s1">&#39;network directory or set the `overwrite` flag &#39;</span>
+                              <span class="s1">&#39;to `True`&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+                    <span class="n">file_</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;from hydpy import *</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">file_</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">selection</span><span class="o">.</span><span class="n">elements</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NetworkManager.delete"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.NetworkManager.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">selections</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete network files.  One or more filenames and/or</span>
+<span class="sd">        :class:`~hydpy.selectiontools.Selection` instances can serve as</span>
+<span class="sd">        function arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">selection</span> <span class="ow">in</span> <span class="n">selections</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+                <span class="n">name</span> <span class="o">+=</span> <span class="s1">&#39;.py&#39;</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">EnvironmentError</span><span class="p">:</span>
+                <span class="n">exception</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">exception</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;: &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">exception</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">))))</span></div>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ControlManager"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.ControlManager">[docs]</a><span class="k">class</span> <span class="nc">ControlManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manager for control parameter files.&quot;&quot;&quot;</span>
+
+    <span class="c1"># The following file path to content mapping is used to circumvent reading</span>
+    <span class="c1"># the same secondary control parameter file from disk multiple times.</span>
+    <span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;control&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">projectname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controldirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_getbasepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path pointing to all control directories.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span><span class="p">)</span>
+
+    <span class="n">basepath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getbasepath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getprojectdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Folder containing the control directories of the current project.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span>
+
+    <span class="k">def</span> <span class="nf">_setprojectdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Path `</span><span class="si">%s</span><span class="s1">` does not contain a control directory &#39;</span>
+                          <span class="s1">&#39;named `</span><span class="si">%s</span><span class="s1">`.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">directory</span>
+
+    <span class="n">projectdirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getprojectdirectory</span><span class="p">,</span> <span class="n">_setprojectdirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getprojectpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path of the project directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectdirectory</span><span class="p">)</span>
+
+    <span class="n">projectpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getprojectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getcontroldirectories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Folders containing the control files of different parameter sets.&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="n">FolderShow</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">directories</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">directories</span>
+
+    <span class="n">controldirectories</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getcontroldirectories</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getcontrolpaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the control directories.&quot;&quot;&quot;</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="n">FolderShow</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">dummy</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">controldirectories</span><span class="p">:</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">paths</span>
+
+    <span class="n">controlpaths</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getcontrolpaths</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getcontroldirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The selected (or the only selectable) control directory&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">controldirectories</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controldirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controldirectory</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain the&#39;</span>
+                              <span class="s1">&#39;specified control directory `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_controldirectory</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">directories</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain any &#39;</span>
+                          <span class="s1">&#39;control directories.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">directories</span><span class="o">.</span><span class="n">default</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple control&#39;</span>
+                          <span class="s1">&#39;directories, but none is named `default`.  &#39;</span>
+                          <span class="s1">&#39;Please specify the control directory to be &#39;</span>
+                          <span class="s1">&#39;worked with manually.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setcontroldirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_controldirectory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain a &#39;</span>
+                          <span class="s1">&#39;control directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_delcontroldirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_controldirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">controldirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getcontroldirectory</span><span class="p">,</span> <span class="n">_setcontroldirectory</span><span class="p">,</span>
+                                <span class="n">_delcontroldirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getcontrolpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the selected control directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controldirectory</span><span class="p">)</span>
+
+    <span class="n">controlpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getcontrolpath</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ControlManager.loadfile"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.ControlManager.loadfile">[docs]</a>    <span class="k">def</span> <span class="nf">loadfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the namespace of the given file (and eventually of its</span>
+<span class="sd">        subfile) as a :class:`dict`.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            * filename (:class:`str`): Any object returning a valid filename</span>
+<span class="sd">              with or without extension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">workingpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">controlpath</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The specified control path `</span><span class="si">%s</span><span class="s1">` does not exist.&#39;</span>
+                          <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">controlpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read2dict</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">info</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">workingpath</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlManager.read2dict"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.ControlManager.read2dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">read2dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reads the control parameters of the given path (and its subpaths</span>
+<span class="sd">        where appropriate) and stores it in the given :class:`dict` `info`.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            * path (:class:`str`): Any object returning a valid path</span>
+<span class="sd">              with or without extension.</span>
+<span class="sd">            * info (:class:`dict`): Target dictionary.</span>
+
+<span class="sd">        Note that the :class:`dict` `info` can be used to feed information</span>
+<span class="sd">        into the execution of control files.  Use this function only if you</span>
+<span class="sd">        are completely sure on how the control parameter import of HydPy</span>
+<span class="sd">        works.  Otherwise, you should most probably prefer to use</span>
+<span class="sd">        :func:`loadfile` or :func:`loadfiles`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">+=</span> <span class="s1">&#39;.py&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">exec</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_registry</span><span class="p">[</span><span class="n">path</span><span class="p">],</span> <span class="p">{},</span> <span class="n">info</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;While trying to load the control file `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">path</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;model&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Model parameters cannot be loaded from control &#39;</span>
+                          <span class="s1">&#39;file `</span><span class="si">%s</span><span class="s1">`.  Please refer to the HydPy &#39;</span>
+                          <span class="s1">&#39;documentation on how to prepare control files &#39;</span>
+                          <span class="s1">&#39;properly.&#39;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FolderShow"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.FolderShow">[docs]</a><span class="k">class</span> <span class="nc">FolderShow</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FolderShow.add"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.FolderShow.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">exec</span><span class="p">(</span><span class="s1">&#39;self.</span><span class="si">%s</span><span class="s1"> = r&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The directory name `</span><span class="si">%s</span><span class="s1">` cannot be handled as a &#39;</span>
+                          <span class="s1">&#39;variable name.  Please avoid arithmetic operators &#39;</span>
+                          <span class="s1">&#39;like `-`, prefixed numbers...&#39;</span> <span class="o">%</span> <span class="n">directory</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;Folders()&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;           </span><span class="si">%s</span><span class="s1">,&#39;</span> <span class="o">%</span> <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">(</span><span class="n">args</span> <span class="o">+</span> <span class="n">kwargs</span><span class="p">)]</span>
+            <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;FolderShow(&#39;</span> <span class="o">+</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">11</span><span class="p">:]</span>
+            <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SequenceManager"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.SequenceManager">[docs]</a><span class="k">class</span> <span class="nc">SequenceManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manager for sequence files.&quot;&quot;&quot;</span>
+
+    <span class="n">_supportedmodes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;npy&#39;</span><span class="p">,</span> <span class="s1">&#39;asc&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projectdirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputdirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">outputdirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodedirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tempdirectory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">inputfiletype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputfiletype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodefiletype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;sequences&#39;</span>
+        <span class="k">if</span> <span class="n">projectdirectory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projectdirectory</span> <span class="o">=</span> <span class="n">projectdirectory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">projectname</span>
+        <span class="k">if</span> <span class="n">inputdirectory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputdirectory</span> <span class="o">=</span> <span class="n">inputdirectory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_inputdirectory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">outputdirectory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputdirectory</span> <span class="o">=</span> <span class="n">outputdirectory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_outputdirectory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">nodedirectory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodedirectory</span> <span class="o">=</span> <span class="n">nodedirectory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nodedirectory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">tempdirectory</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tempdirectory</span> <span class="o">=</span> <span class="n">tempdirectory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tempdirectory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">inputfiletype</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputfiletype</span> <span class="o">=</span> <span class="n">inputfiletype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_inputfiletype</span> <span class="o">=</span> <span class="s1">&#39;npy&#39;</span>
+        <span class="k">if</span> <span class="n">outputfiletype</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputfiletype</span> <span class="o">=</span> <span class="n">outputfiletype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_outputfiletype</span> <span class="o">=</span> <span class="s1">&#39;npy&#39;</span>
+        <span class="k">if</span> <span class="n">outputfiletype</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputfiletype</span> <span class="o">=</span> <span class="n">outputfiletype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_outputfiletype</span> <span class="o">=</span> <span class="s1">&#39;npy&#39;</span>
+        <span class="k">if</span> <span class="n">nodefiletype</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodefiletype</span> <span class="o">=</span> <span class="n">nodefiletype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nodefiletype</span> <span class="o">=</span> <span class="s1">&#39;npy&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputoverwrite</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputoverwrite</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simoverwrite</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsoverwrite</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_getbasepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path pointing to all sequence directories.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span><span class="p">)</span>
+    <span class="n">basepath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getbasepath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getprojectdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Folder containing the file directories of the current project.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span>
+
+    <span class="k">def</span> <span class="nf">_setprojectdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Path `</span><span class="si">%s</span><span class="s1">` does not contain a directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">directory</span>
+
+    <span class="n">projectdirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getprojectdirectory</span><span class="p">,</span> <span class="n">_setprojectdirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getprojectpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path of the project directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectdirectory</span><span class="p">)</span>
+
+    <span class="n">projectpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getprojectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getsequencedirectories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Folders containing the different input/output/temp sequences.&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="n">FolderShow</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">directories</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">directories</span>
+
+    <span class="n">sequencedirectories</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getsequencedirectories</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getsequencepaths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the sequence directories.&quot;&quot;&quot;</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="n">FolderShow</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequencedirectories</span><span class="p">:</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">paths</span>
+
+    <span class="n">sequencepaths</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getsequencepaths</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getinputdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The selected (or the only selectable) input sequence directory.&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequencedirectories</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputdirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputdirectory</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain the&#39;</span>
+                              <span class="s1">&#39;specified input sequence directory `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputdirectory</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">directories</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain any &#39;</span>
+                          <span class="s1">&#39;sequence directories.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">directories</span><span class="o">.</span><span class="n">input</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple &#39;</span>
+                              <span class="s1">&#39;sequence directories, but none is named &#39;</span>
+                              <span class="s1">&#39;`input`.  Please specify the input sequence &#39;</span>
+                              <span class="s1">&#39;directory to be worked with manually.&#39;</span>
+                              <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setinputdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_inputdirectory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain sequence &#39;</span>
+                          <span class="s1">&#39;directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_delinputdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputdirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">inputdirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getinputdirectory</span><span class="p">,</span> <span class="n">_setinputdirectory</span><span class="p">,</span>
+                              <span class="n">_delinputdirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getoutputdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The selected (or the only selectable) output sequence directory.&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequencedirectories</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputdirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputdirectory</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain the&#39;</span>
+                              <span class="s1">&#39;specified output sequence directory `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputdirectory</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">directories</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain any &#39;</span>
+                          <span class="s1">&#39;sequence directories.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">directories</span><span class="o">.</span><span class="n">output</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple &#39;</span>
+                              <span class="s1">&#39;sequence directories, but none is named &#39;</span>
+                              <span class="s1">&#39;`output`.  Please specify the sequence &#39;</span>
+                              <span class="s1">&#39;directory to be worked with manually.&#39;</span>
+                              <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setoutputdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_outputdirectory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain sequence &#39;</span>
+                          <span class="s1">&#39;directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_deloutputdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputdirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">outputdirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getoutputdirectory</span><span class="p">,</span> <span class="n">_setoutputdirectory</span><span class="p">,</span>
+                               <span class="n">_deloutputdirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getnodedirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The selected (or the only selectable) node sequence directory.&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequencedirectories</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodedirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodedirectory</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain the&#39;</span>
+                              <span class="s1">&#39;specified node sequence directory `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodedirectory</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">directories</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain any &#39;</span>
+                          <span class="s1">&#39;sequence directories.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">directories</span><span class="o">.</span><span class="n">node</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple &#39;</span>
+                              <span class="s1">&#39;sequence directories, but none is named &#39;</span>
+                              <span class="s1">&#39;`node`.  Please specify the node sequence &#39;</span>
+                              <span class="s1">&#39;directory to be worked with manually.&#39;</span>
+                              <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setnodedirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nodedirectory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain sequence &#39;</span>
+                          <span class="s1">&#39;directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_delnodedirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodedirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">nodedirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getnodedirectory</span><span class="p">,</span> <span class="n">_setnodedirectory</span><span class="p">,</span>
+                             <span class="n">_delnodedirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_gettempdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The selected (or the only selectable) temporary sequence directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequencedirectories</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tempdirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tempdirectory</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain the&#39;</span>
+                              <span class="s1">&#39;specified temporary sequence directory `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tempdirectory</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">directories</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain any &#39;</span>
+                          <span class="s1">&#39;sequence directories.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">directories</span><span class="o">.</span><span class="n">temp</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple &#39;</span>
+                              <span class="s1">&#39;sequence directories, but none is named &#39;</span>
+                              <span class="s1">&#39;`temp`.  Please specify the temporary sequence &#39;</span>
+                              <span class="s1">&#39;directory to be worked with manually.&#39;</span>
+                              <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_settempdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tempdirectory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain sequence &#39;</span>
+                          <span class="s1">&#39;directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_deltempdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tempdirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">tempdirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_gettempdirectory</span><span class="p">,</span> <span class="n">_settempdirectory</span><span class="p">,</span>
+                             <span class="n">_deltempdirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getinputpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the selected input sequence directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputdirectory</span><span class="p">)</span>
+    <span class="n">inputpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getinputpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getoutputpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the selected output sequence directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputdirectory</span><span class="p">)</span>
+    <span class="n">outputpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getoutputpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getnodepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the selected node sequence directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodedirectory</span><span class="p">)</span>
+    <span class="n">nodepath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getnodepath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_gettemppath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the selected temporary sequence directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempdirectory</span><span class="p">)</span>
+
+    <span class="n">temppath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_gettemppath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getinputfiletype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;File type of the external input files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputfiletype</span>
+
+    <span class="k">def</span> <span class="nf">_setinputfiletype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfiletype</span><span class="p">):</span>
+        <span class="n">inputfiletype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">inputfiletype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inputfiletype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supportedmodes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_inputfiletype</span> <span class="o">=</span> <span class="n">inputfiletype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;The given input file type `</span><span class="si">%s</span><span class="s1">` is not &#39;</span>
+                                      <span class="s1">&#39;implemented yet.  Please choose one &#39;</span>
+                                      <span class="s1">&#39;of the following file types: </span><span class="si">%s</span><span class="s1">.&#39;</span>
+                                      <span class="o">%</span> <span class="p">(</span><span class="n">inputfiletype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supportedmodes</span><span class="p">))</span>
+
+    <span class="n">inputfiletype</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getinputfiletype</span><span class="p">,</span> <span class="n">_setinputfiletype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getoutputfiletype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;File type of the external output files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputfiletype</span>
+
+    <span class="k">def</span> <span class="nf">_setoutputfiletype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputfiletype</span><span class="p">):</span>
+        <span class="n">outputfiletype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">outputfiletype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outputfiletype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supportedmodes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_outputfiletype</span> <span class="o">=</span> <span class="n">outputfiletype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;The given output file type `</span><span class="si">%s</span><span class="s1">` is not &#39;</span>
+                                      <span class="s1">&#39;implemented yet.  Please choose one &#39;</span>
+                                      <span class="s1">&#39;of the following file types: </span><span class="si">%s</span><span class="s1">.&#39;</span>
+                                      <span class="o">%</span> <span class="p">(</span><span class="n">outputfiletype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supportedmodes</span><span class="p">))</span>
+
+    <span class="n">outputfiletype</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getoutputfiletype</span><span class="p">,</span> <span class="n">_setoutputfiletype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getnodefiletype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;File type of the external node files.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodefiletype</span>
+
+    <span class="k">def</span> <span class="nf">_setnodefiletype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodefiletype</span><span class="p">):</span>
+        <span class="n">nodefiletype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">nodefiletype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nodefiletype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supportedmodes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nodefiletype</span> <span class="o">=</span> <span class="n">nodefiletype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;The given node file type `</span><span class="si">%s</span><span class="s1">` is not &#39;</span>
+                                      <span class="s1">&#39;implemented yet.  Please choose one &#39;</span>
+                                      <span class="s1">&#39;of the following file types: </span><span class="si">%s</span><span class="s1">.&#39;</span>
+                                      <span class="o">%</span> <span class="p">(</span><span class="n">nodefiletype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supportedmodes</span><span class="p">))</span>
+
+    <span class="n">nodefiletype</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getnodefiletype</span><span class="p">,</span> <span class="n">_setnodefiletype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getinputoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputoverwrite</span>
+
+    <span class="k">def</span> <span class="nf">_setinputoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputoverwrite</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">inputoverwrite</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getinputoverwrite</span><span class="p">,</span> <span class="n">_setinputoverwrite</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getoutputoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputoverwrite</span>
+
+    <span class="k">def</span> <span class="nf">_setoutputoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputoverwrite</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">outputoverwrite</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getoutputoverwrite</span><span class="p">,</span> <span class="n">_setoutputoverwrite</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getsimoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simoverwrite</span>
+
+    <span class="k">def</span> <span class="nf">_setsimoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simoverwrite</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">simoverwrite</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getsimoverwrite</span><span class="p">,</span> <span class="n">_setsimoverwrite</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getobsoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obsoverwrite</span>
+
+    <span class="k">def</span> <span class="nf">_setobsoverwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obsoverwrite</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">obsoverwrite</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getobsoverwrite</span><span class="p">,</span> <span class="n">_setobsoverwrite</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConditionManager"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.ConditionManager">[docs]</a><span class="k">class</span> <span class="nc">ConditionManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manager for condition files.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span> <span class="o">=</span> <span class="s1">&#39;conditions&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">projectname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaddirectory</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_savedirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_getbasepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path pointing to all condition directories.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BASEDIRECTORY</span><span class="p">)</span>
+
+    <span class="n">basepath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getbasepath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getprojectdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Folder containing the condition directories of the current</span>
+<span class="sd">        project.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span>
+
+    <span class="k">def</span> <span class="nf">_setprojectdirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Path `</span><span class="si">%s</span><span class="s1">` does not contain a condition directory &#39;</span>
+                          <span class="s1">&#39;named `</span><span class="si">%s</span><span class="s1">`.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projectdirectory</span> <span class="o">=</span> <span class="n">directory</span>
+
+    <span class="n">projectdirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getprojectdirectory</span><span class="p">,</span> <span class="n">_setprojectdirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getprojectpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute path of the project directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectdirectory</span><span class="p">)</span>
+
+    <span class="n">projectpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getprojectpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getconditiondirectories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Folders containing the condition files of e.g. different time</span>
+<span class="sd">        points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="n">FolderShow</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">directories</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">directories</span>
+
+    <span class="n">conditiondirectories</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getconditiondirectories</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getloaddirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The selected (or only selectable) initial conditions directory&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditiondirectories</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaddirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaddirectory</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain the&#39;</span>
+                              <span class="s1">&#39;specified conditions directory `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaddirectory</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain any &#39;</span>
+                          <span class="s1">&#39;conditions directories.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;init_&#39;</span> <span class="o">+</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">firstdate</span><span class="o">.</span><span class="n">string</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple condition&#39;</span>
+                          <span class="s1">&#39;directories, and no first simulation date is &#39;</span>
+                          <span class="s1">&#39;available to determine the relevant one.  &#39;</span>
+                          <span class="s1">&#39;Please specify the condition directory to be &#39;</span>
+                          <span class="s1">&#39;worked with manually.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple condition&#39;</span>
+                          <span class="s1">&#39;directories, but none is in accordance with the  &#39;</span>
+                          <span class="s1">&#39;first simulation date (</span><span class="si">%s</span><span class="s1">).  Please specify&#39;</span>
+                          <span class="s1">&#39;the condition directory to be worked with manually.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">string</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_setloaddirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loaddirectory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain a &#39;</span>
+                          <span class="s1">&#39;condition directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_delloaddirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaddirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">loaddirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getloaddirectory</span><span class="p">,</span> <span class="n">_setloaddirectory</span><span class="p">,</span>
+                             <span class="n">_delloaddirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getsavedirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The selected (or only selectable) final conditions directory&quot;&quot;&quot;</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditiondirectories</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_savedirectory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_savedirectory</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain the&#39;</span>
+                              <span class="s1">&#39;specified conditions directory `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_savedirectory</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">directories</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain any &#39;</span>
+                          <span class="s1">&#39;conditions directories.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="s1">&#39;init_&#39;</span> <span class="o">+</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">lastdate</span><span class="o">.</span><span class="n">string</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple condition&#39;</span>
+                          <span class="s1">&#39;directories, and no last simulation date is &#39;</span>
+                          <span class="s1">&#39;available to determine the relevant one.  &#39;</span>
+                          <span class="s1">&#39;Please specify the condition directory to be &#39;</span>
+                          <span class="s1">&#39;worked with manually.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">directories</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` contains multiple condition&#39;</span>
+                          <span class="s1">&#39;directories, but none is in accordance with the  &#39;</span>
+                          <span class="s1">&#39;last simulation date (</span><span class="si">%s</span><span class="s1">).  Please specify&#39;</span>
+                          <span class="s1">&#39;the condition directory to be worked with manually.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">string</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_setsavedirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_savedirectory</span> <span class="o">=</span> <span class="n">directory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The project path `</span><span class="si">%s</span><span class="s1">` does not contain a &#39;</span>
+                          <span class="s1">&#39;condition directory named `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="n">directory</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_delsavedirectory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaddirectory</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">savedirectory</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getsavedirectory</span><span class="p">,</span> <span class="n">_setsavedirectory</span><span class="p">,</span>
+                             <span class="n">_delsavedirectory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getloadpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the relevant initial condition directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaddirectory</span><span class="p">)</span>
+
+    <span class="n">loadpath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getloadpath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_getsavepath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Absolute paths of the relevant final condition directory.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectpath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">savedirectory</span><span class="p">)</span>
+
+    <span class="n">savepath</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getsavepath</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConditionManager.loadfile"><a class="viewcode-back" href="../../../filetools.html#hydpy.core.filetools.ConditionManager.loadfile">[docs]</a>    <span class="k">def</span> <span class="nf">loadfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+            <span class="n">filename</span> <span class="o">+=</span> <span class="s1">&#39;.py&#39;</span>
+        <span class="k">if</span> <span class="n">dirname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pub</span><span class="o">.</span><span class="n">conditionmanager</span><span class="o">.</span><span class="n">loadpath</span><span class="p">)</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">file_</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;While trying to read the conditions file `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">filepath</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

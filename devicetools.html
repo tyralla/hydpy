@@ -1,0 +1,383 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>devicetools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="filetools" href="filetools.html" />
+    <link rel="prev" title="Framework Modules" href="framework.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="filetools.html" title="filetools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="framework.html" title="Framework Modules"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" accesskey="U">Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="devicetools">
+<span id="id1"></span><h1>devicetools<a class="headerlink" href="#devicetools" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.core.devicetools"></span><dl class="class">
+<dt id="hydpy.core.devicetools.Device">
+<em class="property">class </em><code class="descclassname">hydpy.core.devicetools.</code><code class="descname">Device</code><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="hydpy.core.devicetools.Device.name">
+<code class="descname">name</code><a class="headerlink" href="#hydpy.core.devicetools.Device.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the actual device (node or element).</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="hydpy.core.devicetools.Device.clearregistry">
+<em class="property">classmethod </em><code class="descname">clearregistry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Device.clearregistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Device.clearregistry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="hydpy.core.devicetools.Device.registerednames">
+<em class="property">classmethod </em><code class="descname">registerednames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Device.registerednames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Device.registerednames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all names of <a class="reference internal" href="#hydpy.core.devicetools.Device" title="hydpy.core.devicetools.Device"><code class="xref py py-class docutils literal"><span class="pre">Device</span></code></a> objects initialized so far.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.devicetools.Node">
+<em class="property">class </em><code class="descclassname">hydpy.core.devicetools.</code><code class="descname">Node</code><span class="sig-paren">(</span><em>name</em>, <em>variable=None</em>, <em>route=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.devicetools.Device" title="hydpy.core.devicetools.Device"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.devicetools.Device</span></code></a></p>
+<p>readobs = False
+readext = False
+passsim = True
+passobs = False
+passext = False</p>
+<dl class="attribute">
+<dt id="hydpy.core.devicetools.Node.ROUTING_MODES">
+<code class="descname">ROUTING_MODES</code><em class="property"> = ('newsim', 'obs', 'oldsim')</em><a class="headerlink" href="#hydpy.core.devicetools.Node.ROUTING_MODES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.devicetools.Node.variable">
+<code class="descname">variable</code><a class="headerlink" href="#hydpy.core.devicetools.Node.variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>The variable handled by the respective node instance.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="hydpy.core.devicetools.Node.predefinevariable">
+<em class="property">classmethod </em><code class="descname">predefinevariable</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.predefinevariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.predefinevariable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="hydpy.core.devicetools.Node.registerednodes">
+<em class="property">classmethod </em><code class="descname">registerednodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.registerednodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.registerednodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all <a class="reference internal" href="#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> objects initialized so far.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="hydpy.core.devicetools.Node.gathernewnodes">
+<em class="property">classmethod </em><code class="descname">gathernewnodes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.gathernewnodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.gathernewnodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gather all <cite>new</cite> <a class="reference internal" href="#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> objects. <a class="reference internal" href="#hydpy.core.devicetools.Node" title="hydpy.core.devicetools.Node"><code class="xref py py-class docutils literal"><span class="pre">Node</span></code></a> objects
+are deemed to be new if their constructor has been called since the
+last usage of this method.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.devicetools.Node.routingmode">
+<code class="descname">routingmode</code><a class="headerlink" href="#hydpy.core.devicetools.Node.routingmode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.getdouble_via_exits">
+<code class="descname">getdouble_via_exits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.getdouble_via_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.getdouble_via_exits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.getdouble_via_entries">
+<code class="descname">getdouble_via_entries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.getdouble_via_entries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.getdouble_via_entries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><em>idx=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.prepare_allseries">
+<code class="descname">prepare_allseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.prepare_allseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.prepare_allseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.prepare_simseries">
+<code class="descname">prepare_simseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.prepare_simseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.prepare_simseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.prepare_obsseries">
+<code class="descname">prepare_obsseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.prepare_obsseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.prepare_obsseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.comparisonplot">
+<code class="descname">comparisonplot</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.comparisonplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.comparisonplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Node.assignrepr">
+<code class="descname">assignrepr</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Node.assignrepr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Node.assignrepr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.devicetools.Element">
+<em class="property">class </em><code class="descclassname">hydpy.core.devicetools.</code><code class="descname">Element</code><span class="sig-paren">(</span><em>name</em>, <em>inlets=None</em>, <em>outlets=None</em>, <em>receivers=None</em>, <em>senders=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.devicetools.Device" title="hydpy.core.devicetools.Device"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.devicetools.Device</span></code></a></p>
+<dl class="classmethod">
+<dt id="hydpy.core.devicetools.Element.registeredelements">
+<em class="property">classmethod </em><code class="descname">registeredelements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.registeredelements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.registeredelements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all <a class="reference internal" href="#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a> objects initialized so far.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="hydpy.core.devicetools.Element.gathernewelements">
+<em class="property">classmethod </em><code class="descname">gathernewelements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.gathernewelements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.gathernewelements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gather all <cite>new</cite> <a class="reference internal" href="#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a> objects. <a class="reference internal" href="#hydpy.core.devicetools.Element" title="hydpy.core.devicetools.Element"><code class="xref py py-class docutils literal"><span class="pre">Element</span></code></a> objects
+are deemed to be new if their constructor has been called since the
+last usage of this method.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.devicetools.Element.variables">
+<code class="descname">variables</code><a class="headerlink" href="#hydpy.core.devicetools.Element.variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.initmodel">
+<code class="descname">initmodel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.initmodel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.initmodel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.prepare_allseries">
+<code class="descname">prepare_allseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.prepare_allseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.prepare_allseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.prepare_inputseries">
+<code class="descname">prepare_inputseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.prepare_inputseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.prepare_inputseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.prepare_fluxseries">
+<code class="descname">prepare_fluxseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.prepare_fluxseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.prepare_fluxseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.prepare_stateseries">
+<code class="descname">prepare_stateseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.prepare_stateseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.prepare_stateseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.inputplot">
+<code class="descname">inputplot</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.inputplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.inputplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.fluxplot">
+<code class="descname">fluxplot</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.fluxplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.fluxplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.stateplot">
+<code class="descname">stateplot</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.stateplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.stateplot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Element.assignrepr">
+<code class="descname">assignrepr</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Element.assignrepr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Element.assignrepr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#repr" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">repr()</span></code></a> string with an prefixed assignement.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><ul class="first last simple">
+<li>prefix(<a class="reference external" href="https://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>): Usually something like ‘x = ‘.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.devicetools.Devices">
+<em class="property">class </em><code class="descclassname">hydpy.core.devicetools.</code><code class="descname">Devices</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="hydpy.core.devicetools.Devices.names">
+<code class="descname">names</code><a class="headerlink" href="#hydpy.core.devicetools.Devices.names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.devicetools.Devices.devices">
+<code class="descname">devices</code><a class="headerlink" href="#hydpy.core.devicetools.Devices.devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Devices.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Devices.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Devices.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a shallow copy of the actual <a class="reference internal" href="#hydpy.core.devicetools.Elements" title="hydpy.core.devicetools.Elements"><code class="xref py py-class docutils literal"><span class="pre">Elements</span></code></a> instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Devices.assignrepr">
+<code class="descname">assignrepr</code><span class="sig-paren">(</span><em>prefix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Devices.assignrepr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Devices.assignrepr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.devicetools.Nodes">
+<em class="property">class </em><code class="descclassname">hydpy.core.devicetools.</code><code class="descname">Nodes</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.devicetools.Devices" title="hydpy.core.devicetools.Devices"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.devicetools.Devices</span></code></a></p>
+<dl class="method">
+<dt id="hydpy.core.devicetools.Nodes.prepare_allseries">
+<code class="descname">prepare_allseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Nodes.prepare_allseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Nodes.prepare_allseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Nodes.prepare_simseries">
+<code class="descname">prepare_simseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Nodes.prepare_simseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Nodes.prepare_simseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Nodes.prepare_obsseries">
+<code class="descname">prepare_obsseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Nodes.prepare_obsseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Nodes.prepare_obsseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.core.devicetools.Elements">
+<em class="property">class </em><code class="descclassname">hydpy.core.devicetools.</code><code class="descname">Elements</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#hydpy.core.devicetools.Devices" title="hydpy.core.devicetools.Devices"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.devicetools.Devices</span></code></a></p>
+<dl class="method">
+<dt id="hydpy.core.devicetools.Elements.prepare_allseries">
+<code class="descname">prepare_allseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Elements.prepare_allseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Elements.prepare_allseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Elements.prepare_inputseries">
+<code class="descname">prepare_inputseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Elements.prepare_inputseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Elements.prepare_inputseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Elements.prepare_fluxseries">
+<code class="descname">prepare_fluxseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Elements.prepare_fluxseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Elements.prepare_fluxseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="hydpy.core.devicetools.Elements.prepare_stateseries">
+<code class="descname">prepare_stateseries</code><span class="sig-paren">(</span><em>ramflag=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/core/devicetools.html#Elements.prepare_stateseries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.devicetools.Elements.prepare_stateseries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="framework.html"
+                        title="previous chapter">Framework Modules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="filetools.html"
+                        title="next chapter">filetools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/devicetools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="filetools.html" title="filetools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="framework.html" title="Framework Modules"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" >Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

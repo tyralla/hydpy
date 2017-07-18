@@ -1,0 +1,228 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.hland.hland_states &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.hland.hland_states</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...from site-packages</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.hland.hland_constants</span> <span class="k">import</span> <span class="n">ILAKE</span>
+
+
+<div class="viewcode-block" id="Ic"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.Ic">[docs]</a><span class="k">class</span> <span class="nc">Ic</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interception storage [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Ic.trim"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.Ic.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with :math:`IC \\leq ICMAX`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nmbzones(5)</span>
+<span class="sd">        &gt;&gt;&gt; icmax(2.)</span>
+<span class="sd">        &gt;&gt;&gt; states.ic(-1.,0., 1., 2., 3.)</span>
+<span class="sd">        &gt;&gt;&gt; states.ic</span>
+<span class="sd">        ic(0.0, 0.0, 1.0, 2.0, 2.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">control</span><span class="o">.</span><span class="n">icmax</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SP"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.SP">[docs]</a><span class="k">class</span> <span class="nc">SP</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Frozen water stored in the snow layer [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SP.trim"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.SP.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim values in accordance with :math:`WC \\leq WHC \\cdot SP`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nmbzones(7)</span>
+<span class="sd">        &gt;&gt;&gt; whc(.1)</span>
+<span class="sd">        &gt;&gt;&gt; states.wc.values = -1., 0., 1., -1., 0., .5, 1.</span>
+<span class="sd">        &gt;&gt;&gt; states.sp(-1., 0., 0., 5., 5., 5., 5.)</span>
+<span class="sd">        &gt;&gt;&gt; states.sp</span>
+<span class="sd">        sp(0.0, 0.0, 10.0, 5.0, 5.0, 5.0, 10.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">whc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">whc</span>
+        <span class="n">wc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">wc</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wc</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">lower</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">wc</span><span class="o">/</span><span class="n">whc</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lower</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WC"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.WC">[docs]</a><span class="k">class</span> <span class="nc">WC</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Liquid water content of the snow layer [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WC.trim"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.WC.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim values in accordance with :math:`WC \\leq WHC \\cdot SP`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nmbzones(7)</span>
+<span class="sd">        &gt;&gt;&gt; whc(.1)</span>
+<span class="sd">        &gt;&gt;&gt; states.sp = 0., 0., 0., 5., 5., 5., 5.</span>
+<span class="sd">        &gt;&gt;&gt; states.wc(-1., 0., 1., -1., 0., .5, 1.)</span>
+<span class="sd">        &gt;&gt;&gt; states.wc</span>
+<span class="sd">        wc(0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">whc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">whc</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">sp</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">whc</span><span class="o">*</span><span class="n">sp</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SM"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.SM">[docs]</a><span class="k">class</span> <span class="nc">SM</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Soil moisture [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SM.trim"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.SM.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim values in accordance with :math:`SM \\leq FC`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nmbzones(5)</span>
+<span class="sd">        &gt;&gt;&gt; fc(200.)</span>
+<span class="sd">        &gt;&gt;&gt; states.sm(-100.,0., 100., 200., 300.)</span>
+<span class="sd">        &gt;&gt;&gt; states.sm</span>
+<span class="sd">        sm(0.0, 0.0, 100.0, 200.0, 200.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">fc</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UZ"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.UZ">[docs]</a><span class="k">class</span> <span class="nc">UZ</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Storage in the upper zone layer [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LZ"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.LZ">[docs]</a><span class="k">class</span> <span class="nc">LZ</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Storage in the lower zone layer [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LZ.trim"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.LZ.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim negative value whenever there is no internal lake within</span>
+<span class="sd">        the respective subbasin.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.hland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nmbzones(2)</span>
+<span class="sd">        &gt;&gt;&gt; zonetype(FIELD, ILAKE)</span>
+<span class="sd">        &gt;&gt;&gt; states.lz(-1.)</span>
+<span class="sd">        &gt;&gt;&gt; states.lz</span>
+<span class="sd">        lz(-1.0)</span>
+<span class="sd">        &gt;&gt;&gt; zonetype(FIELD, FOREST)</span>
+<span class="sd">        &gt;&gt;&gt; states.lz(-1.0)</span>
+<span class="sd">        &gt;&gt;&gt; states.lz</span>
+<span class="sd">        lz(0.0)</span>
+<span class="sd">        &gt;&gt;&gt; states.lz(1.)</span>
+<span class="sd">        &gt;&gt;&gt; states.lz</span>
+<span class="sd">        lz(1.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">control</span><span class="o">.</span><span class="n">zonetype</span> <span class="o">==</span> <span class="n">ILAKE</span><span class="p">):</span>
+                <span class="n">lower</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="StateSequences"><a class="viewcode-back" href="../../../../HydPy-H-Land.html#hydpy.models.hland.hland_states.StateSequences">[docs]</a><span class="k">class</span> <span class="nc">StateSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;State sequences of the HydPy-H-Land model.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">Ic</span><span class="p">,</span> <span class="n">SP</span><span class="p">,</span> <span class="n">WC</span><span class="p">,</span> <span class="n">SM</span><span class="p">,</span> <span class="n">UZ</span><span class="p">,</span> <span class="n">LZ</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

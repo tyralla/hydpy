@@ -1,0 +1,814 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lland.lland_control &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lland.lland_control</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># ...from site-packages</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">timetools</span>
+<span class="c1"># ...model specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_constants</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_parameters</span>
+
+
+<div class="viewcode-block" id="FT"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.FT">[docs]</a><span class="k">class</span> <span class="nc">FT</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Teileinzugsgebietsfläche (subbasin area) [km²].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">1e-10</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NHRU"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.NHRU">[docs]</a><span class="k">class</span> <span class="nc">NHRU</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Anzahl der Hydrotope (number of hydrological response units) [-].</span>
+
+<span class="sd">    Note that :class:`NHRU` determines the length of most 1-dimensional</span>
+<span class="sd">    HydPy-L-Land parameters and sequences.  This required that the value of</span>
+<span class="sd">    the respective :class:`NHRU` instance is set before any of the values</span>
+<span class="sd">    of these 1-dimensional parameters or sequences are set.  Changing the</span>
+<span class="sd">    value of the :class:`NHRU` instance necessitates setting their values</span>
+<span class="sd">    again.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(5)</span>
+<span class="sd">        &gt;&gt;&gt; control.kg.shape</span>
+<span class="sd">        (5,)</span>
+<span class="sd">        &gt;&gt;&gt; fluxes.tkor.shape</span>
+<span class="sd">        (5,)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The prefered way to pass a value to :class:`NHRU` instances</span>
+<span class="sd">        within parameter control files.  Sets the shape of the associated</span>
+<span class="sd">        1-dimensional parameter and sequence objects additionally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">_name</span><span class="p">,</span> <span class="n">subpars</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">pars</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subpars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">par</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">par</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">_name</span><span class="p">,</span> <span class="n">subseqs</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">pars</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">seq</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;moy&#39;</span><span class="p">):</span>
+                    <span class="n">seq</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="FHRU"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.FHRU">[docs]</a><span class="k">class</span> <span class="nc">FHRU</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flächenanteile der Hydrotope (area percentages of the respective</span>
+<span class="sd">    HRUs) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Lnk"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.Lnk">[docs]</a><span class="k">class</span> <span class="nc">Lnk</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Landnutzungsklasse (land use class) [-].</span>
+
+<span class="sd">    For increasing legibility, the HydPy-L-Land constants are used for string</span>
+<span class="sd">    representions of :class:`Lnk` instances:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">    &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; nhru(4)</span>
+<span class="sd">    &gt;&gt;&gt; lnk(ACKER, ACKER, WASSER, MISCHW)</span>
+<span class="sd">    &gt;&gt;&gt; lnk.values</span>
+<span class="sd">    array([ 4,  4, 16, 15])</span>
+<span class="sd">    &gt;&gt;&gt; lnk</span>
+<span class="sd">    lnk(ACKER, ACKER, WASSER, MISCHW)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">SPAN</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="nb">max</span><span class="p">(</span><span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+<div class="viewcode-block" id="Lnk.compressrepr"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.Lnk.compressrepr">[docs]</a>    <span class="k">def</span> <span class="nf">compressrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list which contains a string representation with land</span>
+<span class="sd">        uses beeing defined by the constants</span>
+<span class="sd">        :const:`~hydpy.models.lland.lland_constants.SIED_D`,</span>
+<span class="sd">        :const:`~hydpy.models.lland.lland_constants.SIED_L`...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">invmap</span> <span class="o">=</span> <span class="p">{</span><span class="n">value</span><span class="p">:</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span>
+                  <span class="n">lland_constants</span><span class="o">.</span><span class="n">CONSTANTS</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">invmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                          <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)]</span></div></div>
+
+
+<div class="viewcode-block" id="HNN"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.HNN">[docs]</a><span class="k">class</span> <span class="nc">HNN</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Höhe über Normal-Null (height above sea level) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KG"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.KG">[docs]</a><span class="k">class</span> <span class="nc">KG</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Niederschlagskorrekturfaktor (adjustment factor for precipitation)</span>
+<span class="sd">    [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KT"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.KT">[docs]</a><span class="k">class</span> <span class="nc">KT</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Temperaturkorrektursummand (adjustment summand for air temperature)</span>
+<span class="sd">    [°C].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KE"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.KE">[docs]</a><span class="k">class</span> <span class="nc">KE</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Grasreferenzverdunstungskorrekturfaktor (adjustment factor for</span>
+<span class="sd">    reference evapotranspiration) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="KF"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.KF">[docs]</a><span class="k">class</span> <span class="nc">KF</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Küstenfaktor (&quot;coast factor&quot; of Turc-Wendling&#39;s evaporation equation</span>
+<span class="sd">    [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="o">.</span><span class="mi">6</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FLn"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.FLn">[docs]</a><span class="k">class</span> <span class="nc">FLn</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">LanduseMonthParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Landnutzungsabhängiger Verdunstungsfaktor (factor for adjusting</span>
+<span class="sd">    reference evapotranspiration to different land use classes) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HInz"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.HInz">[docs]</a><span class="k">class</span> <span class="nc">HInz</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interzeptionskapazität bezogen auf die Blattoberfläche (interception</span>
+<span class="sd">    capacity normalized to the leaf surface area) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LAI"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.LAI">[docs]</a><span class="k">class</span> <span class="nc">LAI</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">LanduseMonthParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Blattflächenindex (leaf area index) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TRefT"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.TRefT">[docs]</a><span class="k">class</span> <span class="nc">TRefT</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterLand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lufttemperaturgrenzwert des grundlegenden Grad-Tag-Verfahrens</span>
+<span class="sd">    (air temperature threshold of the degree-day method) [°C].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TRefN"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.TRefN">[docs]</a><span class="k">class</span> <span class="nc">TRefN</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterLand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Niederschlagstemperaturgrenzwert des erweiterten Grad-Tag-Verfahrens</span>
+<span class="sd">    (precipitation temperature threshold of the degree-day method) [°C].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TGr"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.TGr">[docs]</a><span class="k">class</span> <span class="nc">TGr</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterLand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Temperaturgrenzwert flüssiger/fester Niederschlag (threshold</span>
+<span class="sd">    temperature liquid/frozen precipitation) [°C].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TSp"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.TSp">[docs]</a><span class="k">class</span> <span class="nc">TSp</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterLand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Temperaturspanne flüssiger/fester Niederschlag (temperature range</span>
+<span class="sd">    with mixed precipitation) [°C].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">INIT</span> <span class="o">=</span> <span class="mf">0.</span></div>
+
+
+<div class="viewcode-block" id="GTF"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.GTF">[docs]</a><span class="k">class</span> <span class="nc">GTF</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterLand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Grad-Tag-Faktor (factor of the degree-day method) [mm/°C/T].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RSchmelz"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.RSchmelz">[docs]</a><span class="k">class</span> <span class="nc">RSchmelz</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Spezifische Schmelzwärme von Wasser (specific melt heat of water)</span>
+<span class="sd">    [J/g].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">INIT</span> <span class="o">=</span> <span class="mf">334.</span></div>
+
+
+<div class="viewcode-block" id="CPWasser"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.CPWasser">[docs]</a><span class="k">class</span> <span class="nc">CPWasser</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Spezifische Wärmekapazität von Wasser (specific heat capacity of water)</span>
+<span class="sd">    [J/g].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">INIT</span> <span class="o">=</span> <span class="mf">4.1868</span></div>
+
+
+<div class="viewcode-block" id="PWMax"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.PWMax">[docs]</a><span class="k">class</span> <span class="nc">PWMax</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterLand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Maximalverhältnis Gesamt- zu Trockenschnee (maximum ratio of the</span>
+<span class="sd">    total and the frozen water equivalent stored in the snow cover) [-].</span>
+
+<span class="sd">    In addition to the :class:`parametertools.SingleParameter` call method, it</span>
+<span class="sd">    is possible to set the value of parameter :class:`PWMax` in accordance to</span>
+<span class="sd">    the keyword arguments `rhot0` and `rhodkrit`.</span>
+
+<span class="sd">    Basic Equation:</span>
+<span class="sd">        :math:`PWMax = \\frac{1.474 \\cdot rhodkrit}</span>
+<span class="sd">        {rhot0 + 0.474 \\cdot rhodkrit}`</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        Using the common values for both rhot0 and rhodkrit...</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep()</span>
+<span class="sd">        &gt;&gt;&gt; nhru(1)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; pwmax(rhot0=0.2345, rhodkrit=0.42)</span>
+
+<span class="sd">        ...leads to,...</span>
+
+<span class="sd">        &gt;&gt;&gt; pwmax</span>
+<span class="sd">        pwmax(1.427833)</span>
+
+<span class="sd">        This is also the default value of :class:`PWMax` and means that</span>
+<span class="sd">        the proportion of the liquid water in the snow cover cannot go</span>
+<span class="sd">        above 30%.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The prefered way to pass values to :class:`PWMax` instances</span>
+<span class="sd">        within parameter control files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterLand</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;rhot0&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;rhodkrit&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For parameter `pwmax` a value can be set &#39;</span>
+                                 <span class="s1">&#39;directly by passing a single value or &#39;</span>
+                                 <span class="s1">&#39;indirectly by using the keyword arguments &#39;</span>
+                                 <span class="s1">&#39;`rhot0` and `rhodkrit`.&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the alternative calculation of &#39;</span>
+                                 <span class="s1">&#39;parameter `pwmax`, values for both keyword &#39;</span>
+                                 <span class="s1">&#39;keyword arguments `rhot0` and `rhodkrit` &#39;</span>
+                                 <span class="s1">&#39;must be given.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rhot0</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;rhot0&#39;</span><span class="p">])</span>
+                <span class="n">rhodkrit</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;rhodkrit&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="p">(</span><span class="mf">1.474</span><span class="o">*</span><span class="n">rhodkrit</span><span class="o">/</span><span class="p">(</span><span class="n">rhot0</span><span class="o">+</span><span class="mf">0.474</span><span class="o">*</span><span class="n">rhodkrit</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="GrasRef_R"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.GrasRef_R">[docs]</a><span class="k">class</span> <span class="nc">GrasRef_R</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bodenfeuchte-Verdunstung-Parameter (soil moisture dependend</span>
+<span class="sd">    evaporation factor) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NFk"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.NFk">[docs]</a><span class="k">class</span> <span class="nc">NFk</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Nutzbare Feldkapazität (usable field capacity) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RelWZ"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.RelWZ">[docs]</a><span class="k">class</span> <span class="nc">RelWZ</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Relative Mindestbodenfeuchte für die Interflowentstehung (threshold</span>
+<span class="sd">       value of relative soil moisture for interflow generation) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RelWZ.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.RelWZ.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with :math:`RelWB \\leq RelWZ`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(3)</span>
+<span class="sd">        &gt;&gt;&gt; relwb.values = .5</span>
+<span class="sd">        &gt;&gt;&gt; relwz(0.2, .5, .8)</span>
+<span class="sd">        &gt;&gt;&gt; relwz</span>
+<span class="sd">        relwz(0.5, 0.5, 0.8)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">relwb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">relwb</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">relwb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="n">relwb</span>
+        <span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RelWB"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.RelWB">[docs]</a><span class="k">class</span> <span class="nc">RelWB</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Relative Mindestbodenfeuchte für die Basisabflussentstehung (threshold</span>
+<span class="sd">       value of relative soil moisture for base flow generation) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RelWB.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.RelWB.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with :math:`RelWB \\leq RelWZ`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(3)</span>
+<span class="sd">        &gt;&gt;&gt; relwz.values = .5</span>
+<span class="sd">        &gt;&gt;&gt; relwb(0.2, .5, .8)</span>
+<span class="sd">        &gt;&gt;&gt; relwb</span>
+<span class="sd">        relwb(0.2, 0.5, 0.5)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">relwz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">relwz</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">relwz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">relwz</span>
+        <span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Beta"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.Beta">[docs]</a><span class="k">class</span> <span class="nc">Beta</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Drainageindex des tiefen Bodenspeichers (storage coefficient for</span>
+<span class="sd">    releasing base flow from the lower soil compartment) [1/T].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FBeta"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.FBeta">[docs]</a><span class="k">class</span> <span class="nc">FBeta</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Faktor zur Erhöhung der Perkolation im Grobporenbereich (factor for</span>
+<span class="sd">    increasing percolation under wet conditions) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DMin"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.DMin">[docs]</a><span class="k">class</span> <span class="nc">DMin</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Drainageindex des mittleren Bodenspeichers (flux rate for</span>
+<span class="sd">    releasing interflow from the middle soil compartment) [mm/T].</span>
+
+<span class="sd">    In addition to the :class:`parametertools.MultiParameterSoil` call method,</span>
+<span class="sd">    it is possible to set the value of parameter :class:`DMin` in accordance</span>
+<span class="sd">    to the keyword argument `r_dmin` due to compatibility reasons with the</span>
+<span class="sd">    original LARSIM implemetation.</span>
+
+<span class="sd">    Basic Equation:</span>
+<span class="sd">        :math:`Dmin = 0.024192 \\cdot r_dmin`</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(1)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; dmax(10.) # to prevent trimming of dmin, see below</span>
+<span class="sd">        &gt;&gt;&gt; dmin(r_dmin=10.)</span>
+<span class="sd">        &gt;&gt;&gt; dmin</span>
+<span class="sd">        dmin(0.24192)</span>
+
+<span class="sd">        Note the additional dependence of the parameter value on the</span>
+<span class="sd">        relation between the `parameterstep` and the actual `simulationstep`:</span>
+
+<span class="sd">        &gt;&gt;&gt; dmin.values</span>
+<span class="sd">        array([ 0.12096])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The prefered way to pass values to :class:`DMin` instances</span>
+<span class="sd">        within parameter control files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;r_dmin&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="mf">0.024192</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">applytimefactor</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trim</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DMin.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.DMin.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with :math:`DMin \\leq DMax`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(5)</span>
+<span class="sd">        &gt;&gt;&gt; dmax.values = 2.</span>
+<span class="sd">        &gt;&gt;&gt; dmin(-2., 0., 2., 4., 6.)</span>
+<span class="sd">        &gt;&gt;&gt; dmin</span>
+<span class="sd">        dmin(0.0, 0.0, 2.0, 4.0, 4.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">dmax</span>
+        <span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DMax"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.DMax">[docs]</a><span class="k">class</span> <span class="nc">DMax</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Drainageindex des oberen Bodenspeichers (additional flux rate for</span>
+<span class="sd">    releasing interflow from the upper soil compartment) [mm/T].</span>
+
+<span class="sd">    In addition to the :class:`parametertools.MultiParameterSoil` call method,</span>
+<span class="sd">    it is possible to set the value of parameter :class:`DMax` in accordance</span>
+<span class="sd">    to the keyword argument `r_dmax` due to compatibility reasons with the</span>
+<span class="sd">    original LARSIM implemetation.</span>
+
+<span class="sd">    Basic Equation:</span>
+<span class="sd">        :math:`Dmax = 2.4192 \\cdot r_dmax`</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(1)</span>
+<span class="sd">        &gt;&gt;&gt; lnk(ACKER)</span>
+<span class="sd">        &gt;&gt;&gt; dmin(0.) # to prevent trimming of dmax, see below</span>
+<span class="sd">        &gt;&gt;&gt; dmax(r_dmax=10.)</span>
+<span class="sd">        &gt;&gt;&gt; dmax</span>
+<span class="sd">        dmax(24.192)</span>
+
+<span class="sd">        Note the additional dependence of the parameter value on the</span>
+<span class="sd">        relation between the `parameterstep` and the actual `simulationstep`:</span>
+
+<span class="sd">        &gt;&gt;&gt; dmax.values</span>
+<span class="sd">        array([ 12.096])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The prefered way to pass values to :class:`DMin` instances</span>
+<span class="sd">        within parameter control files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;r_dmax&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="mf">2.4192</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">applytimefactor</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trim</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DMax.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.DMax.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with :math:`DMax \\geq DMin`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(3)</span>
+<span class="sd">        &gt;&gt;&gt; dmin.values = 2.</span>
+<span class="sd">        &gt;&gt;&gt; dmax(2., 4., 6.)</span>
+<span class="sd">        &gt;&gt;&gt; dmax</span>
+<span class="sd">        dmax(4.0, 4.0, 6.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">dmin</span>
+        <span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="BSf"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.BSf">[docs]</a><span class="k">class</span> <span class="nc">BSf</span><span class="p">(</span><span class="n">lland_parameters</span><span class="o">.</span><span class="n">MultiParameterSoil</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bodenfeuchte-Sättigungsfläche-Parameter (shape parameter for the</span>
+<span class="sd">    relation between the avarage soil moisture and the relative saturated</span>
+<span class="sd">    area of a subbasin) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="A1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.A1">[docs]</a><span class="k">class</span> <span class="nc">A1</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parameter für die kontinuierliche Aufteilung der</span>
+<span class="sd">    Direktabflusskomponenten (threshold value for the continuous seperation</span>
+<span class="sd">    of direct runoff in a slow and a fast component) [mm/d]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="A2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.A2">[docs]</a><span class="k">class</span> <span class="nc">A2</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parameter für die diskontinuierliche Aufteilung der</span>
+<span class="sd">    Direktabflusskomponenten (threshold value for the discontinuous seperation</span>
+<span class="sd">    of direct runoff in a slow and a fast component) [mm/d]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TInd"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.TInd">[docs]</a><span class="k">class</span> <span class="nc">TInd</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fließzeitindex (factor related to the time of concentration) [T].</span>
+
+<span class="sd">    In addition to the :class:`parametertools.SingleParameter` call method, it</span>
+<span class="sd">    is possible to set the value of parameter :class:`TInd` in accordance to</span>
+<span class="sd">    the keyword arguments `tal` (talweg, [km]), `hot` (higher reference</span>
+<span class="sd">    altitude, [m]), and `hut` (lower reference altitude, [m]).  This is</span>
+<span class="sd">    supposed to decrease the time of runoff concentration in small and/or</span>
+<span class="sd">    steep catchments.  Note that :class:`TInd` does not only affect direct</span>
+<span class="sd">    runoff, but interflow and base flow as well.  Hence it seems advisable</span>
+<span class="sd">    to use this regionalization strategy with caution.</span>
+
+<span class="sd">    Basic Equation:</span>
+<span class="sd">        :math:`TInd[h] = (0.868 \\cdot \\frac{Tal^3}{HOT-HUT})^{0.385}`</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Using typical values:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; tind(tal=5., hot=210., hut=200.)</span>
+<span class="sd">        &gt;&gt;&gt; tind</span>
+<span class="sd">        tind(0.104335)</span>
+
+<span class="sd">        Note that this result is related to the selected parameter step size</span>
+<span class="sd">        of one day.  The value related to the selected simulation step size</span>
+<span class="sd">        of 12 hours is:</span>
+
+<span class="sd">        &gt;&gt;&gt; round(tind.value, 6)</span>
+<span class="sd">        0.20867</span>
+
+<span class="sd">        Unplausible input values lead to the following exception:</span>
+<span class="sd">        &gt;&gt;&gt; tind(tal=5., hot=200., hut=200.)</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        ValueError: For the alternative calculation of parameter `tind`, the value assigned to keyword argument `tal` must be greater then zero and the one of `hot` must be greater than the one of `hut`.  However, for element ?, the values `5.0`, `200.0` and `200.0` were given respectively.</span>
+<span class="sd">        &gt;&gt;&gt; tind(tal=0., hot=210., hut=200.)</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        ValueError: For the alternative calculation of parameter `tind`, the value assigned to keyword argument `tal` must be greater then zero and the one of `hot` must be greater than the one of `hut`.  However, for element ?, the values `0.0`, `210.0` and `200.0` were given respectively.</span>
+
+<span class="sd">        However, it is hard to define exact bounds for the value of</span>
+<span class="sd">        :class:`TInd` itself.  Whenever it is below 0.001 or above 1000 days,</span>
+<span class="sd">        the following warning is given:</span>
+
+<span class="sd">        &gt;&gt;&gt; tind(tal=.001, hot=210., hut=200.)</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        UserWarning: Due to the given values for the keyword arguments `tal` (0.001), `hot` (210.0) and `hut` (200.0), parameter `tind` of element `?` has been set to an unrealistic value of `0.000134 hours`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The prefered way to pass values to :class:`TInd` instances</span>
+<span class="sd">        within parameter control files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;tal&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;hot&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;hut&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For parameter `tind` a value can be set &#39;</span>
+                                 <span class="s1">&#39;directly by passing a single value or &#39;</span>
+                                 <span class="s1">&#39;indirectly by using the keyword arguments &#39;</span>
+                                 <span class="s1">&#39;`tal`, `hot`, and `hut`.&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">counter</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the alternative calculation of &#39;</span>
+                                 <span class="s1">&#39;parameter `tind`, values for all three &#39;</span>
+                                 <span class="s1">&#39;keyword keyword arguments `tal`, `hot`, &#39;</span>
+                                 <span class="s1">&#39;and `hut` must be given.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tal</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;tal&#39;</span><span class="p">])</span>
+                <span class="n">hot</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;hot&#39;</span><span class="p">])</span>
+                <span class="n">hut</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;hut&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">tal</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">hot</span> <span class="o">&lt;=</span> <span class="n">hut</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the alternative calculation of &#39;</span>
+                                     <span class="s1">&#39;parameter `tind`, the value assigned to &#39;</span>
+                                     <span class="s1">&#39;keyword argument `tal` must be greater &#39;</span>
+                                     <span class="s1">&#39;then zero and the one of `hot` must be &#39;</span>
+                                     <span class="s1">&#39;greater than the one of `hut`.  &#39;</span>
+                                     <span class="s1">&#39;However, for element </span><span class="si">%s</span><span class="s1">, the values &#39;</span>
+                                     <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">`, `</span><span class="si">%s</span><span class="s1">` and `</span><span class="si">%s</span><span class="s1">` were given &#39;</span>
+                                     <span class="s1">&#39;respectively.&#39;</span>
+                                     <span class="o">%</span> <span class="p">(</span><span class="n">objecttools</span><span class="o">.</span><span class="n">devicename</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                                        <span class="n">tal</span><span class="p">,</span> <span class="n">hot</span><span class="p">,</span> <span class="n">hut</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="o">.</span><span class="mi">868</span><span class="o">*</span><span class="n">tal</span><span class="o">**</span><span class="mi">3</span><span class="o">/</span><span class="p">(</span><span class="n">hot</span><span class="o">-</span><span class="n">hut</span><span class="p">))</span><span class="o">**.</span><span class="mi">385</span>
+                <span class="k">if</span> <span class="p">(</span><span class="bp">self</span> <span class="o">&gt;</span> <span class="mf">1000.</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span> <span class="o">&lt;</span> <span class="o">.</span><span class="mi">001</span><span class="p">):</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Due to the given values for the keyword &#39;</span>
+                                  <span class="s1">&#39;arguments `tal` (</span><span class="si">%s</span><span class="s1">), `hot` (</span><span class="si">%s</span><span class="s1">) and `hut` &#39;</span>
+                                  <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">), parameter `tind` of element `</span><span class="si">%s</span><span class="s1">` has &#39;</span>
+                                  <span class="s1">&#39;been set to an unrealistic value of `</span><span class="si">%s</span><span class="s1"> &#39;</span>
+                                  <span class="s1">&#39;hours`.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tal</span><span class="p">,</span> <span class="n">hot</span><span class="p">,</span> <span class="n">hut</span><span class="p">,</span>
+                                               <span class="n">objecttools</span><span class="o">.</span><span class="n">devicename</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                                               <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*=</span> <span class="n">timetools</span><span class="o">.</span><span class="n">Period</span><span class="p">(</span><span class="s1">&#39;1h&#39;</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">simulationstep</span></div>
+
+
+<div class="viewcode-block" id="EQB"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQB">[docs]</a><span class="k">class</span> <span class="nc">EQB</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kalibrierfaktor für die Basisabflusskonzentration (factor for adjusting</span>
+<span class="sd">    the concentration time of baseflow). [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EQB.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQB.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with :math:`EQI1 \\leq EQB`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1.value = 2.</span>
+<span class="sd">        &gt;&gt;&gt; eqb(1.)</span>
+<span class="sd">        &gt;&gt;&gt; eqb</span>
+<span class="sd">        eqb(2.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqb(2.)</span>
+<span class="sd">        &gt;&gt;&gt; eqb</span>
+<span class="sd">        eqb(2.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqb(3.)</span>
+<span class="sd">        &gt;&gt;&gt; eqb</span>
+<span class="sd">        eqb(3.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqi1</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EQI1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQI1">[docs]</a><span class="k">class</span> <span class="nc">EQI1</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kalibrierfaktor für die &quot;untere&quot; Zwischenabflusskonzentration</span>
+<span class="sd">    (factor for adjusting the concentration time of the first interflow</span>
+<span class="sd">    component) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EQI1.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQI1.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with</span>
+<span class="sd">        :math:`EQI2 \\leq EQI1 \\leq EQB`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; eqb.value = 3.</span>
+<span class="sd">        &gt;&gt;&gt; eqi2.value = 1.</span>
+<span class="sd">        &gt;&gt;&gt; eqi1(0.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1</span>
+<span class="sd">        eqi1(1.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1(1.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1</span>
+<span class="sd">        eqi1(1.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1(2.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1</span>
+<span class="sd">        eqi1(2.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1(3.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1</span>
+<span class="sd">        eqi1(3.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1(4.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1</span>
+<span class="sd">        eqi1(3.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqi2</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqb</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EQI2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQI2">[docs]</a><span class="k">class</span> <span class="nc">EQI2</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kalibrierfaktor für die &quot;obere&quot; Zwischenabflusskonzentration</span>
+<span class="sd">    (factor for adjusting the concentration time of the second interflow</span>
+<span class="sd">    component) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EQI2.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQI2.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with</span>
+<span class="sd">        :math:`EQD \\leq EQI2 \\leq EQI1`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; eqi1.value = 3.</span>
+<span class="sd">        &gt;&gt;&gt; eqd1.value = 1.</span>
+<span class="sd">        &gt;&gt;&gt; eqi2(0.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2</span>
+<span class="sd">        eqi2(1.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2(1.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2</span>
+<span class="sd">        eqi2(1.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2(2.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2</span>
+<span class="sd">        eqi2(2.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2(3.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2</span>
+<span class="sd">        eqi2(3.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2(4.)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2</span>
+<span class="sd">        eqi2(3.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqd1</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqi1</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EQD1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQD1">[docs]</a><span class="k">class</span> <span class="nc">EQD1</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kalibrierfaktor für die langsamere Direktabflusskonzentration (factor</span>
+<span class="sd">    for adjusting the concentration time of the slower component of direct</span>
+<span class="sd">    runoff). [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EQD1.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQD1.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with</span>
+<span class="sd">        :math:`EQD2 \\leq EQD1 \\leq EQI2`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; eqi2.value = 3.</span>
+<span class="sd">        &gt;&gt;&gt; eqd2.value = 1.</span>
+<span class="sd">        &gt;&gt;&gt; eqd1(0.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1</span>
+<span class="sd">        eqd1(1.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1(1.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1</span>
+<span class="sd">        eqd1(1.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1(2.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1</span>
+<span class="sd">        eqd1(2.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1(3.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1</span>
+<span class="sd">        eqd1(3.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1(4.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1</span>
+<span class="sd">        eqd1(3.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqd2</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqi2</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EQD2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQD2">[docs]</a><span class="k">class</span> <span class="nc">EQD2</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kalibrierfaktor für die schnellere Direktabflusskonzentration (factor</span>
+<span class="sd">    for adjusting the concentration time of the faster component of direct</span>
+<span class="sd">    runoff). [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EQD2.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.EQD2.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim upper values in accordance with</span>
+<span class="sd">        :math:`EQD2 \\leq EQD1`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; eqd1.value = 3.</span>
+<span class="sd">        &gt;&gt;&gt; eqd2(2.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd2</span>
+<span class="sd">        eqd2(2.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqd2(3.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd2</span>
+<span class="sd">        eqd2(3.0)</span>
+<span class="sd">        &gt;&gt;&gt; eqd2(4.)</span>
+<span class="sd">        &gt;&gt;&gt; eqd2</span>
+<span class="sd">        eqd2(3.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subpars</span><span class="o">.</span><span class="n">eqd1</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ControlParameters"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_control.ControlParameters">[docs]</a><span class="k">class</span> <span class="nc">ControlParameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SubParameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control parameters of HydPy-L-Land, directly defined by the user.&quot;&quot;&quot;</span>
+    <span class="n">_PARCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">FT</span><span class="p">,</span> <span class="n">NHRU</span><span class="p">,</span> <span class="n">Lnk</span><span class="p">,</span> <span class="n">FHRU</span><span class="p">,</span> <span class="n">HNN</span><span class="p">,</span> <span class="n">KG</span><span class="p">,</span> <span class="n">KT</span><span class="p">,</span> <span class="n">KE</span><span class="p">,</span> <span class="n">KF</span><span class="p">,</span> <span class="n">FLn</span><span class="p">,</span> <span class="n">HInz</span><span class="p">,</span> <span class="n">LAI</span><span class="p">,</span>
+                   <span class="n">TRefT</span><span class="p">,</span> <span class="n">TRefN</span><span class="p">,</span> <span class="n">TGr</span><span class="p">,</span> <span class="n">TSp</span><span class="p">,</span> <span class="n">GTF</span><span class="p">,</span> <span class="n">RSchmelz</span><span class="p">,</span> <span class="n">CPWasser</span><span class="p">,</span> <span class="n">PWMax</span><span class="p">,</span>
+                   <span class="n">GrasRef_R</span><span class="p">,</span> <span class="n">NFk</span><span class="p">,</span> <span class="n">RelWZ</span><span class="p">,</span> <span class="n">RelWB</span><span class="p">,</span> <span class="n">Beta</span><span class="p">,</span> <span class="n">FBeta</span><span class="p">,</span> <span class="n">DMax</span><span class="p">,</span> <span class="n">DMin</span><span class="p">,</span> <span class="n">BSf</span><span class="p">,</span>
+                   <span class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">TInd</span><span class="p">,</span> <span class="n">EQB</span><span class="p">,</span> <span class="n">EQI1</span><span class="p">,</span> <span class="n">EQI2</span><span class="p">,</span> <span class="n">EQD1</span><span class="p">,</span> <span class="n">EQD2</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

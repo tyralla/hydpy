@@ -1,0 +1,257 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lstream_v1 &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lstream_v1</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Integration test:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lstream_v1 import *</span>
+<span class="sd">    &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; simulationstep(&#39;12h&#39;)</span>
+
+<span class="sd">    Secondly, the final model output shall be passed to `outflow`:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.cythons.pointer import Double</span>
+<span class="sd">    &gt;&gt;&gt; inflow, outflow = Double(0.), Double(0.)</span>
+<span class="sd">    &gt;&gt;&gt; inlets.q.shape = 1</span>
+<span class="sd">    &gt;&gt;&gt; inlets.q.setpointer(inflow, 0)</span>
+<span class="sd">    &gt;&gt;&gt; outlets.q.setpointer(outflow)</span>
+
+<span class="sd">    Define the geometry and roughness values for the first test channel:</span>
+
+<span class="sd">    &gt;&gt;&gt; bm(2.)</span>
+<span class="sd">    &gt;&gt;&gt; bnm(4.)</span>
+<span class="sd">    &gt;&gt;&gt; hm(1.)</span>
+<span class="sd">    &gt;&gt;&gt; bv(.5, 10.)</span>
+<span class="sd">    &gt;&gt;&gt; bbv(1., 2.)</span>
+<span class="sd">    &gt;&gt;&gt; bnv(1., 8.)</span>
+<span class="sd">    &gt;&gt;&gt; bnvr(20.)</span>
+<span class="sd">    &gt;&gt;&gt; ekm(1.)</span>
+<span class="sd">    &gt;&gt;&gt; skm(20.)</span>
+<span class="sd">    &gt;&gt;&gt; ekv(1.)</span>
+<span class="sd">    &gt;&gt;&gt; skv(60., 80.)</span>
+<span class="sd">    &gt;&gt;&gt; gef(.01)</span>
+<span class="sd">    &gt;&gt;&gt; laen(10.)</span>
+
+<span class="sd">    Set the error tolerances of the iteration small enough, not to</span>
+<span class="sd">    compromise the shown first six decimal places of the following results:</span>
+
+<span class="sd">    &gt;&gt;&gt; qtol(1e-10)</span>
+<span class="sd">    &gt;&gt;&gt; htol(1e-10)</span>
+
+<span class="sd">    &gt;&gt;&gt; parameters.update()</span>
+
+<span class="sd">    &gt;&gt;&gt; states.qz.old = 1.</span>
+<span class="sd">    &gt;&gt;&gt; states.qz.new = 1.</span>
+<span class="sd">    &gt;&gt;&gt; states.qa.old = 1.</span>
+
+<span class="sd">    &gt;&gt;&gt; inflow[0] = 2.</span>
+<span class="sd">    &gt;&gt;&gt; outflow[0] = 0.</span>
+<span class="sd">    &gt;&gt;&gt; model.doit(0)</span>
+<span class="sd">    &gt;&gt;&gt; print(round(outflow[0], 6))</span>
+<span class="sd">    1.737971</span>
+<span class="sd">    &gt;&gt;&gt; inflow[0] = 2000.</span>
+<span class="sd">    &gt;&gt;&gt; outflow[0] = 0.</span>
+<span class="sd">    &gt;&gt;&gt; model.doit(1)</span>
+<span class="sd">    &gt;&gt;&gt; print(round(outflow[0], 6))</span>
+<span class="sd">    1932.529863</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy.core.modelimports</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">modeltools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+<span class="c1"># ...from lstream</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_model</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_control</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_derived</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_fluxes</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_states</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_aides</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_inlets</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lstream</span> <span class="k">import</span> <span class="n">lstream_outlets</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">modeltools</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LARSIM-Stream (Manning) version of HydPy-L-Stream (lstream_v1).&quot;&quot;&quot;</span>
+    <span class="n">_RUNMETHODS</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_model</span><span class="o">.</span><span class="n">update_inlets_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_qref_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_hmin_qmin_hmax_qmax_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_h_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_ag_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_rk_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_qa_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">update_outlets_v1</span><span class="p">)</span>
+    <span class="n">_ADDMETHODS</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_am_um_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_qm_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_av_uv_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_qv_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_avr_uvr_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_qvr_v1</span><span class="p">,</span>
+                   <span class="n">lstream_model</span><span class="o">.</span><span class="n">calc_qg_v1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ControlParameters"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.ControlParameters">[docs]</a><span class="k">class</span> <span class="nc">ControlParameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SubParameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control parameters of lstream_v1, directly defined by the user.&quot;&quot;&quot;</span>
+    <span class="n">_PARCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_control</span><span class="o">.</span><span class="n">Laen</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">Gef</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">HM</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">BM</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">BV</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">BBV</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">BNM</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">BNV</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">BNVR</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">SKM</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">SKV</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">EKM</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">EKV</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">QTol</span><span class="p">,</span>
+                   <span class="n">lstream_control</span><span class="o">.</span><span class="n">HTol</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DerivedParameters"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.DerivedParameters">[docs]</a><span class="k">class</span> <span class="nc">DerivedParameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SubParameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Derived parameters of lstream_v1, indirectly defined by the user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_PARCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_derived</span><span class="o">.</span><span class="n">HV</span><span class="p">,</span>
+                   <span class="n">lstream_derived</span><span class="o">.</span><span class="n">QM</span><span class="p">,</span>
+                   <span class="n">lstream_derived</span><span class="o">.</span><span class="n">QV</span><span class="p">,</span>
+                   <span class="n">lstream_derived</span><span class="o">.</span><span class="n">Sek</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FluxSequences"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.FluxSequences">[docs]</a><span class="k">class</span> <span class="nc">FluxSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flux sequences of LARSIM-ME.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">QRef</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">H</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">AM</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">AV</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">AVR</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">AG</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">UM</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">UV</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">UVR</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">UG</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">QM</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">QV</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">QVR</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">QG</span><span class="p">,</span>
+                   <span class="n">lstream_fluxes</span><span class="o">.</span><span class="n">RK</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StateSequences"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.StateSequences">[docs]</a><span class="k">class</span> <span class="nc">StateSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;State sequences of lstream_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_states</span><span class="o">.</span><span class="n">QZ</span><span class="p">,</span>
+                   <span class="n">lstream_states</span><span class="o">.</span><span class="n">QA</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AideSequences"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.AideSequences">[docs]</a><span class="k">class</span> <span class="nc">AideSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">AideSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Aide sequences of lstream_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_aides</span><span class="o">.</span><span class="n">Temp</span><span class="p">,</span>
+                   <span class="n">lstream_aides</span><span class="o">.</span><span class="n">HMin</span><span class="p">,</span>
+                   <span class="n">lstream_aides</span><span class="o">.</span><span class="n">HMax</span><span class="p">,</span>
+                   <span class="n">lstream_aides</span><span class="o">.</span><span class="n">QMin</span><span class="p">,</span>
+                   <span class="n">lstream_aides</span><span class="o">.</span><span class="n">QMax</span><span class="p">,</span>
+                   <span class="n">lstream_aides</span><span class="o">.</span><span class="n">QTest</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InletSequences"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.InletSequences">[docs]</a><span class="k">class</span> <span class="nc">InletSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LinkSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Upstream link sequences of lstream_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_inlets</span><span class="o">.</span><span class="n">Q</span><span class="p">,)</span></div>
+
+
+<div class="viewcode-block" id="OutletSequences"><a class="viewcode-back" href="../../../lstream_v1.html#hydpy.models.lstream_v1.OutletSequences">[docs]</a><span class="k">class</span> <span class="nc">OutletSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LinkSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Downstream link sequences of lstream_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lstream_outlets</span><span class="o">.</span><span class="n">Q</span><span class="p">,)</span></div>
+
+
+<span class="n">tester</span> <span class="o">=</span> <span class="n">Tester</span><span class="p">()</span>
+<span class="n">cythonizer</span> <span class="o">=</span> <span class="n">Cythonizer</span><span class="p">()</span>
+<span class="n">cythonizer</span><span class="o">.</span><span class="n">complete</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

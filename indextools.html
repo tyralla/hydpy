@@ -1,0 +1,203 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>indextools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="magictools" href="magictools.html" />
+    <link rel="prev" title="hydpytools" href="hydpytools.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="magictools.html" title="magictools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="hydpytools.html" title="hydpytools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" accesskey="U">Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="indextools">
+<span id="id1"></span><h1>indextools<a class="headerlink" href="#indextools" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.core.indextools"></span><dl class="class">
+<dt id="hydpy.core.indextools.Indexer">
+<em class="property">class </em><code class="descclassname">hydpy.core.indextools.</code><code class="descname">Indexer</code><a class="reference internal" href="_modules/hydpy/core/indextools.html#Indexer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.core.indextools.Indexer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2.7/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Handles arrays containing indexes.</p>
+<p>One can specify the index arrays manually, but usually they are determined
+automatically based on the <a class="reference internal" href="timetools.html#hydpy.core.timetools.Timegrids" title="hydpy.core.timetools.Timegrids"><code class="xref py py-class docutils literal"><span class="pre">Timegrids</span></code></a> object
+made available through module <a class="reference internal" href="pub.html#module-hydpy.pub" title="hydpy.pub"><code class="xref py py-mod docutils literal"><span class="pre">pub</span></code></a>.</p>
+<dl class="attribute">
+<dt id="hydpy.core.indextools.Indexer.monthofyear">
+<code class="descname">monthofyear</code><a class="headerlink" href="#hydpy.core.indextools.Indexer.monthofyear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Month of the year index (January = 0…).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.indextools.Indexer.dayofyear">
+<code class="descname">dayofyear</code><a class="headerlink" href="#hydpy.core.indextools.Indexer.dayofyear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Day of the year index (the first of January = 0…).</p>
+<p>For reasons of consistency between leap years and non-leap years,
+assuming a daily time step, index 59 is always associated with the
+29th of February.  Hence, it is missing in non-leap years:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Timegrids</span><span class="p">,</span> <span class="n">Timegrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.indextools</span> <span class="k">import</span> <span class="n">Indexer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;27.02.2004&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;3.03.2004&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;1d&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Indexer</span><span class="p">()</span><span class="o">.</span><span class="n">dayofyear</span>
+<span class="go">array([57, 58, 59, 60, 61])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;27.02.2005&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;3.03.2005&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;1d&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Indexer</span><span class="p">()</span><span class="o">.</span><span class="n">dayofyear</span>
+<span class="go">array([57, 58, 60, 61])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.core.indextools.Indexer.timeofyear">
+<code class="descname">timeofyear</code><a class="headerlink" href="#hydpy.core.indextools.Indexer.timeofyear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time of the year index (first simulation step of each year = 0…).</p>
+<p>The property <a class="reference internal" href="#hydpy.core.indextools.Indexer.timeofyear" title="hydpy.core.indextools.Indexer.timeofyear"><code class="xref py py-attr docutils literal"><span class="pre">timeofyear</span></code></a> is best explained through
+it with property <a class="reference internal" href="#hydpy.core.indextools.Indexer.dayofyear" title="hydpy.core.indextools.Indexer.dayofyear"><code class="xref py py-attr docutils literal"><span class="pre">dayofyear</span></code></a>:</p>
+<p>Let us reconsider one of the examples of the documentation on
+property <a class="reference internal" href="#hydpy.core.indextools.Indexer.dayofyear" title="hydpy.core.indextools.Indexer.dayofyear"><code class="xref py py-attr docutils literal"><span class="pre">dayofyear</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.timetools</span> <span class="k">import</span> <span class="n">Timegrids</span><span class="p">,</span> <span class="n">Timegrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.core.indextools</span> <span class="k">import</span> <span class="n">Indexer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;27.02.2005&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;3.03.2005&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;1d&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Due to the simulation stepsize beeing one day, the index arrays
+calculated by both properties are identical:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Indexer</span><span class="p">()</span><span class="o">.</span><span class="n">dayofyear</span>
+<span class="go">array([57, 58, 60, 61])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Indexer</span><span class="p">()</span><span class="o">.</span><span class="n">timeofyear</span>
+<span class="go">array([57, 58, 60, 61])</span>
+</pre></div>
+</div>
+<p>In the next example the step size is halved:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">Timegrids</span><span class="p">(</span><span class="n">Timegrid</span><span class="p">(</span><span class="s1">&#39;27.02.2005&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;3.03.2005&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                                   <span class="s1">&#39;12h&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now the there a generally two subsequent simulation steps associated
+with the same day:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Indexer</span><span class="p">()</span><span class="o">.</span><span class="n">dayofyear</span>
+<span class="go">array([57, 57, 58, 58, 60, 60, 61, 61])</span>
+</pre></div>
+</div>
+<p>However, the <cite>timeofyear</cite> array gives the index of the
+respective simulation steps of the actual year:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Indexer</span><span class="p">()</span><span class="o">.</span><span class="n">timeofyear</span>
+<span class="go">array([114, 115, 116, 117, 120, 121, 122, 123])</span>
+</pre></div>
+</div>
+<p>Note the gap in the returned index array due to 2005 beeing not a
+leap year.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="hydpytools.html"
+                        title="previous chapter">hydpytools</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="magictools.html"
+                        title="next chapter">magictools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/indextools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="magictools.html" title="magictools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="hydpytools.html" title="hydpytools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="framework.html" >Framework Modules</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.core.modeltools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.core.modeltools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+
+
+<div class="viewcode-block" id="MetaModelType"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.MetaModelType">[docs]</a><span class="k">class</span> <span class="nc">MetaModelType</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dict_</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">tuplename</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;_RUNMETHODS&#39;</span><span class="p">,</span> <span class="s1">&#39;_ADDMETHODS&#39;</span><span class="p">):</span>
+            <span class="n">methods</span> <span class="o">=</span> <span class="n">dict_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tuplename</span><span class="p">,</span> <span class="p">())</span>
+            <span class="k">if</span> <span class="n">methods</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tuplename</span> <span class="o">==</span> <span class="s1">&#39;_RUNMETHODS&#39;</span><span class="p">:</span>
+                    <span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="se">\n\n\n</span><span class="s1">    The following &quot;run methods&quot; are called &#39;</span>
+                           <span class="s1">&#39;each simulation step run in the given sequence:&#39;</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">tuplename</span> <span class="o">==</span> <span class="s1">&#39;_ADDMETHODS&#39;</span><span class="p">:</span>
+                    <span class="n">lst</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="se">\n\n\n</span><span class="s1">    The following &quot;additional methods&quot; are &#39;</span>
+                           <span class="s1">&#39;called by at least one &quot;run method&quot;:&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+                    <span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;      * :func:`~</span><span class="si">%s</span><span class="s1">` `</span><span class="si">%s</span><span class="s1">`&#39;</span>
+                               <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">method</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+                                            <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)),</span>
+                                  <span class="n">objecttools</span><span class="o">.</span><span class="n">description</span><span class="p">(</span><span class="n">method</span><span class="p">)))</span>
+                <span class="n">dict_</span><span class="p">[</span><span class="s1">&#39;__doc__&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parents</span><span class="p">,</span> <span class="n">dict_</span><span class="p">)</span></div>
+
+<span class="n">MetaModelClass</span> <span class="o">=</span> <span class="n">MetaModelType</span><span class="p">(</span><span class="s1">&#39;MetaModelClass&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">MetaModelClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all hydrological models.&quot;&quot;&quot;</span>
+
+    <span class="n">_RUNMETHODS</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">_ADDMETHODS</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cymodel</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;dummy&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cymodel</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">999</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_methods</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_init_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert all pure Python run and add functions of the model class to</span>
+<span class="sd">        methods and assign them to the model instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">tuplename</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;_RUNMETHODS&#39;</span><span class="p">,</span> <span class="s1">&#39;_ADDMETHODS&#39;</span><span class="p">):</span>
+            <span class="n">functions</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuplename</span><span class="p">,</span> <span class="p">())</span>
+            <span class="n">uniques</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">functions</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="n">method</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+                <span class="n">shortname</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">shortname</span> <span class="ow">in</span> <span class="n">uniques</span><span class="p">:</span>
+                    <span class="n">uniques</span><span class="p">[</span><span class="n">shortname</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">uniques</span><span class="p">[</span><span class="n">shortname</span><span class="p">]</span> <span class="o">=</span> <span class="n">method</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">shortname</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span> <span class="ow">in</span> <span class="n">uniques</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shortname</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Model.connect"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Connect the link sequences of the actual model.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;inlets&#39;</span><span class="p">,</span> <span class="s1">&#39;receivers&#39;</span><span class="p">,</span> <span class="s1">&#39;outlets&#39;</span><span class="p">,</span> <span class="s1">&#39;senders&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_connect_subgroup</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">(</span>
+                <span class="s1">&#39;While trying to build the node connection of the `</span><span class="si">%s</span><span class="s1">` &#39;</span>
+                <span class="s1">&#39;sequences of the model handled by element `</span><span class="si">%s</span><span class="s1">`&#39;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">group</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>  <span class="n">objecttools</span><span class="o">.</span><span class="n">devicename</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span></div>
+
+    <span class="k">def</span> <span class="nf">_connect_subgroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+        <span class="n">isentry</span> <span class="o">=</span> <span class="n">group</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;inlets&#39;</span><span class="p">,</span> <span class="s1">&#39;receivers&#39;</span><span class="p">)</span>
+        <span class="n">available_nodes</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span><span class="o">.</span><span class="n">slaves</span>
+        <span class="n">links</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="p">())</span>
+        <span class="n">applied_nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">links</span><span class="p">:</span>
+            <span class="n">selected_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">available_nodes</span>
+                              <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">variable</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">isentry</span><span class="p">:</span>
+                <span class="n">selected_doubles</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">getdouble_via_exits</span><span class="p">()</span>
+                                    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">selected_nodes</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">selected_doubles</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">getdouble_via_entries</span><span class="p">()</span>
+                                    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">selected_nodes</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">applied_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selected_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">seq</span><span class="o">.</span><span class="n">setpointer</span><span class="p">(</span><span class="n">selected_doubles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Sequence `</span><span class="si">%s</span><span class="s1">` cannot be connected, &#39;</span>
+                                       <span class="s1">&#39;as no node is available which is &#39;</span>
+                                       <span class="s1">&#39;handling the variable `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                                       <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Sequence `</span><span class="si">%s</span><span class="s1">` cannot be connected, &#39;</span>
+                                       <span class="s1">&#39;as it is 0-dimensional but multiple &#39;</span>
+                                       <span class="s1">&#39;nodes are available which are &#39;</span>
+                                       <span class="s1">&#39;handling variable `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                                       <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seq</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+            <span class="k">elif</span> <span class="n">seq</span><span class="o">.</span><span class="n">NDIM</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">seq</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_nodes</span><span class="p">)</span>
+                <span class="n">zipped</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">selected_nodes</span><span class="p">,</span> <span class="n">selected_doubles</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">double</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">zipped</span><span class="p">):</span>
+                    <span class="n">applied_nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+                    <span class="n">seq</span><span class="o">.</span><span class="n">setpointer</span><span class="p">(</span><span class="n">double</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">applied_nodes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_nodes</span><span class="p">):</span>
+            <span class="n">remaining_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">available_nodes</span>
+                               <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">applied_nodes</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;The following nodes have not been connected &#39;</span>
+                               <span class="s1">&#39;to any sequences: `</span><span class="si">%s</span><span class="s1">`.&#39;</span>
+                               <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remaining_nodes</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Model.doit"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.doit">[docs]</a>    <span class="k">def</span> <span class="nf">doit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loaddata</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_inlets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_outlets</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_senders</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">savedata</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Model.run"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_RUNMETHODS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">method</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;update_&#39;</span><span class="p">):</span>
+                <span class="n">method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.loaddata"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.loaddata">[docs]</a>    <span class="k">def</span> <span class="nf">loaddata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">loaddata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_sim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.savedata"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.savedata">[docs]</a>    <span class="k">def</span> <span class="nf">savedata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">savedata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_sim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.update_inlets"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.update_inlets">[docs]</a>    <span class="k">def</span> <span class="nf">update_inlets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Maybe.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Model.update_outlets"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.update_outlets">[docs]</a>    <span class="k">def</span> <span class="nf">update_outlets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;In any case.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Model.update_receivers"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.update_receivers">[docs]</a>    <span class="k">def</span> <span class="nf">update_receivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Model.update_senders"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.update_senders">[docs]</a>    <span class="k">def</span> <span class="nf">update_senders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Model.new2old"><a class="viewcode-back" href="../../../modeltools.html#hydpy.core.modeltools.Model.new2old">[docs]</a>    <span class="k">def</span> <span class="nf">new2old</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Assign the new/final state values of the actual time step to the</span>
+<span class="sd">        new/initial state values of the next time step.  Needs to be</span>
+<span class="sd">        overwritten in Cython mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sequences</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+    <span class="k">def</span> <span class="nf">_getidx_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Index of the actual simulation time step.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cymodel</span><span class="o">.</span><span class="n">idx_sim</span>
+
+    <span class="k">def</span> <span class="nf">_setidx_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cymodel</span><span class="o">.</span><span class="n">idx_sim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">idx_sim</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_getidx_sim</span><span class="p">,</span> <span class="n">_setidx_sim</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">objecttools</span><span class="o">.</span><span class="n">dir_</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

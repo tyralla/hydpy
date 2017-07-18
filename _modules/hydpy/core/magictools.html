@@ -1,0 +1,471 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.core.magictools &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.core.magictools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from the Python standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">doctest</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy</span> <span class="k">import</span> <span class="n">pub</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">objecttools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">timetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">filetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">devicetools</span>
+
+
+<div class="viewcode-block" id="Tester"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.Tester">[docs]</a><span class="k">class</span> <span class="nc">Tester</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">package</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_locals</span><span class="p">[</span><span class="s1">&#39;__package__&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ispackage</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;__init__.py&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ispackage</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">modulenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">fn</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">filenames</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">))]</span>
+
+<div class="viewcode-block" id="Tester.doit"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.Tester.doit">[docs]</a>    <span class="k">def</span> <span class="nf">doit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">usedefaultvalues</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usedefaultvalues</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usedefaultvalues</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">printprogress</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">printprogress</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">printprogress</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">warnsimulationstep</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnsimulationstep</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnsimulationstep</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">timegrids</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">_simulationstep</span> <span class="o">=</span> <span class="n">parametertools</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">_simulationstep</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">_simulationstep</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">dirverbose</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">dirverbose</span>
+        <span class="n">reprcomments</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">reprdigits</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reprdigits</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reprdigits</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">warntrim</span> <span class="o">=</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warntrim</span>
+        <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warntrim</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Node</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="n">devicetools</span><span class="o">.</span><span class="n">Element</span><span class="o">.</span><span class="n">_registry</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">devicetools</span><span class="o">.</span><span class="n">Node</span><span class="o">.</span><span class="n">clearregistry</span><span class="p">()</span>
+        <span class="n">devicetools</span><span class="o">.</span><span class="n">Element</span><span class="o">.</span><span class="n">clearregistry</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="mi">34</span> <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usecython</span> <span class="k">else</span> <span class="mi">36</span>
+            <span class="k">with</span> <span class="n">PrintStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                  <span class="s1">&#39;Test </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1">ython mode.&#39;</span>
+                  <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;package&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ispackage</span> <span class="k">else</span> <span class="s1">&#39;module&#39;</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">package</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ispackage</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulenames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                     <span class="s1">&#39;C&#39;</span> <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usecython</span> <span class="k">else</span> <span class="s1">&#39;P&#39;</span><span class="p">))</span>
+            <span class="k">with</span> <span class="n">PrintStyle</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modulenames</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    * </span><span class="si">%s</span><span class="s1">:&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span> <span class="p">)</span>
+                    <span class="k">with</span> <span class="n">StdOutErr</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+                        <span class="n">modulename</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">package</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+                        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">modulename</span><span class="p">)</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="n">modulename</span><span class="p">)</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span>
+                                                <span class="n">category</span><span class="o">=</span><span class="ne">ImportWarning</span><span class="p">)</span>
+                        <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">extraglobs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;testing&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                                        <span class="n">optionflags</span><span class="o">=</span><span class="n">doctest</span><span class="o">.</span><span class="n">ELLIPSIS</span><span class="p">)</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">resetwarnings</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usedefaultvalues</span> <span class="o">=</span> <span class="n">usedefaultvalues</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">printprogress</span> <span class="o">=</span> <span class="n">printprogress</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnsimulationstep</span> <span class="o">=</span> <span class="n">warnsimulationstep</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">timegrids</span> <span class="o">=</span> <span class="n">timegrids</span>
+            <span class="n">parametertools</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">_simulationstep</span> <span class="o">=</span> <span class="n">_simulationstep</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">dirverbose</span> <span class="o">=</span> <span class="n">dirverbose</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reprcomments</span> <span class="o">=</span> <span class="n">reprcomments</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">reprdigits</span> <span class="o">=</span> <span class="n">reprdigits</span>
+            <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warntrim</span> <span class="o">=</span> <span class="n">warntrim</span>
+            <span class="n">devicetools</span><span class="o">.</span><span class="n">Node</span><span class="o">.</span><span class="n">clearregistry</span><span class="p">()</span>
+            <span class="n">devicetools</span><span class="o">.</span><span class="n">Element</span><span class="o">.</span><span class="n">clearregistry</span><span class="p">()</span>
+            <span class="n">devicetools</span><span class="o">.</span><span class="n">Node</span><span class="o">.</span><span class="n">_registry</span> <span class="o">=</span> <span class="n">nodes</span>
+            <span class="n">devicetools</span><span class="o">.</span><span class="n">Element</span><span class="o">.</span><span class="n">_registry</span> <span class="o">=</span> <span class="n">elements</span></div></div>
+
+
+<div class="viewcode-block" id="PrintStyle"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.PrintStyle">[docs]</a><span class="k">class</span> <span class="nc">PrintStyle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">font</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="n">font</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x1B</span><span class="s1">[</span><span class="si">%d</span><span class="s1">;30;</span><span class="si">%d</span><span class="s1">m&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">traceback_</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x1B</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exception</span><span class="p">:</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="StdOutErr"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.StdOutErr">[docs]</a><span class="k">class</span> <span class="nc">StdOutErr</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">encoding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">encoding</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exception</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">traceback_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_</span><span class="p">(</span><span class="s1">&#39;no failures occurred&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span>
+        <span class="k">if</span> <span class="n">exception</span><span class="p">:</span>
+            <span class="n">objecttools</span><span class="o">.</span><span class="n">augmentexcmessage</span><span class="p">()</span>
+
+<div class="viewcode-block" id="StdOutErr.write"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.StdOutErr.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">texts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StdOutErr.print_"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.StdOutErr.print_">[docs]</a>    <span class="k">def</span> <span class="nf">print_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indent</span><span class="o">*</span><span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StdOutErr.flush"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.StdOutErr.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="parameterstep"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.parameterstep">[docs]</a><span class="k">def</span> <span class="nf">parameterstep</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define a parameter time step size within a parameter control file.</span>
+
+<span class="sd">    Argument:</span>
+<span class="sd">      * timestep(:class:`~hydpy.core.timetools.Period`): Time step size.</span>
+
+<span class="sd">    Function :func:`parameterstep` should usually be be applied in a line</span>
+<span class="sd">    immediately behind the model import.  Defining the step size of time</span>
+<span class="sd">    dependent parameters is a prerequisite to access any model specific</span>
+<span class="sd">    parameter.</span>
+
+<span class="sd">    Note that :func:`parameterstep` implements some namespace magic by</span>
+<span class="sd">    means of the module :mod:`inspect`.  This makes things a little</span>
+<span class="sd">    complicated for framework developers, but it eases the definition of</span>
+<span class="sd">    parameter control files for framework users.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">timestep</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parametertools</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">_parameterstep</span> <span class="o">=</span> <span class="n">timetools</span><span class="o">.</span><span class="n">Period</span><span class="p">(</span><span class="n">timestep</span><span class="p">)</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_locals</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;Model&#39;</span><span class="p">]()</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">usecython</span> <span class="ow">and</span> <span class="s1">&#39;cythonizer&#39;</span> <span class="ow">in</span> <span class="n">namespace</span><span class="p">:</span>
+            <span class="n">cythonizer</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;cythonizer&#39;</span><span class="p">]</span>
+            <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;cythonmodule&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cythonizer</span><span class="o">.</span><span class="n">cymodule</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">cymodel</span> <span class="o">=</span> <span class="n">cythonizer</span><span class="o">.</span><span class="n">cymodule</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span>
+            <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;cymodel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cymodel</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cythonizer</span><span class="o">.</span><span class="n">pyxwriter</span><span class="o">.</span><span class="n">listofmodeluserfunctions</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">cymodel</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;doit&#39;</span><span class="p">,</span> <span class="s1">&#39;new2old&#39;</span><span class="p">,</span> <span class="s1">&#39;openfiles&#39;</span><span class="p">,</span> <span class="s1">&#39;closefiles&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;loaddata&#39;</span><span class="p">,</span> <span class="s1">&#39;savedata&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">cymodel</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">cymodel</span><span class="p">,</span> <span class="n">func</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s1">&#39;Parameters&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespace</span><span class="p">:</span>
+            <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;Parameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parametertools</span><span class="o">.</span><span class="n">Parameters</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;Parameters&#39;</span><span class="p">](</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;Sequences&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">namespace</span><span class="p">:</span>
+            <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;Sequences&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequencetools</span><span class="o">.</span><span class="n">Sequences</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">sequences</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;Sequences&#39;</span><span class="p">](</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;parameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">pars</span><span class="p">)</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+            <span class="n">namespace</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pars</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;sequences&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">sequences</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">seqs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">:</span>
+            <span class="n">namespace</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">seqs</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">namespace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;CONSTANTS&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">focus</span> <span class="o">=</span> <span class="n">namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;focus&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">par</span><span class="p">)</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">focus</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">par</span> <span class="ow">is</span> <span class="n">focus</span><span class="p">):</span>
+                <span class="n">namespace</span><span class="p">[</span><span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">par</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">namespace</span><span class="p">[</span><span class="n">par</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="simulationstep"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.simulationstep">[docs]</a><span class="k">def</span> <span class="nf">simulationstep</span><span class="p">(</span><span class="n">timestep</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define a simulation time step size for testing purposes within a</span>
+<span class="sd">    parameter control file.</span>
+
+<span class="sd">    Argument:</span>
+<span class="sd">        * timestep(:class:`~hydpy.core.timetools.Period`): Time step size.</span>
+
+<span class="sd">    Using :func:`simulationstep` only affects the values of time dependent</span>
+<span class="sd">    parameters, when `pub.timegrids.stepsize` is not defined.  It thus has</span>
+<span class="sd">    no influence on usual hydpy simulations at all.  Use it just to check</span>
+<span class="sd">    your parameter control files.  Write it in a line immediately behind</span>
+<span class="sd">    the one calling :func:`parameterstep`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pub</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">warnsimulationstep</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Note that the applied function `simulationstep` is &#39;</span>
+                      <span class="s1">&#39;inteded for testing purposes only.  When doing a &#39;</span>
+                      <span class="s1">&#39;hydpy simulation, parameter values are initialized &#39;</span>
+                      <span class="s1">&#39;based on the actual simulation time step as defined &#39;</span>
+                      <span class="s1">&#39;under `pub.timegrids.stepsize` and the value given &#39;</span>
+                      <span class="s1">&#39;to `simulationstep` is ignored.&#39;</span><span class="p">)</span>
+    <span class="n">parametertools</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">_simulationstep</span> <span class="o">=</span> <span class="n">timetools</span><span class="o">.</span><span class="n">Period</span><span class="p">(</span><span class="n">timestep</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="controlcheck"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.controlcheck">[docs]</a><span class="k">def</span> <span class="nf">controlcheck</span><span class="p">(</span><span class="n">controldir</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">projectdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">controlfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_locals</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">projectdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">projectdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">))</span>
+            <span class="n">projectdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">projectdir</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">))</span>
+        <span class="n">controlpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span>
+                                                   <span class="n">projectdir</span><span class="p">,</span>
+                                                   <span class="n">controldir</span><span class="p">))</span>
+        <span class="n">initfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;__file__&#39;</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">controlfile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">controlfile</span> <span class="o">=</span> <span class="n">initfile</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">controlpath</span><span class="p">,</span> <span class="n">controlfile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The check of consistency between the control &#39;</span>
+                          <span class="s1">&#39;parameter file </span><span class="si">%s</span><span class="s1"> and the initial condition file &#39;</span>
+                          <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> failed.  The control parameter file does not &#39;</span>
+                          <span class="s1">&#39;exist in directory </span><span class="si">%s</span><span class="s1">.&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="n">controlfile</span><span class="p">,</span> <span class="n">initfile</span><span class="p">,</span> <span class="n">controlpath</span><span class="p">))</span>
+        <span class="n">controlmanager</span> <span class="o">=</span> <span class="n">filetools</span><span class="o">.</span><span class="n">ControlManager</span><span class="p">()</span>
+        <span class="n">controlmanager</span><span class="o">.</span><span class="n">projectdirectory</span> <span class="o">=</span> <span class="n">projectdir</span>
+        <span class="n">controlmanager</span><span class="o">.</span><span class="n">selecteddirectory</span> <span class="o">=</span> <span class="n">controldir</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">controlmanager</span><span class="o">.</span><span class="n">loadfile</span><span class="p">(</span><span class="n">controlfile</span><span class="p">)[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="k">for</span> <span class="n">name1</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="s1">&#39;logs&#39;</span><span class="p">):</span>
+            <span class="n">subseqs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">sequences</span><span class="p">,</span> <span class="n">name1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">subseqs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">seq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">subseqs</span><span class="p">:</span>
+                    <span class="n">namespace</span><span class="p">[</span><span class="n">name2</span><span class="p">]</span> <span class="o">=</span> <span class="n">seq</span></div>
+
+
+<span class="n">_PAR_SPEC2CAPT</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(((</span><span class="s1">&#39;parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;Parameter tools&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;constants&#39;</span><span class="p">,</span> <span class="s1">&#39;Constants&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="s1">&#39;Control parameters&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;derived&#39;</span><span class="p">,</span> <span class="s1">&#39;Derived parameters&#39;</span><span class="p">)))</span>
+
+<span class="n">_SEQ_SPEC2CAPT</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(((</span><span class="s1">&#39;sequences&#39;</span><span class="p">,</span> <span class="s1">&#39;Sequence tools&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;Input sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;fluxes&#39;</span><span class="p">,</span> <span class="s1">&#39;Flux sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;states&#39;</span><span class="p">,</span> <span class="s1">&#39;State sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;logs&#39;</span><span class="p">,</span> <span class="s1">&#39;Log sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;inlets&#39;</span><span class="p">,</span> <span class="s1">&#39;Inlet sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;outlets&#39;</span><span class="p">,</span> <span class="s1">&#39;Outlet sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;receivers&#39;</span><span class="p">,</span> <span class="s1">&#39;Receiver sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;senders&#39;</span><span class="p">,</span> <span class="s1">&#39;Sender sequences&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="s1">&#39;aides&#39;</span><span class="p">,</span> <span class="s1">&#39;Aide sequences&#39;</span><span class="p">)))</span>
+
+<span class="n">_all_spec2capt</span> <span class="o">=</span> <span class="n">_PAR_SPEC2CAPT</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">_all_spec2capt</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_SEQ_SPEC2CAPT</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_add_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">marker</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a title for a basemodels docstring.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">marker</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">title</span><span class="p">)]</span>
+
+
+<span class="k">def</span> <span class="nf">_add_lines</span><span class="p">(</span><span class="n">specification</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return autodoc commands for a basemodels docstring.</span>
+
+<span class="sd">    Note that `collection classes` (e.g. `Model`, `ControlParameters`,</span>
+<span class="sd">    `InputSequences` are placed on top of the respective section and the</span>
+<span class="sd">    `contained classes` (e.g. model methods, `ControlParameter` instances,</span>
+<span class="sd">    `InputSequence` instances at the bottom.  This differs from the order</span>
+<span class="sd">    of their definition in the respective modules, but results in a better</span>
+<span class="sd">    documentation structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">caption</span> <span class="o">=</span> <span class="n">_all_spec2capt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">specification</span><span class="p">,</span> <span class="s1">&#39;dummy&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">caption</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;sequences&#39;</span><span class="p">):</span>
+        <span class="n">exists_collectionclass</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">name_collectionclass</span> <span class="o">=</span> <span class="n">caption</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">exists_collectionclass</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">specification</span> <span class="o">==</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;.. autoclass:: &#39;</span> <span class="o">+</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;.Model&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    :members:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    :show-inheritance:&#39;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">exists_collectionclass</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;.. autoclass:: </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                            <span class="n">name_collectionclass</span><span class="p">),</span>
+                  <span class="s1">&#39;    :members:&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;    :show-inheritance:&#39;</span><span class="p">]</span>
+    <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;.. automodule:: &#39;</span> <span class="o">+</span> <span class="n">module</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+              <span class="s1">&#39;    :members:&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;    :show-inheritance:&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">specification</span> <span class="o">==</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;    :exclude-members: Model&#39;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">exists_collectionclass</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;    :exclude-members: &#39;</span> <span class="o">+</span> <span class="n">name_collectionclass</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lines</span>
+
+
+<div class="viewcode-block" id="autodoc_basemodel"><a class="viewcode-back" href="../../../magictools.html#hydpy.core.magictools.autodoc_basemodel">[docs]</a><span class="k">def</span> <span class="nf">autodoc_basemodel</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Add an exhaustive docstring to the `__init__` module of a basemodel.</span>
+
+<span class="sd">    One just has to write `autodoc_basemodel()` at the bottom of an `__init__`</span>
+<span class="sd">    module of a basemodel, and all model, parameter and sequence information</span>
+<span class="sd">    are appended to the modules docstring.  The resulting docstring is suitable</span>
+<span class="sd">    automatic documentation generation via `Sphinx` and `autodoc`.  Hence</span>
+<span class="sd">    it helps in constructing HydPy&#39;s online documentation and supports the</span>
+<span class="sd">    embeded help feature of `Spyder` (to see the result, import the package</span>
+<span class="sd">    of an arbitrary basemodel, e.g. `from hydpy.models import lland` and</span>
+<span class="sd">    press `cntr+i` with the cursor placed on `lland` written in the IPython</span>
+<span class="sd">    console afterwards).</span>
+
+<span class="sd">    Note that the resulting documentation will be complete only when the</span>
+<span class="sd">    modules of the basemodel are named in the standard way, e.g. `lland_model`,</span>
+<span class="sd">    `lland_control`, `lland_inputs`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_locals</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">namespace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;__doc__&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">basemodulename</span> <span class="o">=</span> <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;__name__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">namespace</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+               <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">)</span> <span class="ow">and</span>
+                   <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">basemodulename</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="p">))}</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">specification</span> <span class="o">=</span> <span class="s1">&#39;model&#39;</span>
+    <span class="n">modulename</span> <span class="o">=</span> <span class="n">basemodulename</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">specification</span>
+    <span class="k">if</span> <span class="n">modulename</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="p">[</span><span class="n">modulename</span><span class="p">]</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="n">_add_title</span><span class="p">(</span><span class="s1">&#39;Model features&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="n">_add_lines</span><span class="p">(</span><span class="n">specification</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">spec2capt</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">((</span><span class="n">_PAR_SPEC2CAPT</span><span class="p">,</span> <span class="n">_SEQ_SPEC2CAPT</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s1">&#39;Parameter features&#39;</span><span class="p">,</span> <span class="s1">&#39;Sequence features&#39;</span><span class="p">)):</span>
+        <span class="n">new_lines</span> <span class="o">=</span> <span class="n">_add_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">found_module</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">specification</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span> <span class="ow">in</span> <span class="n">spec2capt</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">modulename</span> <span class="o">=</span> <span class="n">basemodulename</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">specification</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">modulename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">module</span><span class="p">:</span>
+                <span class="n">found_module</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">new_lines</span> <span class="o">+=</span> <span class="n">_add_title</span><span class="p">(</span><span class="n">caption</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="n">new_lines</span> <span class="o">+=</span> <span class="n">_add_lines</span><span class="p">(</span><span class="n">specification</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">found_module</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">+=</span> <span class="n">new_lines</span>
+    <span class="n">doc</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">namespace</span><span class="p">[</span><span class="s1">&#39;__doc__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">doc</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

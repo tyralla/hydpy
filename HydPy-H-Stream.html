@@ -1,0 +1,688 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HydPy-H-Stream &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HydPy-H-Branch" href="HydPy-H-Branch.html" />
+    <link rel="prev" title="HydPy-H-Land" href="HydPy-H-Land.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Branch.html" title="HydPy-H-Branch"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Land.html" title="HydPy-H-Land"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-H.html" accesskey="U">HydPy-H (HBV)</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hydpy-h-stream">
+<span id="id1"></span><h1>HydPy-H-Stream<a class="headerlink" href="#hydpy-h-stream" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-hydpy.models.hstream"></span><p>The HydPy-H-Stream model is an very simple routing approach.  More
+precisely, it is a simplification of the Muskingum approach, which
+itself can be seen as a naive finite difference solution of the
+routing problem.</p>
+<div class="section" id="model-features">
+<h2>Model features<a class="headerlink" href="#model-features" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_model.Model">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_model.</code><code class="descname">Model</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_model.html#Model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_model.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modeltools.html#hydpy.core.modeltools.Model" title="hydpy.core.modeltools.Model"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.modeltools.Model</span></code></a></p>
+<p>The HydPy-H-Stream model.</p>
+<dl class="docutils">
+<dt>The following “run methods” are called each simulation step run in the given sequence:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_model.calc_qjoints_v1" title="hydpy.models.hstream.hstream_model.calc_qjoints_v1"><code class="xref py py-func docutils literal"><span class="pre">calc_qjoints_v1()</span></code></a> <cite>Apply the routing equation.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_model.update_inlets_v1" title="hydpy.models.hstream.hstream_model.update_inlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_inlets_v1()</span></code></a> <cite>Assign the actual value of the inlet sequence to the upper joint of the subreach upstream.</cite></li>
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_model.update_outlets_v1" title="hydpy.models.hstream.hstream_model.update_outlets_v1"><code class="xref py py-func docutils literal"><span class="pre">update_outlets_v1()</span></code></a> <cite>Assing the actual value of the lower joint of of the subreach downstream to the outlet sequence.</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.hstream.hstream_model"></span><dl class="function">
+<dt id="hydpy.models.hstream.hstream_model.calc_qjoints_v1">
+<code class="descclassname">hydpy.models.hstream.hstream_model.</code><code class="descname">calc_qjoints_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_model.html#calc_qjoints_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_model.calc_qjoints_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the routing equation.</p>
+<dl class="docutils">
+<dt>Required derived parameters:</dt>
+<dd><a class="reference internal" href="#hydpy.models.hstream.hstream_derived.NmbSegments" title="hydpy.models.hstream.hstream_derived.NmbSegments"><code class="xref py py-class docutils literal"><span class="pre">NmbSegments</span></code></a>
+<a class="reference internal" href="#hydpy.models.hstream.hstream_derived.C1" title="hydpy.models.hstream.hstream_derived.C1"><code class="xref py py-class docutils literal"><span class="pre">C1</span></code></a>
+<a class="reference internal" href="#hydpy.models.hstream.hstream_derived.C2" title="hydpy.models.hstream.hstream_derived.C2"><code class="xref py py-class docutils literal"><span class="pre">C2</span></code></a>
+<a class="reference internal" href="#hydpy.models.hstream.hstream_derived.C3" title="hydpy.models.hstream.hstream_derived.C3"><code class="xref py py-class docutils literal"><span class="pre">C3</span></code></a></dd>
+<dt>Updated state sequence:</dt>
+<dd><a class="reference internal" href="#hydpy.models.hstream.hstream_states.QJoints" title="hydpy.models.hstream.hstream_states.QJoints"><code class="xref py py-class docutils literal"><span class="pre">QJoints</span></code></a></dd>
+<dt>Basic equation:</dt>
+<dd><span class="math">\(Q_{space+1,time+1} =
+c1 \cdot Q_{space,time+1} +
+c2 \cdot Q_{space,time} +
+c3 \cdot Q_{space+1,time}\)</span></dd>
+</dl>
+<p>Examples:</p>
+<blockquote>
+<div><p>Firstly, define a reach divided into 4 segments:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.hstream</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsegments</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<p>Zero damping is achieved through the following coefficients:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c1</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c2</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c3</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For initialization, assume a base flow of 2m³/s:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="o">.</span><span class="n">old</span> <span class="o">=</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="mf">2.</span>
+</pre></div>
+</div>
+<p>Through successive assignements of different discharge values
+to the upper junction one can see, that these discharge values
+are simply shifted from each junction to the respective lower
+junction at each time step:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_qjoints_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span>
+<span class="go">qjoints(5.0, 2.0, 2.0, 2.0, 2.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_qjoints_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span>
+<span class="go">qjoints(8.0, 5.0, 2.0, 2.0, 2.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">6.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_qjoints_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span>
+<span class="go">qjoints(6.0, 8.0, 5.0, 2.0, 2.0)</span>
+</pre></div>
+</div>
+<p>With the maximum damping allowed, the values of the derived
+parameters are:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c1</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c2</span><span class="p">(</span><span class="o">.</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c3</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Assuming again a base flow of 2m³/s and the same input values
+results in:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="o">.</span><span class="n">old</span> <span class="o">=</span> <span class="mf">2.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="o">.</span><span class="n">new</span> <span class="o">=</span> <span class="mf">2.</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_qjoints_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span>
+<span class="go">qjoints(5.0, 3.5, 2.75, 2.375, 2.1875)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">8.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_qjoints_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span>
+<span class="go">qjoints(8.0, 5.75, 4.25, 3.3125, 2.75)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">6.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">calc_qjoints_v1</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">new2old</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span>
+<span class="go">qjoints(6.0, 5.875, 5.0625, 4.1875, 3.46875)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.hstream.hstream_model.update_inlets_v1">
+<code class="descclassname">hydpy.models.hstream.hstream_model.</code><code class="descname">update_inlets_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_model.html#update_inlets_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_model.update_inlets_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign the actual value of the inlet sequence to the upper joint
+of the subreach upstream.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hydpy.models.hstream.hstream_model.update_outlets_v1">
+<code class="descclassname">hydpy.models.hstream.hstream_model.</code><code class="descname">update_outlets_v1</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_model.html#update_outlets_v1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_model.update_outlets_v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assing the actual value of the lower joint of of the subreach
+downstream to the outlet sequence.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="parameter-features">
+<h2>Parameter features<a class="headerlink" href="#parameter-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-hydpy.models.hstream.hstream_parameters">
+<span id="parameter-tools"></span><h3>Parameter tools<a class="headerlink" href="#module-hydpy.models.hstream.hstream_parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_parameters.Parameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_parameters.</code><code class="descname">Parameters</code><span class="sig-paren">(</span><em>kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_parameters.html#Parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_parameters.Parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.Parameters" title="hydpy.core.parametertools.Parameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.Parameters</span></code></a></p>
+<p>All parameters of the hstream model.</p>
+<dl class="method">
+<dt id="hydpy.models.hstream.hstream_parameters.Parameters.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_parameters.html#Parameters.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_parameters.Parameters.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines the values of the parameters handled by
+<code class="xref py py-class docutils literal"><span class="pre">DerivedParameters</span></code> based on the values of the parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.models.hstream.hstream_parameters.Parameters.calc_nmbsegments">
+<code class="descname">calc_nmbsegments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_parameters.html#Parameters.calc_nmbsegments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_parameters.Parameters.calc_nmbsegments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines in how many segments the whole reach needs to be
+divided to approximate the desired lag time via integer rounding.
+Adjusts the shape of sequence <code class="xref py py-class docutils literal"><span class="pre">QJoints</span></code> additionally.</p>
+<dl class="docutils">
+<dt>Required control parameters:</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">Lag</span></code></dd>
+<dt>Calculated derived parameters:</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">NmbSegments</span></code></dd>
+<dt>Prepared state sequence:</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">QJoints</span></code></dd>
+</dl>
+<p>Example:</p>
+<blockquote>
+<div><p>Define a lag time of 1.4 days and a simulation step size of 12
+hours:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.hstream</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simulationstep</span><span class="p">(</span><span class="s1">&#39;12h&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lag</span><span class="p">(</span><span class="mf">1.4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then the actual lag value for the simulation step size is 2.8</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lag</span>
+<span class="go">lag(1.4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lag</span><span class="o">.</span><span class="n">value</span>
+<span class="go">2.8</span>
+</pre></div>
+</div>
+<p>Through rounding the number of segments is determined:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">calc_nmbsegments</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">nmbsegments</span>
+<span class="go">nmbsegments(3)</span>
+</pre></div>
+</div>
+<p>The number of joints is always the number of segments plus one:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">states</span><span class="o">.</span><span class="n">qjoints</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(4,)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="hydpy.models.hstream.hstream_parameters.Parameters.calc_coefficients">
+<code class="descname">calc_coefficients</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_parameters.html#Parameters.calc_coefficients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_parameters.Parameters.calc_coefficients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Muskingum coefficients.</p>
+<dl class="docutils">
+<dt>Required control parameters:</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">Damp</span></code></dd>
+<dt>Calculated derived parameters:</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">C1</span></code>
+<code class="xref py py-class docutils literal"><span class="pre">C2</span></code>
+<code class="xref py py-class docutils literal"><span class="pre">C3</span></code></dd>
+<dt>Basic equations:</dt>
+<dd><p class="first"><span class="math">\(c_1 = \frac{Damp}{1+Damp}\)</span></p>
+<p><span class="math">\(c_3 = \frac{Damp}{1+Damp}\)</span></p>
+<p class="last"><span class="math">\(c_2 = 1.-c_1-c_3\)</span></p>
+</dd>
+</dl>
+<p>Examples:</p>
+<blockquote>
+<div><p>If no damping is required, the coeffients are:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">hydpy.models.hstream</span> <span class="k">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parameterstep</span><span class="p">(</span><span class="s1">&#39;1d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">damp</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">calc_coefficients</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="n">derived</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="n">derived</span><span class="o">.</span><span class="n">c3</span>
+<span class="go">(c1(0.0), c2(1.0), c3(0.0))</span>
+</pre></div>
+</div>
+<p>The strongest damping is achieved through:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">damp</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">calc_coefficients</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="n">derived</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="n">derived</span><span class="o">.</span><span class="n">c3</span>
+<span class="go">(c1(0.5), c2(0.0), c3(0.5))</span>
+</pre></div>
+</div>
+<p>And finally an intermediate example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">damp</span><span class="p">(</span><span class="o">.</span><span class="mi">25</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">calc_coefficients</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">derived</span><span class="o">.</span><span class="n">c1</span><span class="p">,</span> <span class="n">derived</span><span class="o">.</span><span class="n">c2</span><span class="p">,</span> <span class="n">derived</span><span class="o">.</span><span class="n">c3</span>
+<span class="go">(c1(0.2), c2(0.6), c3(0.2))</span>
+</pre></div>
+</div>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="control-parameters">
+<h3>Control parameters<a class="headerlink" href="#control-parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_control.ControlParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_control.</code><code class="descname">ControlParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_control.html#ControlParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_control.ControlParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Control parameters of hstream, directly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_control.Lag" title="hydpy.models.hstream.hstream_control.Lag"><code class="xref py py-class docutils literal"><span class="pre">Lag</span></code></a> <cite>Time lag between inflow and outflow [T].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_control.Damp" title="hydpy.models.hstream.hstream_control.Damp"><code class="xref py py-class docutils literal"><span class="pre">Damp</span></code></a> <cite>Damping of the hydrograph [-].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.hstream.hstream_control"></span><dl class="class">
+<dt id="hydpy.models.hstream.hstream_control.Lag">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_control.</code><code class="descname">Lag</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_control.html#Lag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Lag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Time lag between inflow and outflow [T].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Lag.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Lag.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Lag.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Lag.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Lag.TIME">
+<code class="descname">TIME</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Lag.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Lag.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Lag.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_control.Damp">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_control.</code><code class="descname">Damp</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_control.html#Damp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Damp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Damping of the hydrograph [-].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Damp.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Damp.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Damp.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, 1.0)</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Damp.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Damp.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Damp.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_control.Damp.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.hstream.hstream_control.Damp.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="derived-parameters">
+<h3>Derived parameters<a class="headerlink" href="#derived-parameters" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_derived.DerivedParameters">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_derived.</code><code class="descname">DerivedParameters</code><span class="sig-paren">(</span><em>pars</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_derived.html#DerivedParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.DerivedParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SubParameters" title="hydpy.core.parametertools.SubParameters"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SubParameters</span></code></a></p>
+<p>Derived parameters of hstream, indirectly defined by the user.</p>
+<dl class="docutils">
+<dt>The following parameter classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_derived.NmbSegments" title="hydpy.models.hstream.hstream_derived.NmbSegments"><code class="xref py py-class docutils literal"><span class="pre">NmbSegments</span></code></a> <cite>Number of river segments [-].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_derived.C1" title="hydpy.models.hstream.hstream_derived.C1"><code class="xref py py-class docutils literal"><span class="pre">C1</span></code></a> <cite>First coefficient of the muskingum working formula [-].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_derived.C2" title="hydpy.models.hstream.hstream_derived.C2"><code class="xref py py-class docutils literal"><span class="pre">C2</span></code></a> <cite>Second coefficient of the muskingum working formula [-].</cite></li>
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_derived.C3" title="hydpy.models.hstream.hstream_derived.C3"><code class="xref py py-class docutils literal"><span class="pre">C3</span></code></a> <cite>Third coefficient of the muskingum working formula [-].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.hstream.hstream_derived"></span><dl class="class">
+<dt id="hydpy.models.hstream.hstream_derived.NmbSegments">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_derived.</code><code class="descname">NmbSegments</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_derived.html#NmbSegments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.NmbSegments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Number of river segments [-].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.NmbSegments.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.NmbSegments.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.NmbSegments.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0, None)</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.NmbSegments.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.NmbSegments.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.NmbSegments.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.NmbSegments.TYPE">
+<code class="descname">TYPE</code><em class="property"> = int</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.NmbSegments.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_derived.C1">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_derived.</code><code class="descname">C1</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_derived.html#C1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>First coefficient of the muskingum working formula [-].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C1.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C1.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C1.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, 0.5)</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C1.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C1.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C1.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C1.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C1.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_derived.C2">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_derived.</code><code class="descname">C2</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_derived.html#C2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Second coefficient of the muskingum working formula [-].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C2.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C2.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C2.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, 1.0)</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C2.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C2.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C2.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C2.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C2.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_derived.C3">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_derived.</code><code class="descname">C3</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_derived.html#C3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="parametertools.html#hydpy.core.parametertools.SingleParameter" title="hydpy.core.parametertools.SingleParameter"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.parametertools.SingleParameter</span></code></a></p>
+<p>Third coefficient of the muskingum working formula [-].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C3.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C3.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C3.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, 0.5)</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C3.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C3.TIME">
+<code class="descname">TIME</code><em class="property"> = None</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C3.TIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_derived.C3.TYPE">
+<code class="descname">TYPE</code><em class="property"> = float</em><a class="headerlink" href="#hydpy.models.hstream.hstream_derived.C3.TYPE" title="Permalink to this definition">¶</a></dt>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="sequence-features">
+<h2>Sequence features<a class="headerlink" href="#sequence-features" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="state-sequences">
+<h3>State sequences<a class="headerlink" href="#state-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_states.StateSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_states.</code><code class="descname">StateSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_states.html#StateSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_states.StateSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequences" title="hydpy.core.sequencetools.StateSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequences</span></code></a></p>
+<p>State sequences of the hstream model.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_states.QJoints" title="hydpy.models.hstream.hstream_states.QJoints"><code class="xref py py-class docutils literal"><span class="pre">QJoints</span></code></a> <cite>Runoff at the segment junctions [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.hstream.hstream_states"></span><dl class="class">
+<dt id="hydpy.models.hstream.hstream_states.QJoints">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_states.</code><code class="descname">QJoints</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_states.html#QJoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_states.QJoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.StateSequence" title="hydpy.core.sequencetools.StateSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.StateSequence</span></code></a></p>
+<p>Runoff at the segment junctions [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_states.QJoints.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 1</em><a class="headerlink" href="#hydpy.models.hstream.hstream_states.QJoints.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_states.QJoints.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.hstream.hstream_states.QJoints.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_states.QJoints.SPAN">
+<code class="descname">SPAN</code><em class="property"> = (0.0, None)</em><a class="headerlink" href="#hydpy.models.hstream.hstream_states.QJoints.SPAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="inlet-sequences">
+<h3>Inlet sequences<a class="headerlink" href="#inlet-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_inlets.InletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_inlets.</code><code class="descname">InletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_inlets.html#InletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_inlets.InletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Upstream link sequences of the hstream model.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_inlets.Q" title="hydpy.models.hstream.hstream_inlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Runoff [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.hstream.hstream_inlets"></span><dl class="class">
+<dt id="hydpy.models.hstream.hstream_inlets.Q">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_inlets.</code><code class="descname">Q</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_inlets.html#Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_inlets.Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequence" title="hydpy.core.sequencetools.LinkSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequence</span></code></a></p>
+<p>Runoff [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_inlets.Q.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_inlets.Q.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_inlets.Q.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.hstream.hstream_inlets.Q.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="outlet-sequences">
+<h3>Outlet sequences<a class="headerlink" href="#outlet-sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hydpy.models.hstream.hstream_outlets.OutletSequences">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_outlets.</code><code class="descname">OutletSequences</code><span class="sig-paren">(</span><em>seqs</em>, <em>cls_fastaccess=None</em>, <em>cymodel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_outlets.html#OutletSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_outlets.OutletSequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequences" title="hydpy.core.sequencetools.LinkSequences"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequences</span></code></a></p>
+<p>Downstream link sequences of the hstream model.</p>
+<dl class="docutils">
+<dt>The following sequence classes are selected:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#hydpy.models.hstream.hstream_outlets.Q" title="hydpy.models.hstream.hstream_outlets.Q"><code class="xref py py-class docutils literal"><span class="pre">Q</span></code></a> <cite>Runoff [m³/s].</cite></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-hydpy.models.hstream.hstream_outlets"></span><dl class="class">
+<dt id="hydpy.models.hstream.hstream_outlets.Q">
+<em class="property">class </em><code class="descclassname">hydpy.models.hstream.hstream_outlets.</code><code class="descname">Q</code><a class="reference internal" href="_modules/hydpy/models/hstream/hstream_outlets.html#Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#hydpy.models.hstream.hstream_outlets.Q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="sequencetools.html#hydpy.core.sequencetools.LinkSequence" title="hydpy.core.sequencetools.LinkSequence"><code class="xref py py-class docutils literal"><span class="pre">hydpy.core.sequencetools.LinkSequence</span></code></a></p>
+<p>Runoff [m³/s].</p>
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_outlets.Q.NDIM">
+<code class="descname">NDIM</code><em class="property"> = 0</em><a class="headerlink" href="#hydpy.models.hstream.hstream_outlets.Q.NDIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="hydpy.models.hstream.hstream_outlets.Q.NUMERIC">
+<code class="descname">NUMERIC</code><em class="property"> = False</em><a class="headerlink" href="#hydpy.models.hstream.hstream_outlets.Q.NUMERIC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HydPy-H-Stream</a><ul>
+<li><a class="reference internal" href="#model-features">Model features</a></li>
+<li><a class="reference internal" href="#parameter-features">Parameter features</a><ul>
+<li><a class="reference internal" href="#module-hydpy.models.hstream.hstream_parameters">Parameter tools</a></li>
+<li><a class="reference internal" href="#control-parameters">Control parameters</a></li>
+<li><a class="reference internal" href="#derived-parameters">Derived parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sequence-features">Sequence features</a><ul>
+<li><a class="reference internal" href="#state-sequences">State sequences</a></li>
+<li><a class="reference internal" href="#inlet-sequences">Inlet sequences</a></li>
+<li><a class="reference internal" href="#outlet-sequences">Outlet sequences</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="HydPy-H-Land.html"
+                        title="previous chapter">HydPy-H-Land</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="HydPy-H-Branch.html"
+                        title="next chapter">HydPy-H-Branch</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/HydPy-H-Stream.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Branch.html" title="HydPy-H-Branch"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="HydPy-H-Land.html" title="HydPy-H-Land"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modelcollection.html" >Model Collection</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="HydPy-H.html" >HydPy-H (HBV)</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

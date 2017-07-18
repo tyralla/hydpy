@@ -1,0 +1,185 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lstream.lstream_control &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lstream.lstream_control</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+
+
+<div class="viewcode-block" id="Laen"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.Laen">[docs]</a><span class="k">class</span> <span class="nc">Laen</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flusslänge (channel length) [km].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gef"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.Gef">[docs]</a><span class="k">class</span> <span class="nc">Gef</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sohlgefälle (channel slope) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.HM">[docs]</a><span class="k">class</span> <span class="nc">HM</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Höhe Hauptgerinne (height of the main channel) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.BM">[docs]</a><span class="k">class</span> <span class="nc">BM</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sohlbreite Hauptgerinne (bed width of the main channel) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BNM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.BNM">[docs]</a><span class="k">class</span> <span class="nc">BNM</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Böschungsneigung Hauptgerinne (slope of both main channel embankments)</span>
+<span class="sd">    [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.BV">[docs]</a><span class="k">class</span> <span class="nc">BV</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">LeftRightParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sohlbreite Vorländer (bed widths of both forelands) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BBV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.BBV">[docs]</a><span class="k">class</span> <span class="nc">BBV</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">LeftRightParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Breite Vorlandböschungen (width of both foreland embankments) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BNV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.BNV">[docs]</a><span class="k">class</span> <span class="nc">BNV</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">LeftRightParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Böschungsneigung Vorländer (slope of both foreland embankments) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BNVR"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.BNVR">[docs]</a><span class="k">class</span> <span class="nc">BNVR</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">LeftRightParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Böschungsneigung Vorlandränder (slope of both outer embankments) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SKM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.SKM">[docs]</a><span class="k">class</span> <span class="nc">SKM</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rauigkeitsbeiwert Hauptgerinne (roughness coefficient of the main</span>
+<span class="sd">    channel) [m^(1/3)/s].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SKV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.SKV">[docs]</a><span class="k">class</span> <span class="nc">SKV</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">LeftRightParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rauigkeitsbeiwert Vorländer (roughness coefficient of the both</span>
+<span class="sd">    forelands) [m^(1/3)/s].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EKM"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.EKM">[docs]</a><span class="k">class</span> <span class="nc">EKM</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kalibrierfaktor Hauptgerinne (calibration factor for the main</span>
+<span class="sd">    channel) [-].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EKV"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.EKV">[docs]</a><span class="k">class</span> <span class="nc">EKV</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">LeftRightParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kalibrierfaktor Vorländer (calibration factor for both forelands) [m].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QTol"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.QTol">[docs]</a><span class="k">class</span> <span class="nc">QTol</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Approximationstoleranz Abfluss (discharge related stopping criterion</span>
+<span class="sd">    for root-finding algorithms) [m³/s].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">INIT</span> <span class="o">=</span> <span class="mf">1e-6</span></div>
+
+
+<div class="viewcode-block" id="HTol"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.HTol">[docs]</a><span class="k">class</span> <span class="nc">HTol</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SingleParameter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Approximationstoleranz Wasserstand (water stage related stopping</span>
+<span class="sd">    criterion for root-finding algorithms) [m].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">,</span> <span class="n">TIME</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">INIT</span> <span class="o">=</span> <span class="mf">1e-6</span></div>
+
+
+<div class="viewcode-block" id="ControlParameters"><a class="viewcode-back" href="../../../../HydPy-L-Stream.html#hydpy.models.lstream.lstream_control.ControlParameters">[docs]</a><span class="k">class</span> <span class="nc">ControlParameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SubParameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control parameters HydPy-L-Stream, directly defined by the user.&quot;&quot;&quot;</span>
+    <span class="n">_PARCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">Laen</span><span class="p">,</span> <span class="n">Gef</span><span class="p">,</span> <span class="n">HM</span><span class="p">,</span> <span class="n">BM</span><span class="p">,</span> <span class="n">BV</span><span class="p">,</span> <span class="n">BBV</span><span class="p">,</span> <span class="n">BNM</span><span class="p">,</span> <span class="n">BNV</span><span class="p">,</span> <span class="n">BNVR</span><span class="p">,</span>
+                   <span class="n">SKM</span><span class="p">,</span> <span class="n">SKV</span><span class="p">,</span> <span class="n">EKM</span><span class="p">,</span> <span class="n">EKV</span><span class="p">,</span> <span class="n">QTol</span><span class="p">,</span> <span class="n">HTol</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

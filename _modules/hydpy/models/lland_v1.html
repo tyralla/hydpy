@@ -1,0 +1,396 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lland_v1 &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lland_v1</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Version 1 of the L-Land model is designed to aggree with the LARSIM-ME</span>
+<span class="sd">configuration of the LARSIM model used by the German Federal Institute</span>
+<span class="sd">of Hydrology (BfG), but offers more flexibility in some regards (e.g. in</span>
+<span class="sd">parameterization).  It can briefly be summarized as follows:</span>
+
+<span class="sd"> * Simple routines for adjusting the meteorological input data.</span>
+<span class="sd"> * Reference evapotranspiration after Turc-Wendling.</span>
+<span class="sd"> * An enhanced degree-day-method for calculating snow melt.</span>
+<span class="sd"> * A simple snow retention routine.</span>
+<span class="sd"> * Landuse and month specific potential evapotranspiration.</span>
+<span class="sd"> * Acual soil evapotranspiration after ATV-DVWK- 504 (2002).</span>
+<span class="sd"> * Soil routine based on the Xinanjiang model.</span>
+<span class="sd"> * One base flow, two interflow and two direct flow components.</span>
+<span class="sd"> * Seperate linear storages for modelling runoff concentration.</span>
+<span class="sd"> * Additional evaporation from water areas.</span>
+
+<span class="sd">The following picture shows the general structure of L-Land Version 1.  Note</span>
+<span class="sd">that, besides water areas and sealed surface areas, all land use types rely</span>
+<span class="sd">on the same process equations:</span>
+
+<span class="sd">.. image:: HydPy-L-Land_Version-1.png</span>
+
+<span class="sd">As all models implemented in HydPy, base model L-Land can principally be</span>
+<span class="sd">applied on arbitrary simulation step sizes.  But for the L-Land version 1</span>
+<span class="sd">application model one has to be aware, that the Turc-Wendling equation</span>
+<span class="sd">for calculating reference evaporation is designed for daily values only.</span>
+
+
+<span class="sd">Integration tests:</span>
+
+<span class="sd">    The integration tests are performed in January (to allow for realistic</span>
+<span class="sd">    snow examples), spanning over a period of five days:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy import pub, Timegrid, Timegrids</span>
+<span class="sd">    &gt;&gt;&gt; pub.timegrids = Timegrids(Timegrid(&#39;01.01.2000&#39;,</span>
+<span class="sd">    ...                                    &#39;06.01.2000&#39;,</span>
+<span class="sd">    ...                                    &#39;1d&#39;))</span>
+
+<span class="sd">    Prepare the model instance and built the connections to element `land`</span>
+<span class="sd">    and node `outlet`:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.models.lland_v1 import *</span>
+<span class="sd">    &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; from hydpy import Node, Element</span>
+<span class="sd">    &gt;&gt;&gt; outlet = Node(&#39;outlet&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; land = Element(&#39;land&#39;, outlets=outlet)</span>
+<span class="sd">    &gt;&gt;&gt; land.connect(model)</span>
+
+<span class="sd">    All tests shall be performed using single hydrological response unit with</span>
+<span class="sd">    a size of one square kilometre an a altitude of 100 meter:</span>
+
+<span class="sd">    &gt;&gt;&gt; nhru(1)</span>
+<span class="sd">    &gt;&gt;&gt; ft(1.)</span>
+<span class="sd">    &gt;&gt;&gt; fhru(1.)</span>
+<span class="sd">    &gt;&gt;&gt; hnn(100.)</span>
+
+<span class="sd">    Initialize a test function object, which prepares and runs the tests</span>
+<span class="sd">    and prints their results for the given sequences:</span>
+
+<span class="sd">    &gt;&gt;&gt; from hydpy.core.testtools import Test</span>
+<span class="sd">    &gt;&gt;&gt; test = Test(land, inits={&#39;inzp&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;wats&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;waes&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;bowa&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qdgz1&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qdgz2&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qigz1&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qigz2&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qbgz&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qdga1&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qdga2&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qiga1&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qiga2&#39;: 0.,</span>
+<span class="sd">    ...                          &#39;qbga&#39;: 0.})</span>
+<span class="sd">    &gt;&gt;&gt; test.dateformat = &#39;%d.%m.&#39;</span>
+
+<span class="sd">    Set the input values for the complete simulation period:</span>
+
+<span class="sd">    &gt;&gt;&gt; inputs.nied.series = 0., 5., 5., 5., 0.</span>
+<span class="sd">    &gt;&gt;&gt; inputs.teml.series = -2., -1., 0., 1., 2.</span>
+<span class="sd">    &gt;&gt;&gt; inputs.glob.series = 100.</span>
+
+<span class="sd">    Define the control parameter values (select only arable land, sealed</span>
+<span class="sd">    soil and water area as landuse classes, as all other land use classes</span>
+<span class="sd">    are functionally identical with arable land):</span>
+
+<span class="sd">    &gt;&gt;&gt; lnk(ACKER)</span>
+<span class="sd">    &gt;&gt;&gt; kg(1.2)</span>
+<span class="sd">    &gt;&gt;&gt; kt(-1.)</span>
+<span class="sd">    &gt;&gt;&gt; ke(0.9)</span>
+<span class="sd">    &gt;&gt;&gt; kf(.6)</span>
+<span class="sd">    &gt;&gt;&gt; fln.acker_jan = 1.</span>
+<span class="sd">    &gt;&gt;&gt; fln.vers_jan = .8</span>
+<span class="sd">    &gt;&gt;&gt; fln.wasser_jan = 1.3</span>
+<span class="sd">    &gt;&gt;&gt; hinz(.2)</span>
+<span class="sd">    &gt;&gt;&gt; lai.acker_jan = 1.0</span>
+<span class="sd">    &gt;&gt;&gt; treft(0.)</span>
+<span class="sd">    &gt;&gt;&gt; trefn(0.)</span>
+<span class="sd">    &gt;&gt;&gt; tgr(0.)</span>
+<span class="sd">    &gt;&gt;&gt; tsp(0.)</span>
+<span class="sd">    &gt;&gt;&gt; gtf(5.)</span>
+<span class="sd">    &gt;&gt;&gt; rschmelz(334.)</span>
+<span class="sd">    &gt;&gt;&gt; cpwasser(4.1868)</span>
+<span class="sd">    &gt;&gt;&gt; pwmax(1.4)</span>
+<span class="sd">    &gt;&gt;&gt; grasref_r(5.)</span>
+<span class="sd">    &gt;&gt;&gt; nfk(200.)</span>
+<span class="sd">    &gt;&gt;&gt; relwz(.5)</span>
+<span class="sd">    &gt;&gt;&gt; relwb(.05)</span>
+<span class="sd">    &gt;&gt;&gt; beta(.01)</span>
+<span class="sd">    &gt;&gt;&gt; fbeta(1.)</span>
+<span class="sd">    &gt;&gt;&gt; dmax(5.)</span>
+<span class="sd">    &gt;&gt;&gt; dmin(1.)</span>
+<span class="sd">    &gt;&gt;&gt; bsf(.4)</span>
+<span class="sd">    &gt;&gt;&gt; a1(0.)</span>
+<span class="sd">    &gt;&gt;&gt; a2(inf)</span>
+<span class="sd">    &gt;&gt;&gt; tind(1.)</span>
+<span class="sd">    &gt;&gt;&gt; eqb(100.)</span>
+<span class="sd">    &gt;&gt;&gt; eqi1(50.)</span>
+<span class="sd">    &gt;&gt;&gt; eqi2(10.)</span>
+<span class="sd">    &gt;&gt;&gt; eqd1(2.)</span>
+<span class="sd">    &gt;&gt;&gt; eqd2(1.)</span>
+
+<span class="sd">    Check the correctness of the results:</span>
+
+<span class="sd">    &gt;&gt;&gt; test()</span>
+<span class="sd">    |   date | nied | teml |  glob | nkor | tkor |      et0 |     evpo | nbes | sbes | evi |      evb |     wgtf |     schm |     wada |      qdb | qib1 | qib2 | qbb |     qdgz |        q | inzp |     wats |     waes |     bowa |    qdgz1 | qdgz2 | qigz1 | qigz2 | qbgz |    qdga1 | qdga2 | qiga1 | qiga2 | qbga |   outlet |</span>
+<span class="sd">    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+<span class="sd">    | 01.01. |  0.0 | -2.0 | 100.0 |  0.0 | -3.0 | 0.779561 | 0.779561 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |      0.0 |      0.0 |      0.0 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |  0.0 |      0.0 |      0.0 |      0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |</span>
+<span class="sd">    | 02.01. |  5.0 | -1.0 | 100.0 |  6.0 | -2.0 | 0.813809 | 0.813809 |  5.8 |  5.8 | 0.2 |      0.0 |      0.0 |      0.0 |      0.0 |      0.0 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |  0.0 |      5.8 |      5.8 |      0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |</span>
+<span class="sd">    | 03.01. |  5.0 |  0.0 | 100.0 |  6.0 | -1.0 | 0.847495 | 0.847495 |  5.8 |  5.8 | 0.2 |      0.0 |      0.0 |      0.0 |      0.0 |      0.0 |  0.0 |  0.0 | 0.0 |      0.0 |      0.0 |  0.0 |     11.6 |     11.6 |      0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |   0.0 |   0.0 |   0.0 |  0.0 |      0.0 |</span>
+<span class="sd">    | 04.01. |  5.0 |  1.0 | 100.0 |  6.0 |  0.0 | 0.880634 | 0.880634 |  5.8 |  0.0 | 0.2 |      0.0 |      0.0 |      0.0 |     1.16 | 0.000962 |  0.0 |  0.0 | 0.0 | 0.000962 | 0.000205 |  0.0 |     11.6 |    16.24 | 1.159038 | 0.000962 |   0.0 |   0.0 |   0.0 |  0.0 | 0.000205 |   0.0 |   0.0 |   0.0 |  0.0 | 0.000002 |</span>
+<span class="sd">    | 05.01. |  0.0 |  2.0 | 100.0 |  0.0 |  1.0 | 0.913238 | 0.913238 |  0.0 |  0.0 | 0.0 | 0.013321 | 5.012535 | 5.012535 | 7.017549 | 0.047086 |  0.0 |  0.0 | 0.0 | 0.047086 |  0.01033 |  0.0 | 6.587465 | 9.222451 |  8.11618 | 0.047086 |   0.0 |   0.0 |   0.0 |  0.0 |  0.01033 |   0.0 |   0.0 |   0.0 |  0.0 |  0.00012 |</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...from HydPy</span>
+<span class="kn">from</span> <span class="nn">hydpy.core.modelimports</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">modeltools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">parametertools</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+<span class="c1"># ...from lland</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_model</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_control</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_derived</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_inputs</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_fluxes</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_states</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_aides</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland</span> <span class="k">import</span> <span class="n">lland_outlets</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland.lland_parameters</span> <span class="k">import</span> <span class="n">Parameters</span>
+<span class="kn">from</span> <span class="nn">hydpy.models.lland.lland_constants</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">(</span><span class="n">modeltools</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LARSIM-Land version of HydPy-L-Land (lland_v1).&quot;&quot;&quot;</span>
+    <span class="n">_RUNMETHODS</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_model</span><span class="o">.</span><span class="n">calc_nkor_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_tkor_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_et0_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_evpo_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_nbes_inzp_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_evi_inzp_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_sbes_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_wgtf_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_schm_wats_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_wada_waes_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_evb_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qbb_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qib1_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qib2_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qdb_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_bowa_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qbgz_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qigz1_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qigz2_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qdgz_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qdgz1_qdgz2_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qbga_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qiga1_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qiga2_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qdga1_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_qdga2_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">calc_q_v1</span><span class="p">,</span>
+                   <span class="n">lland_model</span><span class="o">.</span><span class="n">update_outlets_v1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ControlParameters"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.ControlParameters">[docs]</a><span class="k">class</span> <span class="nc">ControlParameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SubParameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control parameters of lland_v1, directly defined by the user.&quot;&quot;&quot;</span>
+    <span class="n">_PARCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_control</span><span class="o">.</span><span class="n">FT</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">NHRU</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">Lnk</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">FHRU</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">HNN</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">KG</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">KT</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">KE</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">KF</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">FLn</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">HInz</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">LAI</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">TRefT</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">TRefN</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">TGr</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">TSp</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">GTF</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">RSchmelz</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">CPWasser</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">PWMax</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">GrasRef_R</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">NFk</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">RelWZ</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">RelWB</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">Beta</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">FBeta</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">DMax</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">DMin</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">BSf</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">A1</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">A2</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">TInd</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">EQB</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">EQI1</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">EQI2</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">EQD1</span><span class="p">,</span>
+                   <span class="n">lland_control</span><span class="o">.</span><span class="n">EQD2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DerivedParameters"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.DerivedParameters">[docs]</a><span class="k">class</span> <span class="nc">DerivedParameters</span><span class="p">(</span><span class="n">parametertools</span><span class="o">.</span><span class="n">SubParameters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Derived parameters of lland_v1, indirectly defined by the user.&quot;&quot;&quot;</span>
+    <span class="n">_PARCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_derived</span><span class="o">.</span><span class="n">MOY</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">KInz</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">WB</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">WZ</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">KB</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">KI1</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">KI2</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">KD1</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">KD2</span><span class="p">,</span>
+                   <span class="n">lland_derived</span><span class="o">.</span><span class="n">QFactor</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InputSequences"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.InputSequences">[docs]</a><span class="k">class</span> <span class="nc">InputSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">InputSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Input sequences of lland_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_inputs</span><span class="o">.</span><span class="n">Nied</span><span class="p">,</span>
+                   <span class="n">lland_inputs</span><span class="o">.</span><span class="n">TemL</span><span class="p">,</span>
+                   <span class="n">lland_inputs</span><span class="o">.</span><span class="n">Glob</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FluxSequences"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.FluxSequences">[docs]</a><span class="k">class</span> <span class="nc">FluxSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">FluxSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Flux sequences of lland_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_fluxes</span><span class="o">.</span><span class="n">NKor</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">TKor</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">ET0</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">EvPo</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">NBes</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">SBes</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">EvI</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">EvB</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">WGTF</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">Schm</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">WaDa</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">QDB</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">QIB1</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">QIB2</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">QBB</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">QDGZ</span><span class="p">,</span>
+                   <span class="n">lland_fluxes</span><span class="o">.</span><span class="n">Q</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StateSequences"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.StateSequences">[docs]</a><span class="k">class</span> <span class="nc">StateSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;State sequences of lland_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_states</span><span class="o">.</span><span class="n">Inzp</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">WATS</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">WAeS</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">BoWa</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QDGZ1</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QDGZ2</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QIGZ1</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QIGZ2</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QBGZ</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QDGA1</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QDGA2</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QIGA1</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QIGA2</span><span class="p">,</span>
+                   <span class="n">lland_states</span><span class="o">.</span><span class="n">QBGA</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AideSequences"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.AideSequences">[docs]</a><span class="k">class</span> <span class="nc">AideSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">AideSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Aide sequences of lland_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_aides</span><span class="o">.</span><span class="n">Temp</span><span class="p">,</span>
+                   <span class="n">lland_aides</span><span class="o">.</span><span class="n">SfA</span><span class="p">,</span>
+                   <span class="n">lland_aides</span><span class="o">.</span><span class="n">Exz</span><span class="p">,</span>
+                   <span class="n">lland_aides</span><span class="o">.</span><span class="n">BVl</span><span class="p">,</span>
+                   <span class="n">lland_aides</span><span class="o">.</span><span class="n">MVl</span><span class="p">,</span>
+                   <span class="n">lland_aides</span><span class="o">.</span><span class="n">RVl</span><span class="p">,</span>
+                   <span class="n">lland_aides</span><span class="o">.</span><span class="n">EPW</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OutletSequences"><a class="viewcode-back" href="../../../lland_v1.html#hydpy.models.lland_v1.OutletSequences">[docs]</a><span class="k">class</span> <span class="nc">OutletSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">LinkSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Downstream link sequences of lland_v1.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">lland_outlets</span><span class="o">.</span><span class="n">Q</span><span class="p">,)</span></div>
+
+
+<span class="n">tester</span> <span class="o">=</span> <span class="n">Tester</span><span class="p">()</span>
+<span class="n">cythonizer</span> <span class="o">=</span> <span class="n">Cythonizer</span><span class="p">()</span>
+<span class="n">cythonizer</span><span class="o">.</span><span class="n">complete</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

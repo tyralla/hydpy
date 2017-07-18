@@ -1,0 +1,252 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>hydpy.models.lland.lland_states &#8212; HydPy 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for hydpy.models.lland.lland_states</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># import...</span>
+<span class="c1"># ...from standard library</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="c1"># ...from site-packages</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="c1"># ...HydPy specific</span>
+<span class="kn">from</span> <span class="nn">hydpy.core</span> <span class="k">import</span> <span class="n">sequencetools</span>
+
+
+<div class="viewcode-block" id="Inzp"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.Inzp">[docs]</a><span class="k">class</span> <span class="nc">Inzp</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interzeptionsspeicherung (interception storage) [mm].</span>
+
+<span class="sd">    Note that :class:`Inzp` of HydPy-L implements no specialized trim method</span>
+<span class="sd">    (as opposed to :class:`~hydpy.models.hland.hland_states.Ic` of HydPy-H).</span>
+<span class="sd">    This is due the discontinuous evolution of</span>
+<span class="sd">    :class:`~hydpy.models.lland.lland_control.IcC` in time.  In accordance</span>
+<span class="sd">    with the orginal LARSIM implementation, :class:`Inzp` can be temporarily</span>
+<span class="sd">    overfilled during rain periods whenever</span>
+<span class="sd">    :class:`~hydpy.models.lland.lland_control.IcC` drops rapidly between two</span>
+<span class="sd">    months.  A specialized trim method would just make the excess water</span>
+<span class="sd">    vanish.  But in HydPy-L, the excess water becomes</span>
+<span class="sd">    :class:`~hydpy.models.lland.lland_fluxes.ThruFall` in the first simulation</span>
+<span class="sd">    step of the new month.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WATS"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.WATS">[docs]</a><span class="k">class</span> <span class="nc">WATS</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wasseräquivalent Trockenschnee (frozen water equivalent of the snow</span>
+<span class="sd">    cover) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WATS.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.WATS.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim values in accordance with :math:`WAeS \\leq PWMax \\cdot WATS`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(7)</span>
+<span class="sd">        &gt;&gt;&gt; pwmax(2.)</span>
+<span class="sd">        &gt;&gt;&gt; states.waes = -1., 0., 1., -1., 5., 10., 20.</span>
+<span class="sd">        &gt;&gt;&gt; states.wats(-1., 0., 0., 5., 5., 5., 5.)</span>
+<span class="sd">        &gt;&gt;&gt; states.wats</span>
+<span class="sd">        wats(0.0, 0.0, 0.5, 5.0, 5.0, 5.0, 10.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pwmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">pwmax</span>
+        <span class="n">waes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">waes</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">waes</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">lower</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">waes</span><span class="o">/</span><span class="n">pwmax</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lower</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WAeS"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.WAeS">[docs]</a><span class="k">class</span> <span class="nc">WAeS</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wasseräquivalent Gesamtschnee (total water equivalent of the snow</span>
+<span class="sd">    cover) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WAeS.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.WAeS.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim values in accordance with :math:`WAeS \\leq PWMax \\cdot WATS`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(7)</span>
+<span class="sd">        &gt;&gt;&gt; pwmax(2.)</span>
+<span class="sd">        &gt;&gt;&gt; states.wats = 0., 0., 0., 5., 5., 5., 5.</span>
+<span class="sd">        &gt;&gt;&gt; states.waes(-1., 0., 1., -1., 5., 10., 20.)</span>
+<span class="sd">        &gt;&gt;&gt; states.waes</span>
+<span class="sd">        waes(0.0, 0.0, 0.0, 0.0, 5.0, 10.0, 10.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pwmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">pwmax</span>
+        <span class="n">wats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">wats</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">wats</span><span class="o">.</span><span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">pwmax</span><span class="o">*</span><span class="n">wats</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="BoWa"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.BoWa">[docs]</a><span class="k">class</span> <span class="nc">BoWa</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bodenwasserspeicherung (soil water storage) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BoWa.trim"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.BoWa.trim">[docs]</a>    <span class="k">def</span> <span class="nf">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Trim values in accordance with :math:`BoWa \\leq NFk`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from hydpy.models.lland import *</span>
+<span class="sd">        &gt;&gt;&gt; parameterstep(&#39;1d&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; nhru(5)</span>
+<span class="sd">        &gt;&gt;&gt; nfk(200.)</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa(-100.,0., 100., 200., 300.)</span>
+<span class="sd">        &gt;&gt;&gt; states.bowa</span>
+<span class="sd">        bowa(0.0, 0.0, 100.0, 200.0, 200.0)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subseqs</span><span class="o">.</span><span class="n">seqs</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">nfk</span>
+        <span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="o">.</span><span class="n">trim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="QDGZ1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGZ1">[docs]</a><span class="k">class</span> <span class="nc">QDGZ1</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zufluss in den trägeren Direktabfluss-Gebietsspeicher (inflow into</span>
+<span class="sd">    the less responsive storage compartment for direct runoff) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QDGZ2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGZ2">[docs]</a><span class="k">class</span> <span class="nc">QDGZ2</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zufluss in den dynamischeren Direktabfluss-Gebietsspeicher (inflow into</span>
+<span class="sd">    the more responsive storage compartment for direct runoff) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QIGZ1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGZ1">[docs]</a><span class="k">class</span> <span class="nc">QIGZ1</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot;Zufluss in den ersten Zwischenabfluss-Gebietsspeicher (inflow into the</span>
+<span class="sd">    first storage compartment for interflow) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QIGZ2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGZ2">[docs]</a><span class="k">class</span> <span class="nc">QIGZ2</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zufluss in den zweiten Zwischenabfluss-Gebietsspeicher (inflow into the</span>
+<span class="sd">    second storage compartment for interflow) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QBGZ"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QBGZ">[docs]</a><span class="k">class</span> <span class="nc">QBGZ</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zufluss in den Basisabfluss-Gebietsspeicher (inflow into the</span>
+<span class="sd">    storage compartment for base flow) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QDGA1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGA1">[docs]</a><span class="k">class</span> <span class="nc">QDGA1</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abfluss aus dem trägeren Direktabfluss-Gebietsspeicher (outflow from</span>
+<span class="sd">    the less responsive storage compartment for direct runoff) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QDGA2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QDGA2">[docs]</a><span class="k">class</span> <span class="nc">QDGA2</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abfluss aus dem dynamischeren Direktabfluss-Gebietsspeicher (outflow</span>
+<span class="sd">    from the more responsive storage compartment for direct runoff) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QIGA1"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGA1">[docs]</a><span class="k">class</span> <span class="nc">QIGA1</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abfluss aus dem &quot;unteren&quot; Zwischenabfluss-Gebietsspeicher (outflow from</span>
+<span class="sd">    the storage compartment for the first interflow component) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QIGA2"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QIGA2">[docs]</a><span class="k">class</span> <span class="nc">QIGA2</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abfluss aus dem &quot;oberen&quot; Zwischenabfluss-Gebietsspeicher (outflow from</span>
+<span class="sd">    the storage compartment for the second interflow component) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QBGA"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.QBGA">[docs]</a><span class="k">class</span> <span class="nc">QBGA</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abfluss aus dem Basisabfluss-Gebietsspeicher (outflow from the</span>
+<span class="sd">    storage compartment for base flow) [mm].&quot;&quot;&quot;</span>
+    <span class="n">NDIM</span><span class="p">,</span> <span class="n">NUMERIC</span><span class="p">,</span> <span class="n">SPAN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StateSequences"><a class="viewcode-back" href="../../../../HydPy-L-Land.html#hydpy.models.lland.lland_states.StateSequences">[docs]</a><span class="k">class</span> <span class="nc">StateSequences</span><span class="p">(</span><span class="n">sequencetools</span><span class="o">.</span><span class="n">StateSequences</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;State sequences of the HydPy-L-Land model.&quot;&quot;&quot;</span>
+    <span class="n">_SEQCLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">Inzp</span><span class="p">,</span> <span class="n">WATS</span><span class="p">,</span> <span class="n">WAeS</span><span class="p">,</span> <span class="n">BoWa</span><span class="p">,</span> <span class="n">QDGZ1</span><span class="p">,</span> <span class="n">QDGZ2</span><span class="p">,</span> <span class="n">QIGZ1</span><span class="p">,</span> <span class="n">QIGZ2</span><span class="p">,</span>
+                   <span class="n">QBGZ</span><span class="p">,</span> <span class="n">QDGA1</span><span class="p">,</span> <span class="n">QDGA2</span><span class="p">,</span> <span class="n">QIGA1</span><span class="p">,</span> <span class="n">QIGA2</span><span class="p">,</span> <span class="n">QBGA</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">HydPy 2.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Christoph Tyralla.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>
