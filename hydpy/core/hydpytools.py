@@ -45,13 +45,13 @@ class HydPy(object):
             pub.sequencemanager = filetools.SequenceManager()
             pub.conditionmanager = filetools.ConditionManager()
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def preparenetwork(self):
         pub.selections = selectiontools.Selections()
         pub.selections += pub.networkmanager.load()
         self.updatedevices(pub.selections.complete)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def initmodels(self):
         warn = pub.options.warnsimulationstep
         pub.options.warnsimulationstep = False
@@ -76,7 +76,7 @@ class HydPy(object):
         finally:
             pub.options.warnsimulationstep = warn
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def savecontrols(self, controldirectory=None, projectdirectory=None,
                      parameterstep=None, simulationstep=None):
         _controldirectory = pub.controlmanager._controldirectory
@@ -93,13 +93,13 @@ class HydPy(object):
             pub.controlmanager._controldirectory = _controldirectory
             pub.controlmanager._projectdirectory = _projectdirectory
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def loadconditions(self, conditiondirectory=None, controldirectory=None,
                        projectdirectory=None):
         self._ioconditions(conditiondirectory,  controldirectory,
                            projectdirectory, True)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def saveconditions(self, conditiondirectory=None, controldirectory=None,
                        projectdirectory=None):
         self._ioconditions(conditiondirectory,  controldirectory,
@@ -269,7 +269,7 @@ class HydPy(object):
                 funcs.append(node._savedata_sim)
         return funcs
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def doit(self):
         idx_start, idx_end = self.simindices
         self.openfiles(idx_start)
@@ -279,56 +279,56 @@ class HydPy(object):
                 func(idx)
         self.closefiles()
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def prepare_modelseries(self, ramflag=True):
         for (name, element) in magictools.progressbar(self.elements):
             element.prepare_allseries(ramflag)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def prepare_inputseries(self, ramflag=True):
         for (name, element) in magictools.progressbar(self.elements):
             element.prepare_inputseries(ramflag)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def prepare_fluxseries(self, ramflag=True):
         for (name, element) in magictools.progressbar(self.elements):
             element.prepare_fluxseries(ramflag)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def prepare_stateseries(self, ramflag=True):
         for (name, element) in magictools.progressbar(self.elements):
             element.prepare_stateseries(ramflag)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def prepare_nodeseries(self, ramflag=True):
         self.prepare_simseries(ramflag)
         self.prepare_obsseries(ramflag)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def prepare_simseries(self, ramflag=True):
         for (name, node) in magictools.progressbar(self.nodes):
             node.prepare_simseries(ramflag)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def prepare_obsseries(self, ramflag=True):
         for (name, node) in magictools.progressbar(self.nodes):
             node.prepare_obsseries(ramflag)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def save_modelseries(self):
         self.save_inputseries()
         self.save_fluxseries()
         self.save_stateseries()
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def save_inputseries(self):
         self._save_modelseries('inputs', pub.sequencemanager.inputoverwrite)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def save_fluxseries(self):
         self._save_modelseries('fluxes', pub.sequencemanager.outputoverwrite)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def save_stateseries(self):
         self._save_modelseries('states', pub.sequencemanager.outputoverwrite)
 
@@ -346,16 +346,16 @@ class HydPy(object):
                                       'the already existing file `%s`.'
                                       % seq.filepath_ext)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def save_nodeseries(self):
         self.save_simseries()
         self.save_obsseries()
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def save_simseries(self, ramflag=True):
         self._save_nodeseries('sim', pub.sequencemanager.simoverwrite)
 
-    @magictools.printprogress
+    #@magictools.printprogress
     def save_obsseries(self, ramflag=True):
         self._save_nodeseries('obs', pub.sequencemanager.obsoverwrite)
 
