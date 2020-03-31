@@ -17,10 +17,17 @@ class Q9(sequencetools.LogSequence):
     The last value is always set to zero to avoid biased results:
 
     >>> from hydpy.models.grxjland import *
+    >>> from hydpy import pub
     >>> parameterstep('1d')
     >>> simulationstep('1d')
+    >>> pub.options.usedefaultvalues(True)
     >>> x4(3.4)
     >>> derived.uh1.update()
+    
+    logs q9 have initial values of 0.:
+    
+    >>> logs.q9
+    q9(0.0, 0.0, 0.0, 0.0)
     >>> logs.q9(1.0, 2.0, 1.0, 3.0)
     >>> logs.q9
     q9(1.0, 2.0, 1.0, 0.0)
@@ -43,6 +50,7 @@ from shape (3) into shape (4)
     q9(2.0, 2.0, 2.0, 0.0)
     """
     NDIM, NUMERIC, SPAN = 1, False, (0., None)
+    INIT = 0
 
     def __call__(self, *args):
         try:
