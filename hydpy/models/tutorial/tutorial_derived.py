@@ -4,7 +4,7 @@ from hydpy.core import parametertools
 from hydpy.models.tutorial import tutorial_control
 
 class QFactor(parametertools.Parameter):
-    """Factor for converting mm/stepsize to m3/s."""
+    """Factor for converting mm/stepsize to m³/s."""
     NDIM, TYPE, TIME, SPAN = 0, float, None, (0., None)
 
     CONTROLPARAMETERS = (

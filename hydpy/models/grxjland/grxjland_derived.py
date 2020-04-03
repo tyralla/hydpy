@@ -38,7 +38,7 @@ class UH1(parametertools.Parameter):
         >>> pub.options.reprdigits = 6
         >>> x4(0.6)
         >>> derived.uh1.update()
-        >>> logs.q9.shape
+        >>> logs.quh1.shape
         (1,)
         >>> derived.uh1
         uh1(1.0)
@@ -49,7 +49,7 @@ class UH1(parametertools.Parameter):
 
         >>> x4(1.)
         >>> derived.uh1.update()
-        >>> logs.q9.shape
+        >>> logs.quh1.shape
         (1,)
         >>> derived.uh1
         uh1(1.0)
@@ -58,14 +58,14 @@ class UH1(parametertools.Parameter):
         
         >>> x4(1.8)
         >>> derived.uh1.update()
-        >>> logs.q9.shape
+        >>> logs.quh1.shape
         (2,)
         >>> derived.uh1
         uh1(0.230048, 0.769952)
         
         >>> x4(6.3)
         >>> derived.uh1.update()
-        >>> logs.q9.shape
+        >>> logs.quh1.shape
         (7,)
         >>> derived.uh1
         uh1(0.010038, 0.046746, 0.099694, 0.16474, 0.239926, 0.324027, 0.11483)
@@ -77,7 +77,7 @@ class UH1(parametertools.Parameter):
         
         """
         x4 = self.subpars.pars.control.x4
-        q9 = self.subpars.pars.model.sequences.logs.q9
+        q9 = self.subpars.pars.model.sequences.logs.quh1
         # Determine UH parameters...
         if x4 <= 1.:
             # ...when x4 smaller than or equal to the simulation time step.
@@ -124,7 +124,7 @@ class UH2(parametertools.Parameter):
         >>> pub.options.reprdigits = 6
         >>> x4(0.6)
         >>> derived.uh2.update()
-        >>> logs.q1.shape
+        >>> logs.quh2.shape
         (2,)
         >>> derived.uh2
         uh2(0.967925, 0.032075)
@@ -133,7 +133,7 @@ class UH2(parametertools.Parameter):
         
         >>> x4(2.8)
         >>> derived.uh2.update()
-        >>> logs.q1.shape
+        >>> logs.quh2.shape
         (6,)
         >>> derived.uh2
         uh2(0.038113, 0.177487, 0.368959, 0.292023, 0.112789, 0.010628)
@@ -145,7 +145,7 @@ class UH2(parametertools.Parameter):
         
         """
         x4 = self.subpars.pars.control.x4
-        q1 = self.subpars.pars.model.sequences.logs.q1
+        q1 = self.subpars.pars.model.sequences.logs.quh2
         # Determine UH parameters...
         if x4 <= 1.:
             index = numpy.arange(1, 3)

@@ -23,7 +23,6 @@ Integration tests:
 
     >>> from hydpy.models.grxjland import *
     >>> parameterstep('1d')
-    >>> simulationstep('1d')
     >>> from hydpy import Node, Element
     >>> outlet = Node('outlet')
     >>> land = Element('land', outlets=outlet)
@@ -42,7 +41,7 @@ Integration tests:
     >>> IntegrationTest.plotting_options.activated=(
     ...     inputs.e, inputs.p, fluxes.qt)
     >>> test = IntegrationTest(land)
-    >>> test.dateformat = '%d.%m. %H:00'
+    >>> test.dateformat = '%d.%m.'
 
     .. _grxjland_gr4j_ex1:
 
@@ -60,10 +59,10 @@ Integration tests:
     Set initial storage levels: production store 30% filled, routing store 50% filled. log.sequences empty
     
 
-    >>> test.inits = ((states.s, 0.3 * x1.value),
-    ...               (states.r, 0.5 * x3.value),
-    ...               (logs.q9, [0,0,0]),
-    ...               (logs.q1, [0,0,0,0,0]))
+    >>> test.inits = ((states.s, 0.3 * x1),
+    ...               (states.r, 0.5 * x3),
+    ...               (logs.q9, [0.0, 0.0, 0.0]),
+    ...               (logs.q1, [0.0, 0.0, 0.0, 0.0, 0.0]))
 
     Input sequences |P| and |E|:
 
@@ -108,9 +107,9 @@ class Model(modeltools.AdHocModel):
         grxjland_model.Calc_En_Pn_V1,
         grxjland_model.Calc_Ps_V1,
         grxjland_model.Calc_Es_Perc_S_V1,
-        grxjland_model.Calc_OutUH1_Q9_V1,
-        grxjland_model.Calc_OutUH2_Q1_V1,
-        grxjland_model.Calc_F_Qr_R_V1,
+        grxjland_model.Calc_UH1_V1,
+        grxjland_model.Calc_UH2_V1,
+        grxjland_model.Calc_RoutingStore_V1,
         grxjland_model.Calc_Qd_V1,
         grxjland_model.Calc_Qt_V1,
     )

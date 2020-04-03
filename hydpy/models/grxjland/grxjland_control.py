@@ -29,4 +29,14 @@ class X3(parametertools.Parameter):
 class X4(parametertools.Parameter):
     """Time base of unit hydrographs UH1 (X4) and UH2 (2*X4) [d]."""
     NDIM, TYPE, TIME, SPAN = 0, float, False, (0.5, None)
+    
+class X5(parametertools.Parameter):
+    """Intercatchment exchange threshold [-]."""
+    NDIM, TYPE, TIME, SPAN = 0, float, None, (None, None)
+    
+class X6(parametertools.Parameter):
+    """coefficient for emptying exponential store [mm]."""
+    NDIM, TYPE, TIME, SPAN = 0, float, None, (0, None)
+    
+
 

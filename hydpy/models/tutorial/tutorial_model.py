@@ -8,7 +8,7 @@ from hydpy.models.tutorial import tutorial_states
 from hydpy.models.tutorial import tutorial_outlets
 from hydpy.models.tutorial import tutorial_derived
 
-class Calc_Storage1(modeltools.Method):
+class Calc_Storage1_V1(modeltools.Method):
     """ Calculate water content and outflow of storage 1.
         
         Basic equations: 
@@ -76,7 +76,7 @@ class Calc_Storage1(modeltools.Method):
             flu.f2 = 0.
         
 
-class Calc_Storage2(modeltools.Method):
+class Calc_Storage2_V1(modeltools.Method):
     """ Calculate water content and outflow of storage 2.
     
         Basic equations:
@@ -137,7 +137,7 @@ class Calc_Storage2(modeltools.Method):
         sta.s2 = sta.s2 - flu.f3
         
 
-class Pass_Q(modeltools.Method):
+class Pass_Q_V1(modeltools.Method):
     """Update the outlet link sequence.
 
     Basic equation:
@@ -163,17 +163,17 @@ class Pass_Q(modeltools.Method):
         
 
 class Model(modeltools.AdHocModel):
-    """Definition of the simple tutorial model with 2 storages.
+    """Definition of the base model of the simple tutorial model with 2 storages.
     """
     INLET_METHODS = ()
     RECEIVER_METHODS = ()
     RUN_METHODS = (
-        Calc_Storage1,
-        Calc_Storage2
+        Calc_Storage1_V1,
+        Calc_Storage2_V1,
     )
     ADD_METHODS = ()
     OUTLET_METHODS = (
-        Pass_Q,
+        Pass_Q_V1,
     )
     SENDER_METHODS = ()
 

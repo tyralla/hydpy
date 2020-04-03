@@ -57,3 +57,6 @@ class R(sequencetools.StateSequence):
             upper = self.subseqs.seqs.model.parameters.control.x3
         super().trim(lower, upper)
 
+class R2(sequencetools.StateSequence):
+    """Level of the exponential storage [mm]."""
+    NDIM, NUMERIC, SPAN = 0, False, (None, None)

@@ -42,6 +42,9 @@ class F(sequencetools.FluxSequence):
 class Qr(sequencetools.FluxSequence):
     """Outflow of the routing storage [mm]."""
     NDIM, NUMERIC = 0, False
+class Qr2(sequencetools.FluxSequence):
+    """Outflow of the exponential storage [mm]."""
+    NDIM, NUMERIC = 0, False
 class Qd(sequencetools.FluxSequence):
     """Flow component direct flow [mm]."""
     NDIM, NUMERIC = 0, False

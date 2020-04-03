@@ -254,8 +254,10 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         sta.s = sta.s - flu.perc
         
 
-class Calc_OutUH1_Q9_V1(modeltools.Method):
-    """Calculate the unit hydrograph output (convolution).
+class Calc_UH1_V1(modeltools.Method):
+    """Calculate the unit hydrograph UH1 output (convolution).
+    
+    Input to the unit hydrograph UH1 is 90% of Pr.
 
     Examples:
 
@@ -270,18 +272,18 @@ class Calc_OutUH1_Q9_V1(modeltools.Method):
         >>> derived.uh1.update()
         >>> derived.uh1
         uh1(0.06415, 0.298737, 0.637113)
-        >>> logs.q9 = 1.0, 3.0, 0.0
+        >>> logs.quh1 = 1.0, 3.0, 0.0
 
         Without new input, the actual output is simply the first value
         stored in the logging sequence and the values of the logging
         sequence are shifted to the left:
 
         >>> fluxes.pr = 0.0
-        >>> model.calc_outuh1_q9_v1()
+        >>> model.calc_uh1_v1()
         >>> fluxes.q9
         q9(1.0)
-        >>> logs.q9
-        q9(3.0, 0.0, 0.0)
+        >>> logs.quh1
+        quh1(3.0, 0.0, 0.0)
 
         With an new input of 4mm, the actual output consists of the first
         value stored in the logging sequence and the input value
@@ -290,52 +292,43 @@ class Calc_OutUH1_Q9_V1(modeltools.Method):
         input values and the remaining ordinates:
 
         >>> fluxes.pr = 4.0
-        >>> model.calc_outuh1_q9_v1()
+        >>> model.calc_uh1_v1()
         >>> fluxes.q9
         q9(3.2566)
-        >>> logs.q9
-        q9(1.194949, 2.548451, 0.0)
+        >>> logs.quh1
+        quh1(1.194949, 2.548451, 0.0)
         
         In the next example we set the memory to zero (no input in the past), and apply a single input signal:
         
-        >>> logs.q9 = 0.0, 0.0, 0.0
+        >>> logs.quh1 = 0.0, 0.0, 0.0
         >>> fluxes.pr = 4.0
-        >>> model.calc_outuh1_q9_v1()
+        >>> model.calc_uh1_v1()
         >>> fluxes.q9
-        q9(3.2566)
+        q9(0.23094)
         >>> fluxes.pr = 0.0
-        >>> model.calc_outuh1_q9_v1()
+        >>> model.calc_uh1_v1()
         >>> fluxes.q9
-        >>> model.calc_outuh1_q9_v1()
+        q9(1.075454)
+        >>> model.calc_uh1_v1()
         >>> fluxes.q9
-        q9(2.548451)
-        >>> model.calc_outuh1_q9_v1()
+        q9(2.293605)
+        >>> model.calc_uh1_v1()
         >>> fluxes.q9
         q9(0.0)
         
         A unit hydrograph with only one ordinate results in the direct
-        routing of the input:
+        routing of the input, remember, only 90% of pr enters UH1:
         
-        >>> x4(3)
+        >>> x4(0.8)
         >>> derived.uh1.update()
         >>> derived.uh1
-
-        >>> derived.uh.shape = 1
-        >>> derived.uh = 1.0
-        >>> fluxes.inuh = 0.0
-        >>> logs.quh.shape = 1
-        >>> logs.quh = 0.0
-        >>> model.calc_outuh_quh_v1()
-        >>> fluxes.outuh
-        outuh(0.0)
-        >>> logs.quh
-        quh(0.0)
-        >>> fluxes.inuh = 4.0
-        >>> model.calc_outuh_quh()
-        >>> fluxes.outuh
-        outuh(4.0)
-        >>> logs.quh
-        quh(0.0)
+        uh1(1.0)
+        >>> logs.quh1 = 0
+        >>> fluxes.pr = 4.0
+        >>> model.calc_uh1_v1()
+        >>> fluxes.q9
+        q9(3.6)
+        
     """
     DERIVEDPARAMETERS = (
         grxjland_derived.UH1,
@@ -344,7 +337,7 @@ class Calc_OutUH1_Q9_V1(modeltools.Method):
         grxjland_fluxes.Pr,
     )
     UPDATEDSEQUENCES = (
-        grxjland_logs.Q9,
+        grxjland_logs.QUH1,
     )
     RESULTSEQUENCES = (
         grxjland_fluxes.Q9,
@@ -355,16 +348,18 @@ class Calc_OutUH1_Q9_V1(modeltools.Method):
         flu = model.sequences.fluxes.fastaccess
         log = model.sequences.logs.fastaccess
         # 90 % of Pr enters UH1
-        flu.q9 = der.uh1[0] * 0.9 * flu.pr + log.q9[0]
+        flu.q9 = der.uh1[0] * 0.9 * flu.pr + log.quh1[0]
         for jdx in range(1, len(der.uh1)):
-            log.q9[jdx - 1] = der.uh1[jdx] * 0.9 * flu.pr + log.q9[jdx]
+            log.quh1[jdx - 1] = der.uh1[jdx] * 0.9 * flu.pr + log.quh1[jdx]
             
-class Calc_OutUH2_Q1_V1(modeltools.Method):
-    """Calculate the unit hydrograph output (convolution).
+class Calc_UH2_V1(modeltools.Method):
+    """Calculate the unit hydrograph UH2 output (convolution).
+    
+    Input to the unit hydrograph UH2 is 10% of Pr.
 
     Examples:
 
-        Prepare a unit hydrograph with only three ordinates:
+        Prepare a unit hydrograph with six ordinates:
 
         >>> from hydpy.models.grxjland import *
         >>> from hydpy import pub
@@ -374,19 +369,19 @@ class Calc_OutUH2_Q1_V1(modeltools.Method):
         >>> x4(3)
         >>> derived.uh2.update()
         >>> derived.uh2
-        uh2(0.06415, 0.298737, 0.637113)
-        >>> logs.q1 = 1.0, 3.0, 0.0
+        uh2(0.032075, 0.149369, 0.318556, 0.318556, 0.149369, 0.032075)
+        >>> logs.quh2 = 1.0, 3.0, 0.0, 2.0, 1.0, 0.0
 
         Without new input, the actual output is simply the first value
         stored in the logging sequence and the values of the logging
         sequence are shifted to the left:
 
         >>> fluxes.pr = 0.0
-        >>> model.calc_outuh2_q1_v1()
+        >>> model.calc_uh2_v1()
         >>> fluxes.q1
         q1(1.0)
-        >>> logs.q1
-        q1(3.0, 0.0, 0.0)
+        >>> logs.quh2
+        quh2(3.0, 0.0, 2.0, 1.0, 0.0, 0.0)
 
         With an new input of 4mm, the actual output consists of the first
         value stored in the logging sequence and the input value
@@ -395,52 +390,39 @@ class Calc_OutUH2_Q1_V1(modeltools.Method):
         input values and the remaining ordinates:
 
         >>> fluxes.pr = 4.0
-        >>> model.calc_outuh2_q1_v1()
+        >>> model.calc_uh2_v1()
         >>> fluxes.q1
-        q1(3.2566)
-        >>> logs.q1
-        q1(1.194949, 2.548451, 0.0)
+        q1(3.01283)
+        >>> logs.quh2
+        quh2(0.059747, 2.127423, 1.127423, 0.059747, 0.01283, 0.0)
         
         In the next example we set the memory to zero (no input in the past), and apply a single input signal:
         
-        >>> logs.q1 = 0.0, 0.0, 0.0
+        >>> logs.quh2 = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
         >>> fluxes.pr = 4.0
-        >>> model.calc_outuh2_q1_v1()
+        >>> model.calc_uh2_v1()
         >>> fluxes.q1
-        q1(3.2566)
+        q1(0.01283)
         >>> fluxes.pr = 0.0
-        >>> model.calc_outuh2_q1_v1()
+        >>> model.calc_uh2_v1()
         >>> fluxes.q1
-        >>> model.calc_outuh2_q1_v1()
+        q1(0.059747)
+        >>> model.calc_uh2_v1()
         >>> fluxes.q1
-        q1(2.548451)
-        >>> model.calc_outuh2_q1_v1()
+        q1(0.127423)
+        >>> model.calc_uh2_v1()
+        >>> fluxes.q1
+        q1(0.127423)
+        >>> model.calc_uh2_v1()
+        >>> fluxes.q1
+        q1(0.059747)
+        >>> model.calc_uh2_v1()
+        >>> fluxes.q1
+        q1(0.01283)
+        >>> model.calc_uh2_v1()
         >>> fluxes.q1
         q1(0.0)
         
-        A unit hydrograph with only one ordinate results in the direct
-        routing of the input:
-        
-        >>> x4(3)
-        >>> derived.uh2.update()
-        >>> derived.uh2
-
-        >>> derived.uh.shape = 1
-        >>> derived.uh = 1.0
-        >>> fluxes.inuh = 0.0
-        >>> logs.quh.shape = 1
-        >>> logs.quh = 0.0
-        >>> model.calc_outuh_quh_v1()
-        >>> fluxes.outuh
-        outuh(0.0)
-        >>> logs.quh
-        quh(0.0)
-        >>> fluxes.inuh = 4.0
-        >>> model.calc_outuh_quh()
-        >>> fluxes.outuh
-        outuh(4.0)
-        >>> logs.quh
-        quh(0.0)
     """
     DERIVEDPARAMETERS = (
         grxjland_derived.UH2,
@@ -449,7 +431,7 @@ class Calc_OutUH2_Q1_V1(modeltools.Method):
         grxjland_fluxes.Pr,
     )
     UPDATEDSEQUENCES = (
-        grxjland_logs.Q1,
+        grxjland_logs.QUH2,
     )
     RESULTSEQUENCES = (
         grxjland_fluxes.Q1,
@@ -460,11 +442,72 @@ class Calc_OutUH2_Q1_V1(modeltools.Method):
         flu = model.sequences.fluxes.fastaccess
         log = model.sequences.logs.fastaccess
         # 10 % of Pr enters UH2
-        flu.q1 = der.uh2[0] * 0.1 * flu.pr + log.q1[0]
+        flu.q1 = der.uh2[0] * 0.1 * flu.pr + log.quh2[0]
         for jdx in range(1, len(der.uh2)):
-            log.q1[jdx - 1] = der.uh2[jdx] * 0.1 * flu.pr + log.q1[jdx]
+            log.quh2[jdx - 1] = der.uh2[jdx] * 0.1 * flu.pr + log.quh2[jdx]
             
-class Calc_F_Qr_R_V1(modeltools.Method):
+
+class Calc_UH2_V2(modeltools.Method):
+    """Calculate the unit hydrograph UH2 output (convolution).
+    
+    This is the version for the GR5J model. The input is 100% of Pr, the output of the Unit Hydrograph is 
+    splitted in two parts: 90% gets Q9 and 10% gets Q1.
+
+    Examples:
+
+        Prepare a unit hydrograph with only six ordinates:
+
+        >>> from hydpy.models.grxjland import *
+        >>> from hydpy import pub
+        >>> parameterstep('1d')
+        >>> simulationstep('1d')
+        >>> pub.options.reprdigits = 6
+        >>> x4(3)
+        >>> derived.uh2.update()
+        >>> derived.uh2
+        uh2(0.032075, 0.149369, 0.318556, 0.318556, 0.149369, 0.032075)
+        >>> logs.quh2 = 3.0, 3.0, 0.0, 2.0, 4.0, 0.0
+        
+        Without new input, the actual output is simply the first value
+        stored in the logging sequence and the values of the logging
+        sequence are shifted to the left. The output is splitted in the two parts:
+        
+        >>> fluxes.pr = 0.0
+        >>> model.calc_uh2_v2()
+        >>> fluxes.q1
+        q1(0.3)
+        >>> fluxes.q9
+        q9(2.7)
+        >>> logs.quh2
+        quh2(3.0, 0.0, 2.0, 4.0, 0.0, 0.0)
+        
+    """
+    DERIVEDPARAMETERS = (
+        grxjland_derived.UH2,
+    )
+    REQUIREDSEQUENCES = (
+        grxjland_fluxes.Pr,
+    )
+    UPDATEDSEQUENCES = (
+        grxjland_logs.QUH2,
+    )
+    RESULTSEQUENCES = (
+        grxjland_fluxes.Q1,
+        grxjland_fluxes.Q9,
+    )
+    @staticmethod
+    def __call__(model: modeltools.Model) -> None:
+        der = model.parameters.derived.fastaccess
+        flu = model.sequences.fluxes.fastaccess
+        log = model.sequences.logs.fastaccess
+        quh2 = der.uh2[0] * flu.pr + log.quh2[0]
+        for jdx in range(1, len(der.uh2)):
+            log.quh2[jdx - 1] = der.uh2[jdx] * flu.pr + log.quh2[jdx]
+        flu.q1 = 0.1 * quh2
+        flu.q9 = 0.9 * quh2
+
+            
+class Calc_RoutingStore_V1(modeltools.Method):
     """ Calculate groundwater exchange term F, level of the non-linear routing store R and the outflow Qr of the reservoir.
 
     Basic equations:
@@ -498,51 +541,51 @@ class Calc_F_Qr_R_V1(modeltools.Method):
         >>> from hydpy import pub
         >>> parameterstep('1d')
         >>> pub.options.reprdigits = 6
-        >>> x2(20.)
+        >>> x2(1.02)
         >>> x3(100.)
         >>> fluxes.q9 = 20.
         >>> states.r = 95.
-        >>> model.calc_f_qr_r_v1()
+        >>> model.calc_routingstore_v1()
         >>> fluxes.f
-        f(16.713316)
+        f(0.852379)
         >>> states.r
-        r(93.079181)
+        r(89.548769)
         >>> fluxes.qr
-        qr(38.634135)
+        qr(26.30361)
         
         Positive groundwater exchange coefficient, routing storage nearly empty:
         
         >>> states.r = 10.
-        >>> model.calc_f_qr_r_v1()
+        >>> model.calc_routingstore_v1()
         >>> fluxes.f
-        f(0.006325)
+        f(0.000323)
         >>> states.r
-        r(29.945817)
+        r(29.939875)
         >>> fluxes.qr
-        qr(0.060508)
+        qr(0.060448)
         
         Negative groundwater exchange coefficient, routing storage nearly full
         
-        >>> x2(-20.)
+        >>> x2(-1.02)
         >>> states.r = 95.
-        >>> model.calc_f_qr_r_v1()
+        >>> model.calc_routingstore_v1()
         >>> fluxes.f
-        f(-16.713316)
+       f(-0.852379)
         >>> states.r
-        r(83.353723)
+        r(89.067124)
         >>> fluxes.qr
-        qr(14.932961)
+        qr(25.080497)
         
         Negative groundwater exchange coefficient, routing storage nearly empty:
         
         >>> states.r = 10.
-        >>> model.calc_f_qr_r_v1()
+        >>> model.calc_routingstore_v1()
         >>> fluxes.f
-        f(-0.006325)
+        f(-0.000323)
         >>> states.r
-        r(29.933295)
+        r(29.939236)
         >>> fluxes.qr
-        qr(0.060381)
+        qr(0.060441)
         
         
     """
@@ -573,6 +616,262 @@ class Calc_F_Qr_R_V1(modeltools.Method):
         flu.qr = sta.r * (1 - (1 + (sta.r/con.x3)**4)**(-0.25))
         sta.r = sta.r - flu.qr
         
+class Calc_RoutingStore_V2(modeltools.Method):
+    """ Calculate groundwater exchange term F, level of the non-linear routing store R and the outflow Qr of the reservoir.
+    
+    This is the GR5J version of the routing store.
+
+    Basic equations:
+    
+        The ground water exchange term F that acts on both flow components is calculated as:
+        
+      :math:`F = X2 (\frac{R}{X3} - X5)`
+      
+      
+        X2 is the water exchange coefficient. X2 can be either positive in case of water imports, negative for water exports or zero when there is no water exchange.
+        The  higher the level in the routing store, the larger the  exchange. X5 can be seen as the external, quasi-stationary potential of the groundwater system
+        and F is a ‘‘restoring flux’’ acting like a spring device with constant X2. Usually, X2 is negative: the more R/X3 de-parts from X5, the more intense the flux is,
+        which tends to restore its value to X5.
+       
+        The level in the routing store is updated by adding the output Q9 of UH1 and F:
+      
+      :math:`R = max(0; R + Q9 + F)`
+      
+        The outflow Qr of the reservoir is then calculated as:
+        
+      :math:`Qr = R{1-[1+(\\frac{R}{X3})^{4}]^{-1/4}}`
+      
+        The level in the reservoir becomes:
+      
+      :math:`R = R - Qr`
+      
+
+    Examples:
+        
+        Filled storage
+        
+        >>> from hydpy.models.grxjland import *
+        >>> from hydpy import pub
+        >>> parameterstep('1d')
+        >>> pub.options.reprdigits = 6
+        >>> x2(-0.163)
+        >>> x3(100.)
+        >>> x5(0.104)
+        >>> fluxes.q9 = 20.
+        >>> states.r = 95.
+        >>> model.calc_routingstore_v2()
+        >>> fluxes.f
+        f(-0.136214)
+        >>> states.r
+        r(89.272231)
+        >>> fluxes.qr
+        qr(25.591555)
+        
+        Empty storage:
+        
+        >>> states.r = 10.
+        >>> model.calc_routingstore_v2()
+        >>> fluxes.f
+        f(-0.000052)
+        >>> states.r
+        r(29.939505)
+        
+    """
+    
+    REQUIREDSEQUENCES = (
+        grxjland_fluxes.Q9,
+    )
+    CONTROLPARAMETERS = (
+        grxjland_control.X2,
+        grxjland_control.X3,
+        grxjland_control.X5,
+    )
+
+    UPDATEDSEQUENCES = (
+        grxjland_states.R,
+    )
+    
+    RESULTSEQUENCES = (
+        grxjland_fluxes.F,
+        grxjland_fluxes.Qr,
+    )
+    @staticmethod
+    def __call__(model: modeltools.Model) -> None:
+        flu = model.sequences.fluxes.fastaccess
+        sta = model.sequences.states.fastaccess
+        con = model.parameters.control.fastaccess
+        flu.f = con.x2 * (sta.r / con.x3 - con.x5)
+        sta.r = numpy.maximum(0, sta.r + flu.q9 + flu.f)
+        flu.qr = sta.r * (1 - (1 + (sta.r/con.x3)**4)**(-0.25))
+        sta.r = sta.r - flu.qr
+        
+
+class Calc_RoutingStore_V3(modeltools.Method):
+    """ Calculate groundwater exchange term F, level of the non-linear routing store R and the outflow Qr of the reservoir.
+    
+    This is the GR6J version of the routing store. 60 % of Q9 enters the routing store.
+
+    Basic equations:
+    
+        The ground water exchange term F that acts on both flow components is calculated as:
+        
+      :math:`F = X2 (\frac{R}{X3} - X5)`
+      
+      
+        X2 is the water exchange coefficient. X2 can be either positive in case of water imports, negative for water exports or zero when there is no water exchange.
+        The  higher the level in the routing store, the larger the  exchange. X5 can be seen as the external, quasi-stationary potential of the groundwater system
+        and F is a ‘‘restoring flux’’ acting like a spring device with constant X2. Usually, X2 is negative: the more R/X3 de-parts from X5, the more intense the flux is,
+        which tends to restore its value to X5.
+       
+        The level in the routing store is updated by adding the output Q9 of UH1 and F:
+      
+      :math:`R = max(0; R + Q9 + F)`
+      
+        The outflow Qr of the reservoir is then calculated as:
+        
+      :math:`Qr = R{1-[1+(\\frac{R}{X3})^{4}]^{-1/4}}`
+      
+        The level in the reservoir becomes:
+      
+      :math:`R = R - Qr`
+      
+
+    Examples:
+        
+        Filled storage
+        
+        >>> from hydpy.models.grxjland import *
+        >>> from hydpy import pub
+        >>> parameterstep('1d')
+        >>> pub.options.reprdigits = 6
+        >>> x2(-0.163)
+        >>> x3(100.)
+        >>> x5(0.104)
+        >>> fluxes.q9 = 20.
+        >>> states.r = 95.
+        >>> model.calc_routingstore_v3()
+        >>> fluxes.f
+        f(-0.136214)
+        >>> states.r
+        r(89.272231)
+        >>> fluxes.qr
+        qr(25.591555)
+        
+        Empty storage:
+        
+        >>> states.r = 10.
+        >>> model.calc_routingstore_v3()
+        >>> fluxes.f
+        f(-0.000052)
+        >>> states.r
+        r(29.939505)
+        
+    """
+    
+    REQUIREDSEQUENCES = (
+        grxjland_fluxes.Q9,
+    )
+    CONTROLPARAMETERS = (
+        grxjland_control.X2,
+        grxjland_control.X3,
+        grxjland_control.X5,
+    )
+
+    UPDATEDSEQUENCES = (
+        grxjland_states.R,
+    )
+    
+    RESULTSEQUENCES = (
+        grxjland_fluxes.F,
+        grxjland_fluxes.Qr,
+    )
+    @staticmethod
+    def __call__(model: modeltools.Model) -> None:
+        flu = model.sequences.fluxes.fastaccess
+        sta = model.sequences.states.fastaccess
+        con = model.parameters.control.fastaccess
+        flu.f = con.x2 * (sta.r / con.x3 - con.x5)
+        sta.r = numpy.maximum(0, sta.r + 0.6 * flu.q9 + flu.f)
+        flu.qr = sta.r * (1 - (1 + (sta.r/con.x3)**4)**(-0.25))
+        sta.r = sta.r - flu.qr
+        
+        
+class Calc_ExponentialStore_V3(modeltools.Method):
+    """ Calculate exponential store.
+    
+    This is the exponential store of the GR6J version. 40 % of Q9 enters the routing store.
+
+    Basic equations:
+    
+    TODO
+      
+
+    Examples:
+        
+        >>> from hydpy.models.grxjland import *
+        >>> from hydpy import pub
+        >>> parameterstep('1d')
+        >>> pub.options.reprdigits = 6
+        >>> x6(4.5)
+        >>> fluxes.q9 = 10.
+        >>> fluxes.f = -0.5
+        >>> states.r2 = 40.
+        >>> model.calc_exponentialstore_v3()
+        >>> states.r2
+        r2(-0.000285)
+        >>> fluxes.qr2
+        qr2(43.500285)
+        
+        Negative storage values possible
+        
+        >>> states.r2 = -10.
+        >>> fluxes.q9 = 0.1
+        >>> model.calc_exponentialstore_v3()
+        >>> states.r2
+        r2(-10.880042)
+        >>> fluxes.qr2
+        qr2(0.420042)
+        
+    """
+    
+    REQUIREDSEQUENCES = (
+        grxjland_fluxes.Q9,
+        grxjland_fluxes.F,
+    )
+    CONTROLPARAMETERS = (
+        grxjland_control.X6,
+    )
+
+    UPDATEDSEQUENCES = (
+        grxjland_states.R2,
+    )
+    
+    RESULTSEQUENCES = (
+
+        grxjland_fluxes.Qr2,
+    )
+    @staticmethod
+    def __call__(model: modeltools.Model) -> None:
+        flu = model.sequences.fluxes.fastaccess
+        sta = model.sequences.states.fastaccess
+        con = model.parameters.control.fastaccess
+        sta.r2 = sta.r2 + 0.4 * flu.q9 + flu.f
+        ar = sta.r2 / con.x6
+        if ar > 33.:
+            ar = 33.
+        elif ar < -33.:
+            ar = -33.
+        
+        if ar > 7:
+            flu.qr2 = sta.r2 + con.x6 / numpy.exp(ar)
+        elif ar < -7:
+            flu.qr2 = con.x6 * numpy.exp(ar)
+        else:
+            flu.qr2 = con.x6*numpy.log(numpy.exp(ar) + 1.)
+        
+        sta.r2 = sta.r2 - flu.qr2
+
+
 class Calc_Qd_V1(modeltools.Method):
     """ Calculate direct flow component.
 
@@ -658,6 +957,45 @@ class Calc_Qt_V1(modeltools.Method):
         flu = model.sequences.fluxes.fastaccess
         flu.q = flu.qr + flu.qd
         
+class Calc_Qt_V3(modeltools.Method):
+    """ Calculate total flow.
+    
+    GR6jX model version
+
+    Basic equations:
+    
+        Total streamflow is obtained by
+    
+      :math:`Qt = Qr + Qr2 + Qd`
+    
+      
+    Examples:
+        
+        >>> from hydpy.models.grxjland import *
+        >>> parameterstep('1d')
+        >>> fluxes.qr = 20.
+        >>> fluxes.qr2 = 10.
+        >>> fluxes.qd = 10.
+        >>> model.calc_qt_v3()
+        >>> fluxes.qt
+        qt(40.0)
+        
+    """
+    
+    REQUIREDSEQUENCES = (
+        grxjland_fluxes.Qr,
+        grxjland_fluxes.Qr2,
+        grxjland_fluxes.Qd,
+    )
+    
+    RESULTSEQUENCES = (
+        grxjland_fluxes.Qt,
+    )
+    @staticmethod
+    def __call__(model: modeltools.Model) -> None:
+        flu = model.sequences.fluxes.fastaccess
+        flu.q = flu.qr + flu.qr2 + flu.qd
+        
 class Pass_Q_v1(modeltools.Method):
     """Update the outlet link sequence.
 
@@ -684,18 +1022,23 @@ class Pass_Q_v1(modeltools.Method):
 
 
 class Model(modeltools.AdHocModel):
-    """The HydPy-H-Land base model."""
+    """The GRxJ-Land base model."""
     INLET_METHODS = ()
     RECEIVER_METHODS = ()
     RUN_METHODS = (
         Calc_En_Pn_V1,
         Calc_Ps_V1,
         Calc_Es_Perc_S_V1,
-        Calc_OutUH1_Q9_V1,
-        Calc_OutUH2_Q1_V1,
-        Calc_F_Qr_R_V1,
+        Calc_UH1_V1,
+        Calc_UH2_V1,
+        Calc_UH2_V2,
+        Calc_RoutingStore_V1,
+        Calc_RoutingStore_V2,
+        Calc_RoutingStore_V3,
+        Calc_ExponentialStore_V3,
         Calc_Qd_V1,
         Calc_Qt_V1,
+        Calc_Qt_V3,
     )
     ADD_METHODS = ()
     OUTLET_METHODS = (
