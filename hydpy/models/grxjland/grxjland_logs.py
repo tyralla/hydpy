@@ -18,6 +18,7 @@ class QUH1(sequencetools.LogSequence):
 
     >>> from hydpy.models.grxjland import *
     >>> from hydpy import pub
+    >>> ret = pub.options.warnsimulationstep(False)
     >>> parameterstep('1d')
     >>> simulationstep('1d')
     >>> ret = pub.options.usedefaultvalues(True)
@@ -35,12 +36,14 @@ class QUH1(sequencetools.LogSequence):
     When a wrong number of input values is given, |Q9| distributes
     their sum equally and emits the following warning:
 
+    >>> import warnings
+    >>> warnings.filterwarnings("error")
     >>> logs.quh1(1.0, 2.0, 3.0)
     Traceback (most recent call last):
     ...
-    UserWarning: Due to the following problem, log sequence `q9` of \
+    UserWarning: Due to the following problem, log sequence `quh1` of \
 element `?` handling model `grxjland` could be initialised with a averaged \
-value only: While trying to set the value(s) of variable `q9`, the \
+value only: While trying to set the value(s) of variable `quh1`, the \
 following error occurred: While trying to convert the value(s) \
 `(1.0, 2.0, 3.0)` to a numpy ndarray with shape `(4,)` and type \
 `float`, the following error occurred: could not broadcast input array \
@@ -73,6 +76,8 @@ class QUH2(sequencetools.LogSequence):
     The last value is always set to zero to avoid biased results:
 
     >>> from hydpy.models.grxjland import *
+    >>> from hydpy import pub
+    >>> ret = pub.options.warnsimulationstep(False)
     >>> parameterstep('1d')
     >>> simulationstep('1d')
     >>> x4(3.4)
@@ -83,7 +88,6 @@ class QUH2(sequencetools.LogSequence):
 
     When a wrong number of input values is given, |Q1| distributes
     their sum equally and emits the following warning:
-
     >>> import warnings
     >>> warnings.filterwarnings("error")
     >>> logs.quh2(1.0, 2.0, 3.0)

@@ -21,7 +21,7 @@ class UH1(parametertools.Parameter):
     )
 
     def update(self):
-        """Update |UH| based on |X4|.
+        """Update |UH1| based on |X4|.
 
         .. note::
 
@@ -77,12 +77,12 @@ class UH1(parametertools.Parameter):
         
         """
         x4 = self.subpars.pars.control.x4
-        q9 = self.subpars.pars.model.sequences.logs.quh1
+        quh1 = self.subpars.pars.model.sequences.logs.quh1
         # Determine UH parameters...
         if x4 <= 1.:
             # ...when x4 smaller than or equal to the simulation time step.
             self.shape = 1
-            q9.shape = 1
+            quh1.shape = 1
             self(1.)
         else:
             index = numpy.arange(1, numpy.ceil(x4) + 1)
@@ -92,7 +92,7 @@ class UH1(parametertools.Parameter):
             sh1j_1[index - 1 >= x4] = 1
             self.shape = len(sh1j)
             uh1 = self.values
-            q9.shape = len(uh1)
+            quh1.shape = len(uh1)
             uh1[:] = sh1j - sh1j_1
             
             # sum should be equal to one but better normalize
@@ -109,7 +109,7 @@ class UH2(parametertools.Parameter):
     )
 
     def update(self):
-        """Update |UH| based on |X4|.
+        """Update |UH2| based on |X4|.
 
         .. note::
 
@@ -145,7 +145,7 @@ class UH2(parametertools.Parameter):
         
         """
         x4 = self.subpars.pars.control.x4
-        q1 = self.subpars.pars.model.sequences.logs.quh2
+        quh2 = self.subpars.pars.model.sequences.logs.quh2
         # Determine UH parameters...
         if x4 <= 1.:
             index = numpy.arange(1, 3)
@@ -172,7 +172,7 @@ class UH2(parametertools.Parameter):
          
 
         self.shape = len(index)
-        q1.shape = len(index)
+        quh2.shape = len(index)
         uh2 = self.values
         uh2[:] = sh2j - sh2j_1
         self(uh2/numpy.sum(uh2))

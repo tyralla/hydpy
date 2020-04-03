@@ -152,6 +152,10 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         The reservoir content becomes:
         
       :math:`S = S- Perc`
+      
+        Calculate the total actual evapotranspiration from production storage and net rainfall calculation
+        
+      :math:`Es = Es + P - Pn`
 
     Examples:
         
@@ -162,12 +166,14 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         >>> parameterstep('1d')
         >>> pub.options.reprdigits = 6
         >>> x1(300.)
+        >>> inputs.p = 10.
+        >>> fluxes.pn = 0.
         >>> fluxes.ps = 0.
         >>> fluxes.en = 10.
         >>> states.s = 270.
         >>> model.calc_es_perc_s_v1()
         >>> fluxes.es
-        es(9.863469)
+        es(19.863469)
         >>> fluxes.perc
         perc(1.415145)
         >>> states.s
@@ -175,7 +181,7 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         
         Check water balance:
         
-        >>> 270. + fluxes.ps - fluxes.perc - fluxes.es - states.s
+        >>> 270. + fluxes.ps - fluxes.perc - fluxes.es - states.s + inputs.p - fluxes.pn
         0.0
         
         Example production store nearly full, rain:
@@ -185,7 +191,7 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         >>> states.s = 270.
         >>> model.calc_es_perc_s_v1()
         >>> fluxes.es
-        es(0.0)
+        es(10.0)
         >>> fluxes.perc
         perc(2.630796)
         >>> states.s
@@ -193,7 +199,7 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         
         Check water balance:
         
-        >>> 270. + fluxes.ps - fluxes.perc - fluxes.es - states.s
+        >>> 270. + fluxes.ps - fluxes.perc - fluxes.es - states.s + inputs.p - fluxes.pn
         0.0
         
         Example production store empty, no rain
@@ -203,8 +209,11 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         >>> states.s = 0.
         >>> model.calc_es_perc_s_v1()
         >>> fluxes.es
+        es(10.0)
         >>> fluxes.perc
+        perc(0.0)
         >>> states.s
+        s(0.0)
         
         Example production store empty, rain
         
@@ -213,7 +222,7 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         >>> states.s = 0.
         >>> model.calc_es_perc_s_v1()
         >>> fluxes.es
-        es(0.0)
+        es(10.0)
         >>> fluxes.perc
         perc(0.000029)
         >>> states.s
@@ -221,11 +230,13 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         
         Check water balance:
         
-        >>> 0. + fluxes.ps - fluxes.perc - fluxes.es - states.s
+        >>> 0. + fluxes.ps - fluxes.perc - fluxes.es - states.s + inputs.p - fluxes.pn
         0.0
     """
     
     REQUIREDSEQUENCES = (
+        grxjland_inputs.P,
+        grxjland_fluxes.Pn,
         grxjland_fluxes.Ps,
         grxjland_fluxes.En,
     )
@@ -243,6 +254,7 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
     )
     @staticmethod
     def __call__(model: modeltools.Model) -> None:
+        inp = model.sequences.inputs.fastaccess
         flu = model.sequences.fluxes.fastaccess
         sta = model.sequences.states.fastaccess
         con = model.parameters.control.fastaccess
@@ -252,7 +264,47 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         # probably faster
         flu.perc = sta.s * (1. - (1. + (sta.s / con.x1) ** 4. / 25.62890625) ** (-0.25)) 
         sta.s = sta.s - flu.perc
+        flu.es = flu.es + inp.p - flu.pn
         
+
+class Calc_Pr_V1(modeltools.Method):
+    """ Total quantity Pr of water reaching the routing functions.
+    
+    
+
+    Basic equation:
+    
+      :math:`Pr = Perc + (Pn - Ps)`
+
+    Examples:
+        
+        Example production store nearly full, no rain:
+        
+        >>> from hydpy.models.grxjland import *
+        >>> parameterstep('1d')
+        >>> fluxes.ps = 3.
+        >>> fluxes.perc = 10.
+        >>> fluxes.pn = 5.
+        >>> model.calc_pr_v1()
+        >>> 
+        >>> fluxes.pr
+        pr(12.0)
+    """
+    
+    REQUIREDSEQUENCES = (
+        grxjland_fluxes.Ps,
+        grxjland_fluxes.Pn,
+        grxjland_fluxes.Perc,
+    )
+    
+    RESULTSEQUENCES = (
+        grxjland_fluxes.Pr,
+    )
+    @staticmethod
+    def __call__(model: modeltools.Model) -> None:
+        flu = model.sequences.fluxes.fastaccess
+        flu.pr = flu.perc + flu.pn - flu.ps
+    
 
 class Calc_UH1_V1(modeltools.Method):
     """Calculate the unit hydrograph UH1 output (convolution).
@@ -294,9 +346,9 @@ class Calc_UH1_V1(modeltools.Method):
         >>> fluxes.pr = 4.0
         >>> model.calc_uh1_v1()
         >>> fluxes.q9
-        q9(3.2566)
+        q9(3.23094)
         >>> logs.quh1
-        quh1(1.194949, 2.548451, 0.0)
+        quh1(1.075454, 2.293605, 0.0)
         
         In the next example we set the memory to zero (no input in the past), and apply a single input signal:
         
@@ -514,7 +566,7 @@ class Calc_RoutingStore_V1(modeltools.Method):
     
         The ground waterexchange term F that acts on both flow components is calculated as:
         
-      :math:`F = X2 \frac{R}{X3}^{7/2}`
+      :math:`F = X2 \\frac{R}{X3}^{7/2}`
       
       
         X2 is the water exchange coefficient. X2 can be either positive in case of water imports, negative for water exports or zero when there is no water exchange.
@@ -570,7 +622,7 @@ class Calc_RoutingStore_V1(modeltools.Method):
         >>> states.r = 95.
         >>> model.calc_routingstore_v1()
         >>> fluxes.f
-       f(-0.852379)
+        f(-0.852379)
         >>> states.r
         r(89.067124)
         >>> fluxes.qr
@@ -625,7 +677,7 @@ class Calc_RoutingStore_V2(modeltools.Method):
     
         The ground water exchange term F that acts on both flow components is calculated as:
         
-      :math:`F = X2 (\frac{R}{X3} - X5)`
+      :math:`F = X2 (\\frac{R}{X3} - X5)`
       
       
         X2 is the water exchange coefficient. X2 can be either positive in case of water imports, negative for water exports or zero when there is no water exchange.
@@ -661,20 +713,20 @@ class Calc_RoutingStore_V2(modeltools.Method):
         >>> states.r = 95.
         >>> model.calc_routingstore_v2()
         >>> fluxes.f
-        f(-0.136214)
+        f(-0.137898)
         >>> states.r
-        r(89.272231)
+        r(89.271754)
         >>> fluxes.qr
-        qr(25.591555)
+        qr(25.590348)
         
         Empty storage:
         
         >>> states.r = 10.
         >>> model.calc_routingstore_v2()
         >>> fluxes.f
-        f(-0.000052)
+        f(0.000652)
         >>> states.r
-        r(29.939505)
+        r(29.940201)
         
     """
     
@@ -715,7 +767,7 @@ class Calc_RoutingStore_V3(modeltools.Method):
     
         The ground water exchange term F that acts on both flow components is calculated as:
         
-      :math:`F = X2 (\frac{R}{X3} - X5)`
+      :math:`F = X2 (\\frac{R}{X3} - X5)`
       
       
         X2 is the water exchange coefficient. X2 can be either positive in case of water imports, negative for water exports or zero when there is no water exchange.
@@ -751,20 +803,20 @@ class Calc_RoutingStore_V3(modeltools.Method):
         >>> states.r = 95.
         >>> model.calc_routingstore_v3()
         >>> fluxes.f
-        f(-0.136214)
+        f(-0.137898)
         >>> states.r
-        r(89.272231)
+        r(86.736252)
         >>> fluxes.qr
-        qr(25.591555)
+        qr(20.12585)
         
         Empty storage:
         
         >>> states.r = 10.
         >>> model.calc_routingstore_v3()
         >>> fluxes.f
-        f(-0.000052)
+        f(0.000652)
         >>> states.r
-        r(29.939505)
+        r(21.987785)
         
     """
     
@@ -906,6 +958,7 @@ class Calc_Qd_V1(modeltools.Method):
         >>> fluxes.f = -30
         >>> model.calc_qd_v1()
         >>> fluxes.qd
+        qd(0.0)
         
     """
     
@@ -955,7 +1008,7 @@ class Calc_Qt_V1(modeltools.Method):
     @staticmethod
     def __call__(model: modeltools.Model) -> None:
         flu = model.sequences.fluxes.fastaccess
-        flu.q = flu.qr + flu.qd
+        flu.qt = flu.qr + flu.qd
         
 class Calc_Qt_V3(modeltools.Method):
     """ Calculate total flow.
@@ -994,9 +1047,9 @@ class Calc_Qt_V3(modeltools.Method):
     @staticmethod
     def __call__(model: modeltools.Model) -> None:
         flu = model.sequences.fluxes.fastaccess
-        flu.q = flu.qr + flu.qr2 + flu.qd
+        flu.qt = flu.qr + flu.qr2 + flu.qd
         
-class Pass_Q_v1(modeltools.Method):
+class Pass_Q_V1(modeltools.Method):
     """Update the outlet link sequence.
 
     Basic equation:
@@ -1029,6 +1082,7 @@ class Model(modeltools.AdHocModel):
         Calc_En_Pn_V1,
         Calc_Ps_V1,
         Calc_Es_Perc_S_V1,
+        Calc_Pr_V1,
         Calc_UH1_V1,
         Calc_UH2_V1,
         Calc_UH2_V2,
@@ -1042,6 +1096,6 @@ class Model(modeltools.AdHocModel):
     )
     ADD_METHODS = ()
     OUTLET_METHODS = (
-        Pass_Q_v1,
+        Pass_Q_V1,
     )
     SENDER_METHODS = ()
