@@ -9,7 +9,7 @@ import numpy
 from hydpy.core import parametertools
 # ...from grxjland
 from hydpy.models.grxjland import grxjland_control
-from _operator import index
+
 
 class UH1(parametertools.Parameter):
     """Unit hydrograph UH1 ordinates [-]."""
