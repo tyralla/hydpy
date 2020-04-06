@@ -44,6 +44,7 @@ class Calc_TC_V1(modeltools.Method):
         >>> model.calc_tc_v1()
         >>> fluxes.tc
         tc(5.0, 3.8)
+
     """
     CONTROLPARAMETERS = (
         hland_control.NmbZones,

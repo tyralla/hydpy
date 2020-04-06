@@ -6,6 +6,7 @@
 import numpy
 # ...from HydPy
 from hydpy.core import modeltools
+from hydpy.cythons import modelutils
 # ...from grxjland
 from hydpy.models.grxjland import grxjland_inputs
 from hydpy.models.grxjland import grxjland_fluxes
@@ -14,6 +15,73 @@ from hydpy.models.grxjland import grxjland_states
 from hydpy.models.grxjland import grxjland_outlets
 from hydpy.models.grxjland import grxjland_derived
 from hydpy.models.grxjland import grxjland_logs
+
+
+class Calc_PSnowLayer_V1(modeltools.Method):
+    """ Calculate precipitation for each snow layer.
+        Basic equations:
+
+
+    Examples:
+
+        >>> from hydpy.models.grxjland import *
+        >>> from hydpy import pub
+        >>> pub.options.reprdigits = 6
+        >>> parameterstep('1d')
+        >>> nsnowlayers(5)
+        >>> z(1636)
+        >>> derived.zlayers(1052., 1389., 1626., 1822., 2013.)
+        >>> inputs.p = 7.09
+        >>> model.calc_psnowlayer_v1()
+        >>> fluxes.player
+        player(5.656033, 6.494091, 7.156799, 7.755659, 8.387418)
+
+        Elevation of ZLayers > 4000, precipitation doesn't changes with elevation any more
+
+        >>> derived.zlayers(1052., 1389., 1626., 4500., 6300.)
+        >>> model.calc_psnowlayer_v1()
+        >>> fluxes.player
+        player(3.505863, 4.02533, 4.436105, 11.741351, 11.741351)
+
+    """
+
+    CONTROLPARAMETERS = (
+        grxjland_control.NSnowLayers,
+        grxjland_control.Z,
+    )
+
+    DERIVEDPARAMETERS = (
+        grxjland_derived.ZLayers,
+    )
+
+    REQUIREDSEQUENCES = (
+        grxjland_inputs.P,
+    )
+    RESULTSEQUENCES = (
+        grxjland_fluxes.PLayer,
+    )
+
+    @staticmethod
+    def __call__(model: modeltools.Model) -> None:
+        con = model.parameters.control.fastaccess
+        der = model.parameters.derived.fastaccess
+        inp = model.sequences.inputs.fastaccess
+        flu = model.sequences.fluxes.fastaccess
+        d_gradp = 0.00041
+        d_zthreshold = 4000.
+        # calculate mean precipitation to scale
+        d_meanplayer = 0.
+        for k in range(con.nsnowlayers):
+            if der.zlayers[k] < d_zthreshold:
+                flu.player[k] = inp.p * modelutils.exp(d_gradp * (der.zlayers[k] - con.z))
+            elif der.zlayers[k] > d_zthreshold:
+                flu.player[k] = inp.p * modelutils.exp(d_gradp * (d_zthreshold - con.z))
+            else:
+                flu.player[k] = inp.p
+            d_meanplayer = d_meanplayer + flu.player[k] / con.nsnowlayers
+        # scale precipitation, that the mean of yone precipitation is equal to the subbasin precipitation
+        for k in range(con.nsnowlayers):
+            flu.player[k] = flu.player[k] / d_meanplayer * inp.p
 
 
 class Calc_En_Pn_V1(modeltools.Method):
@@ -42,6 +110,7 @@ class Calc_En_Pn_V1(modeltools.Method):
         pn(0.0)
         
         Precipitation larger than evapotranspiration:
+
         >>> inputs.p = 50.
         >>> inputs.e = 10.
         >>> model.calc_en_pn_v1()
@@ -129,7 +198,7 @@ class Calc_Ps_V1(modeltools.Method):
         sta = model.sequences.states.fastaccess
         con = model.parameters.control.fastaccess
         
-        flu.ps = con.x1 * (1. - (sta.s / con.x1) ** 2.) * numpy.tanh(flu.pn / con.x1) / (1. + sta.s / con.x1 * numpy.tanh(flu.pn / con.x1))
+        flu.ps = con.x1 * (1. - (sta.s / con.x1) ** 2.) * modelutils.tanh(flu.pn / con.x1) / (1. + sta.s / con.x1 * modelutils.tanh(flu.pn / con.x1))
         
 class Calc_Es_Perc_S_V1(modeltools.Method):
     """ Calculate actual evaporation rate, water content and percolation leakage from the production store.
@@ -258,7 +327,7 @@ class Calc_Es_Perc_S_V1(modeltools.Method):
         flu = model.sequences.fluxes.fastaccess
         sta = model.sequences.states.fastaccess
         con = model.parameters.control.fastaccess
-        flu.es = (sta.s * (2. - sta.s / con.x1) * numpy.tanh(flu.en / con.x1)) / (1. + (1. - sta.s / con.x1) * numpy.tanh(flu.en / con.x1))
+        flu.es = (sta.s * (2. - sta.s / con.x1) * modelutils.tanh(flu.en / con.x1)) / (1. + (1. - sta.s / con.x1) * modelutils.tanh(flu.en / con.x1))
         sta.s = sta.s -flu.es + flu.ps
         # flu.perc = sta.s * (1. - (1. + (4. * sta.s / 9. / con.x1) ** 4.) ** (-0.25))
         # probably faster
@@ -552,11 +621,11 @@ class Calc_UH2_V2(modeltools.Method):
         der = model.parameters.derived.fastaccess
         flu = model.sequences.fluxes.fastaccess
         log = model.sequences.logs.fastaccess
-        quh2 = der.uh2[0] * flu.pr + log.quh2[0]
+        d_quh2 = der.uh2[0] * flu.pr + log.quh2[0]
         for jdx in range(1, len(der.uh2)):
             log.quh2[jdx - 1] = der.uh2[jdx] * flu.pr + log.quh2[jdx]
-        flu.q1 = 0.1 * quh2
-        flu.q9 = 0.9 * quh2
+        flu.q1 = 0.1 * d_quh2
+        flu.q9 = 0.9 * d_quh2
 
             
 class Calc_RoutingStore_V1(modeltools.Method):
@@ -664,7 +733,7 @@ class Calc_RoutingStore_V1(modeltools.Method):
         sta = model.sequences.states.fastaccess
         con = model.parameters.control.fastaccess
         flu.f = con.x2 * (sta.r / con.x3) ** 3.5
-        sta.r = numpy.maximum(0, sta.r + flu.q9 + flu.f)
+        sta.r = max(0, sta.r + flu.q9 + flu.f)
         flu.qr = sta.r * (1 - (1 + (sta.r/con.x3)**4)**(-0.25))
         sta.r = sta.r - flu.qr
         
@@ -753,7 +822,7 @@ class Calc_RoutingStore_V2(modeltools.Method):
         sta = model.sequences.states.fastaccess
         con = model.parameters.control.fastaccess
         flu.f = con.x2 * (sta.r / con.x3 - con.x5)
-        sta.r = numpy.maximum(0, sta.r + flu.q9 + flu.f)
+        sta.r = max(0, sta.r + flu.q9 + flu.f)
         flu.qr = sta.r * (1 - (1 + (sta.r/con.x3)**4)**(-0.25))
         sta.r = sta.r - flu.qr
         
@@ -843,7 +912,7 @@ class Calc_RoutingStore_V3(modeltools.Method):
         sta = model.sequences.states.fastaccess
         con = model.parameters.control.fastaccess
         flu.f = con.x2 * (sta.r / con.x3 - con.x5)
-        sta.r = numpy.maximum(0, sta.r + 0.6 * flu.q9 + flu.f)
+        sta.r = max(0, sta.r + 0.6 * flu.q9 + flu.f)
         flu.qr = sta.r * (1 - (1 + (sta.r/con.x3)**4)**(-0.25))
         sta.r = sta.r - flu.qr
         
@@ -908,18 +977,18 @@ class Calc_ExponentialStore_V3(modeltools.Method):
         sta = model.sequences.states.fastaccess
         con = model.parameters.control.fastaccess
         sta.r2 = sta.r2 + 0.4 * flu.q9 + flu.f
-        ar = sta.r2 / con.x6
-        if ar > 33.:
-            ar = 33.
-        elif ar < -33.:
-            ar = -33.
+        d_ar = sta.r2 / con.x6
+        if d_ar > 33.:
+            d_ar = 33.
+        elif d_ar < -33.:
+            d_ar = -33.
         
-        if ar > 7:
-            flu.qr2 = sta.r2 + con.x6 / numpy.exp(ar)
-        elif ar < -7:
-            flu.qr2 = con.x6 * numpy.exp(ar)
+        if d_ar > 7:
+            flu.qr2 = sta.r2 + con.x6 / modelutils.exp(d_ar)
+        elif d_ar < -7:
+            flu.qr2 = con.x6 * modelutils.exp(d_ar)
         else:
-            flu.qr2 = con.x6*numpy.log(numpy.exp(ar) + 1.)
+            flu.qr2 = con.x6*modelutils.log(modelutils.exp(d_ar) + 1.)
         
         sta.r2 = sta.r2 - flu.qr2
 
@@ -973,7 +1042,7 @@ class Calc_Qd_V1(modeltools.Method):
     @staticmethod
     def __call__(model: modeltools.Model) -> None:
         flu = model.sequences.fluxes.fastaccess
-        flu.qd = numpy.maximum(0, flu.q1 + flu.f)
+        flu.qd = max(0, flu.q1 + flu.f)
         
 class Calc_Qt_V1(modeltools.Method):
     """ Calculate total flow.
@@ -1079,6 +1148,7 @@ class Model(modeltools.AdHocModel):
     INLET_METHODS = ()
     RECEIVER_METHODS = ()
     RUN_METHODS = (
+        Calc_PSnowLayer_V1,
         Calc_En_Pn_V1,
         Calc_Ps_V1,
         Calc_Es_Perc_S_V1,

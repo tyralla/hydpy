@@ -8,6 +8,14 @@ class En(sequencetools.FluxSequence):
     """Net evapotranspiration capacity [mm]."""
     NDIM, NUMERIC = 0, False
 
+class PLayer(sequencetools.FluxSequence):
+    """Rainfall of each snow layer[mm]."""
+    NDIM, NUMERIC = 1, False
+
+class TLayer(sequencetools.FluxSequence):
+    """Mean air temperature of each snow layer [°C]."""
+    NDIM, NUMERIC = 1, False
+
 class Pn(sequencetools.FluxSequence):
     """Net rainfall [mm]."""
     NDIM, NUMERIC = 0, False

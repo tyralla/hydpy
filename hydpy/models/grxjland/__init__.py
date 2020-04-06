@@ -11,5 +11,5 @@ from hydpy.exe.modelimports import *
 from hydpy.models.grxjland.grxjland_model import Model
 
 tester = Tester()
-# cythonizer = Cythonizer()
-# cythonizer.finalise()
+cythonizer = Cythonizer()
+cythonizer.finalise()
